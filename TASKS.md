@@ -12,7 +12,7 @@ Trạng thái: Backlog -> In progress -> Review -> Done. Bị chặn thì chuy�
 | T-002 (ví dụ) | Cài đặt tính năng X theo spec T-001 | Codex | codex/T-002 | src/x.py, tests/test_x.py | Kiểm thử qua, đúng spec |
 
 | T-008 | check_web.py: ép stdout UTF-8 để không lỗi UnicodeEncodeError trên console Windows mặc định | Codex | codex/T-008 | media-marketing/web/check_web.py | Chạy `python -I check_web.py` (không cần -X utf8) qua 6 mục |
-| T-009 | Cân bằng lại chỉ số: thẻ tối ưu cộng dồn vĩnh viễn làm Retention chạm 98%, Conversion 23% ở ván thắng. Cần spec của Claude trước | Codex | codex/T-009 | scripts/sim/*, data/cards.json, data/config.json, tests/* (sẽ chốt trong spec) | Chưa có spec |
+| T-009 | Cân bằng lại: bản demo 10 tuần quá dễ (chỉ quảng cáo thắng 53%), thẻ nâng cấp cộng dồn làm Retention 98%, LTV/CAC 50 đến 100. Spec xong, chờ VU duyệt để giao | Codex | codex/T-009 | game-studio/godot/scripts/sim/*, data/cards.json, events.json, config.json, tests/balance_sim.gd, tests/test_sim.gd | Xem game-studio/godot/docs/SPEC-T-009.md |
 | T-010 | Kịch bản và video quảng cáo 30 giây (nên làm sau T-009 để cảnh thắng không vô lý) | Claude/Codex | chưa chốt | media-marketing/video/* | Chưa có spec |
 
 ## In progress
