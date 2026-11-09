@@ -79,14 +79,17 @@ func play(card_id: String) -> bool:
 		var card: Dictionary = hand[i]
 		if card.id != card_id:
 			continue
-		if state.energy < card.energy or state.base.cash < card.budget:
+		var budget := float(card.budget)
+		if state.week > int(config.weeks.demo):
+			budget *= float(config.economy.get("full_card_cost_multiplier", 1.0))
+		if state.energy < card.energy or state.base.cash < budget:
 			return false
 		state.energy -= int(card.energy)
-		state.base.cash -= float(card.budget)
+		state.base.cash -= budget
 		for event in active_events.duplicate():
 			if card_id in event.definition.revealed_by:
 				event.revealed = true
-			if card_id in event.definition.resolved_by:
+			if event.revealed and card_id in event.definition.resolved_by:
 				var source: int = event.source
 				state.modifiers = state.modifiers.filter(func(e): return e.source != source)
 				active_events.erase(event)
@@ -134,16 +137,17 @@ func finish_week() -> Dictionary:
 	state.base.users = maxf(0, state.base.users - churned + new_users)
 	var revenue: float = state.base.users * state.value("conversion", config) * state.value("arpu", config)
 	var fixed_cost: float = state.value("fixed_cost", config) + config.economy.cost_per_user * state.base.users
+	if state.week > int(config.weeks.demo):
+		fixed_cost *= float(config.economy.get("full_cost_multiplier", 1.0))
 	# Campaign budgets were debited by play(); do not charge ad spend twice.
 	state.base.cash += revenue - fixed_cost
 	state.bad_ratio_weeks = state.bad_ratio_weeks + 1 if state.ratio(config) < config.loss.ratio else 0
 	state.lost = state.base.cash <= config.loss.cash or (state.bad_ratio_weeks >= config.loss.streak and state.base.cash < config.loss.low_cash)
 	if not state.lost and state.week >= horizon:
-		if horizon == int(config.weeks.demo):
-			var requirements: Dictionary = config.get("win", {})
-			state.lost = state.base.cash < float(requirements.get("min_cash", 0))
-			state.lost = state.lost or state.ratio(config) < float(requirements.get("min_ratio", 0))
-			state.lost = state.lost or state.base.users < float(requirements.get("min_users", 0))
+		var requirements: Dictionary = config.get("win", {}).get("demo" if horizon == int(config.weeks.demo) else "full", {})
+		state.lost = state.base.cash < float(requirements.get("min_cash", 0))
+		state.lost = state.lost or state.ratio(config) < float(requirements.get("min_ratio", 0))
+		state.lost = state.lost or state.base.users < float(requirements.get("min_users", 0))
 		state.won = not state.lost
 	return {"new_users":new_users,"churned":churned,"revenue":revenue,"fixed_cost":fixed_cost,"cash":state.base.cash}
 

@@ -14,6 +14,14 @@ func near(actual: float, expected: float, message: String) -> void:
 	check(absf(actual - expected) < 0.00001, message)
 
 func _init() -> void:
+	var ui_fixture := Sim.new(105, {}, 10)
+	while not ui_fixture.state.lost and not ui_fixture.state.won:
+		ui_fixture.begin_week()
+		for id in ui_fixture.config.balance.priorities.balanced:
+			ui_fixture.play(id)
+		ui_fixture.finish_week()
+	print("UI fixture: cash=%.2f users=%.2f ratio=%.2f" % [ui_fixture.state.base.cash, ui_fixture.state.base.users, ui_fixture.state.ratio(ui_fixture.config)])
+	check(ui_fixture.state.won, "original UI policy seed 105 wins demo")
 	var sim := Sim.new(42)
 	sim.begin_week(false)
 	sim.state.base.ad_spend = 1000.0
@@ -23,7 +31,7 @@ func _init() -> void:
 	near(result.churned, 600.0, "churn")
 	near(sim.state.base.users, 466.0066006601, "users")
 	near(result.revenue, 233.0033003300, "revenue")
-	near(result.cash, 6759.7029702970, "cash including variable server cost")
+	near(result.cash, 8159.7029702970, "cash including variable server cost")
 	var a := Sim.new(789)
 	var b := Sim.new(789)
 	while not a.state.lost and not a.state.won:
@@ -135,6 +143,8 @@ func _init() -> void:
 	near(onboarded.state.value("retention", onboarded.config), 0.4, "onboarding prevents influencer penalty")
 	var full := Sim.new(1)
 	full.state.base.cash = 1000000
+	full.config = full.config.duplicate(true)
+	full.config.win = {}
 	for i in int(full.config.weeks.full):
 		full.begin_week(false)
 		full.finish_week()
@@ -155,9 +165,82 @@ func _init() -> void:
 	near(noisy.prediction_multiplier, 1, "A/B consumed by next action")
 	near(a.score(), b.score(), "same seed and actions produce same score")
 	test_balance_rules()
+	test_revealed_resolution()
+	test_full_rules()
 	test_scores()
 	print("test_sim: %d checks, %d failures" % [checks, failures])
 	quit(0 if failures == 0 else 1)
+
+func card_by_id(sim: RefCounted, id: String) -> Dictionary:
+	for card in sim.cards:
+		if card.id == id:
+			return card
+	return {}
+
+func test_revealed_resolution() -> void:
+	for index in 8:
+		for next_week in [false, true]:
+			var sim := Sim.new(901)
+			sim.state.base.cash = 1000000
+			sim.begin_week(false)
+			var definition: Dictionary = sim.events[index]
+			var remedy: String = definition.resolved_by[0]
+			var analysis: String = definition.revealed_by[0]
+			sim.apply_event(definition)
+			sim.hand = [card_by_id(sim, remedy)]
+			check(sim.play(remedy), "hidden remedy remains playable: " + definition.id)
+			check(sim.active_events.size() == 1 and sim.state.resolved == 0, "hidden remedy cannot resolve or score")
+			check(sim.upgrade_plays.get(remedy, 0) == 1, "hidden remedy applies and counts normal card play")
+			if remedy == "onboarding_redesign":
+				near(sim.state.base.retention, 0.55, "hidden remedy retains its own upgrade")
+			sim.state.energy = 3
+			sim.hand = [card_by_id(sim, analysis)]
+			check(sim.play(analysis), "analysis after blind remedy")
+			check(sim.state.resolved == 0 and sim.event_reports()[0].has("root_cause"), "analysis reveals without retroactive resolution")
+			if next_week:
+				sim.finish_week()
+				sim.begin_week(false)
+				check(sim.event_reports()[0].has("root_cause"), "reveal persists across weeks")
+			sim.hand = [card_by_id(sim, remedy)]
+			check(sim.play(remedy), "revealed remedy playable in same or following week")
+			check(sim.active_events.is_empty() and sim.state.resolved == 1, "only valid removal increments resolved")
+			check(sim.state.modifiers.all(func(effect): return effect.source == 0), "resolution removes incident modifiers only")
+			sim.state.energy = 3
+			sim.hand = [card_by_id(sim, remedy)]
+			sim.play(remedy)
+			check(sim.state.resolved == 1, "resolved incident cannot count twice")
+	var expired := Sim.new(901)
+	expired.state.base.cash = 1000000
+	expired.begin_week(false)
+	expired.apply_event(expired.events[0])
+	var end_week: int = expired.active_events[0].end
+	while expired.state.week < end_week:
+		expired.finish_week()
+		expired.begin_week(false)
+	check(expired.active_events.is_empty() and expired.state.resolved == 0, "hidden event expires without resolution credit")
+
+func test_full_rules() -> void:
+	for horizon in [10, 30]:
+		for gate in ["min_cash", "min_ratio", "min_users"]:
+			var sim := Sim.new(42, {}, horizon)
+			sim.config = sim.config.duplicate(true)
+			sim.state.week = horizon - 1
+			sim.state.base.cash = 1000000
+			var key := "demo" if horizon == 10 else "full"
+			sim.config.win[key][gate] = 1000000000
+			sim.begin_week(false)
+			sim.finish_week()
+			check(sim.state.lost and not sim.state.won, "independent horizon gate: " + key + "/" + gate)
+	var full := Sim.new(42)
+	full.state.week = 10
+	full.begin_week(false)
+	full.hand = [full.cards[7]]
+	var cash_before: float = full.state.base.cash
+	check(full.play("ads_campaign"), "full campaign playable")
+	near(cash_before - full.state.base.cash, full.cards[7].budget * full.config.economy.full_card_cost_multiplier, "full card cost multiplier charged once")
+	var settlement := full.finish_week()
+	near(settlement.fixed_cost, (full.state.value("fixed_cost", full.config) + full.config.economy.cost_per_user * full.state.base.users) * full.config.economy.full_cost_multiplier, "full operating cost multiplier")
+	near(settlement.cash, cash_before - full.cards[7].budget * full.config.economy.full_card_cost_multiplier + settlement.revenue - settlement.fixed_cost, "full campaign not charged again during settlement")
 
 func test_balance_rules() -> void:
 	var sim := Sim.new(42)
@@ -182,6 +265,9 @@ func test_balance_rules() -> void:
 	near(sim.upgrade_plays.onboarding_redesign, 3, "rejected upgrade not counted")
 	sim.state.energy = 3
 	sim.apply_event(sim.events[0])
+	sim.hand = [sim.cards[0], sim.cards[5]]
+	sim.play("sql_deep_dive")
+	sim.state.energy = 3
 	check(sim.play("onboarding_redesign"), "repeated upgrade can still resolve")
 	check(sim.active_events.is_empty() and sim.state.resolved == 1, "diminishing does not weaken resolution")
 	for stat in ["retention", "conversion", "cac", "fixed_cost"]:
@@ -198,7 +284,7 @@ func test_balance_rules() -> void:
 		demo.state.base.users = 1000
 		demo.state.base.retention = 0.75
 		if failed_gate != "none":
-			demo.config.win[failed_gate] = 1000000000
+			demo.config.win.demo[failed_gate] = 1000000000
 		demo.begin_week(false)
 		demo.finish_week()
 		check(demo.state.won == (failed_gate == "none"), "demo final gate " + failed_gate)
