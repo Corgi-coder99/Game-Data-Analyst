@@ -13,7 +13,9 @@ Trạng thái: Backlog -> In progress -> Review -> Done. Bị chặn thì chuy�
 
 ## In progress
 
-(chưa có)
+| ID | Việc | Owner | Nhánh | File được sửa | Tiêu chí hoàn thành |
+|---|---|---|---|---|---|
+| T-007 | Landing page trung thực cho Data Corp (HTML/CSS tĩnh, không CDN, không form) | Codex | codex/T-007 | media-marketing/web/index.html, style.css, check_web.py | Xem media-marketing/web/SPEC-T-007.md |
 
 ## Review
 
