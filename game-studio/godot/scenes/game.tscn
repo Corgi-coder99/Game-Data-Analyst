@@ -1,7 +1,6 @@
-[gd_scene load_steps=2 format=3]
-
+[gd_scene load_steps=3 format=3]
 [ext_resource type="Script" path="res://scripts/ui/game_controller.gd" id="1"]
-
+[ext_resource type="Script" path="res://scripts/ui/metric_chart.gd" id="2"]
 [node name="Game" type="PanelContainer"]
 anchors_preset = 15
 anchor_right = 1.0
@@ -9,32 +8,60 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1")
-
 [node name="Layout" type="VBoxContainer" parent="."]
 layout_mode = 2
-
+theme_override_constants/separation = 3
 [node name="Top" type="HBoxContainer" parent="Layout"]
 layout_mode = 2
-
 [node name="HUD" type="Label" parent="Layout/Top"]
 layout_mode = 2
 size_flags_horizontal = 3
-
 [node name="FinishWeek" type="Button" parent="Layout/Top"]
 layout_mode = 2
-
-[node name="Metrics" type="Label" parent="Layout"]
+[node name="Body" type="HBoxContainer" parent="Layout"]
 layout_mode = 2
 size_flags_vertical = 3
-
+[node name="Dashboard" type="VBoxContainer" parent="Layout/Body"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 1.15
+[node name="Metrics" type="GridContainer" parent="Layout/Body/Dashboard"]
+layout_mode = 2
+columns = 4
+[node name="Warning" type="Label" parent="Layout/Body/Dashboard"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+[node name="ChartTitle" type="Label" parent="Layout/Body/Dashboard"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+[node name="Chart" type="Control" parent="Layout/Body/Dashboard"]
+custom_minimum_size = Vector2(0, 45)
+layout_mode = 2
+size_flags_vertical = 3
+script = ExtResource("2")
+[node name="Details" type="VBoxContainer" parent="Layout/Body"]
+layout_mode = 2
+size_flags_horizontal = 3
+[node name="EventsTitle" type="Label" parent="Layout/Body/Details"]
+layout_mode = 2
+[node name="EventScroll" type="ScrollContainer" parent="Layout/Body/Details"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+[node name="Events" type="Label" parent="Layout/Body/Details/EventScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+autowrap_mode = 2
+theme_override_font_sizes/font_size = 12
+[node name="Journal" type="Label" parent="Layout/Body/Details"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
 [node name="Status" type="Label" parent="Layout"]
 layout_mode = 2
-autowrap_mode = 2
-
+theme_override_font_sizes/font_size = 11
 [node name="Hand" type="HBoxContainer" parent="Layout"]
 layout_mode = 2
 alignment = 1
-
 [node name="End" type="Label" parent="."]
 visible = false
 layout_mode = 2

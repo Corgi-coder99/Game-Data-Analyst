@@ -2,27 +2,58 @@ extends PanelContainer
 
 const Sim = preload("res://scripts/sim/simulation.gd")
 const Loader = preload("res://scripts/data.gd")
+const Palette = preload("res://scripts/ui/palette.gd")
+const LOW_INTEGRITY_THRESHOLD := 60.0
+const METRICS := ["users", "retention", "conversion", "cac", "arpu", "ratio", "integrity"]
 var simulation: RefCounted
 var strings: Dictionary
 var displayed_report: Dictionary
+var history: Array = []
+var previous_week: Dictionary = {}
+var selected_metric := "users"
 var ended := false
+@onready var dashboard = $Layout/Body/Dashboard
+@onready var details = $Layout/Body/Details
 
 func _ready() -> void:
-	preload("res://scripts/ui/palette.gd").apply_to(self)
+	Palette.apply_to(self)
 	strings = Loader.load_json("res://data/strings.json")
 	$Layout/Top/FinishWeek.text = strings.finish_week
 	$Layout/Top/FinishWeek.pressed.connect(finish_week)
+	details.get_node("EventsTitle").text = strings.events_title
+	for metric in METRICS:
+		var button := Button.new()
+		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		button.add_theme_font_size_override("font_size", 11)
+		button.pressed.connect(select_metric.bind(metric))
+		dashboard.get_node("Metrics").add_child(button)
 	start_game()
 
 func start_game(seed_value: int = -1) -> void:
 	var config: Dictionary = Loader.load_json("res://data/config.json")
 	simulation = Sim.new(int(Time.get_ticks_usec()) if seed_value < 0 else seed_value, {}, int(config.weeks.demo))
 	ended = false
+	history.clear()
+	previous_week.clear()
+	selected_metric = "users"
 	$End.hide()
 	$Layout.show()
 	$Layout/Status.text = ""
+	details.get_node("Journal").text = strings.no_journal
 	simulation.begin_week()
 	refresh()
+
+func _input(event: InputEvent) -> void:
+	if ended or not event is InputEventKey or not event.pressed or event.echo:
+		return
+	if event.keycode >= KEY_1 and event.keycode <= KEY_4:
+		var index: int = event.keycode - KEY_1
+		if index < simulation.hand.size():
+			play_card(str(simulation.hand[index].id))
+		get_viewport().set_input_as_handled()
+	elif event.keycode == KEY_ENTER or event.keycode == KEY_KP_ENTER:
+		finish_week()
+		get_viewport().set_input_as_handled()
 
 func play_card(card_id: String) -> bool:
 	if ended:
@@ -31,11 +62,22 @@ func play_card(card_id: String) -> bool:
 	$Layout/Status.text = "" if accepted else strings.rejected
 	if accepted:
 		refresh()
+		$Layout/Top/HUD.modulate = Palette.SELECTED
+		create_tween().tween_property($Layout/Top/HUD, "modulate", Palette.TEXT, 0.2)
 	return accepted
 
 func finish_week() -> void:
 	if ended:
 		return
+	# Freeze the last observed report for next week's arrows and journal estimates.
+	previous_week = displayed_report.duplicate(true)
+	var r := previous_week
+	var economy: Dictionary = simulation.config.economy
+	var effective_cac: float = r.cac * (1.0 + economy.ad_diminishing * r.ad_spend / economy.ad_unit)
+	var acquired: float = r.ad_spend / maxf(0.001, effective_cac)
+	var churned: float = r.users * (1.0 - r.retention)
+	var users_after: float = maxf(0, r.users - churned + acquired)
+	details.get_node("Journal").text = strings.journal % [simulation.state.week, acquired, churned, users_after * r.conversion * r.arpu, r.fixed_cost + economy.cost_per_user * users_after]
 	simulation.finish_week()
 	if simulation.state.lost or simulation.state.won:
 		ended = true
@@ -47,20 +89,69 @@ func finish_week() -> void:
 	$Layout/Status.text = ""
 	refresh()
 
+func metric_value(report: Dictionary, metric: String) -> float:
+	if metric == "ratio":
+		return report.arpu / maxf(float(simulation.config.economy.churn_floor), 1.0 - float(report.retention)) / maxf(0.001, float(report.cac))
+	return float(report[metric])
+
+func select_metric(metric: String) -> void:
+	selected_metric = metric
+	var samples: Array = []
+	for snapshot in history:
+		samples.append(metric_value(snapshot.report, metric))
+	dashboard.get_node("Chart").set_values(samples)
+	var low: float = samples.min() if not samples.is_empty() else 0.0
+	var high: float = samples.max() if not samples.is_empty() else 0.0
+	dashboard.get_node("ChartTitle").text = strings.chart % [strings.metric_names[metric], low, high]
+	for i in METRICS.size():
+		dashboard.get_node("Metrics").get_child(i).modulate = Palette.SELECTED if METRICS[i] == metric else Palette.TEXT
+
 func refresh() -> void:
 	displayed_report = simulation.report()
 	var r := displayed_report
-	$Layout/Top/HUD.text = strings.hud % [simulation.state.week, simulation.horizon, r.cash, simulation.state.energy]
-	# Derive the ratio only from observed metrics, using the economy's churn floor.
-	var ratio: float = r.arpu / maxf(float(simulation.config.economy.churn_floor), 1.0 - float(r.retention)) / maxf(0.001, float(r.cac))
-	$Layout/Metrics.text = strings.metrics % [r.users, r.retention * 100.0, r.conversion * 100.0, r.cac, r.arpu, ratio, r.integrity]
+	history.append({"week": simulation.state.week, "report": r.duplicate(true)})
+	var energy := ""
+	for i in int(simulation.config.energy):
+		energy += strings.energy_full if i < simulation.state.energy else strings.energy_empty
+	$Layout/Top/HUD.text = strings.dashboard_hud % [simulation.state.week, simulation.horizon, r.cash, energy]
+	var uncertain: bool = r.integrity < LOW_INTEGRITY_THRESHOLD
+	dashboard.get_node("Warning").text = strings.integrity_warning if uncertain else ""
+	for i in METRICS.size():
+		var metric: String = METRICS[i]
+		var value := metric_value(r, metric)
+		var arrow: String = strings.arrow_flat
+		if not previous_week.is_empty():
+			var delta := value - metric_value(previous_week, metric)
+			arrow = strings.arrow_up if delta > 0.001 else (strings.arrow_down if delta < -0.001 else strings.arrow_flat)
+		var format_string: String = strings.metric_formats[metric]
+		var scaled := value * 100.0 if metric in ["retention", "conversion"] else value
+		dashboard.get_node("Metrics").get_child(i).text = strings.metric_tile % [strings.metric_names[metric], format_string % scaled, arrow, strings.uncertain if uncertain else ""]
+	select_metric(selected_metric)
+	var event_lines := PackedStringArray()
+	for event in simulation.event_reports():
+		event_lines.append(strings.symptom % event.symptom)
+		if event.has("root_cause"):
+			event_lines.append(strings.root_cause % event.root_cause)
+	details.get_node("EventScroll/Events").text = strings.no_events if event_lines.is_empty() else "\n".join(event_lines)
 	for child in $Layout/Hand.get_children():
 		$Layout/Hand.remove_child(child)
 		child.queue_free()
+	var index := 0
 	for card in simulation.hand:
+		index += 1
 		var button := Button.new()
+		button.custom_minimum_size = Vector2(0, 75)
 		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		button.text = strings.card % [strings.cards[card.id], card.budget, card.energy]
+		button.clip_text = true
+		button.add_theme_font_size_override("font_size", 11)
+		button.text = strings.dashboard_card % [index, strings.cards[card.id], strings.categories[card.category], card.budget, card.energy, strings.card_short[card.id]]
+		button.tooltip_text = strings.card_detail % [strings.cards[card.id], card.budget, card.energy, strings.card_details[card.id]]
+		var style := StyleBoxFlat.new()
+		style.bg_color = Palette.ACCENT
+		style.border_color = Palette.CATEGORIES[card.category]
+		style.set_border_width_all(2)
+		button.add_theme_stylebox_override("normal", style)
+		button.add_theme_stylebox_override("disabled", style)
 		button.disabled = r.cash < card.budget or simulation.state.energy < card.energy
 		button.modulate.a = 0.4 if button.disabled else 1.0
 		button.pressed.connect(play_card.bind(str(card.id)))
