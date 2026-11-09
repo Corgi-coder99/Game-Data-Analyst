@@ -39,5 +39,6 @@ File được sửa: `scenes/game.tscn`, `scripts/ui/*`, `data/strings.json`, `t
 - Chỉ màn này được đọc `state.base` / `state.value()`.
 - Kiểm tra hiển thị tiếng Việt, chữ không bị cắt; bổ sung `assets/CREDITS.md` nếu dùng font ngoài.
 - Mở rộng `tests/test_ui.gd` cho cả hai nhánh thắng và thua.
+- Bổ sung vào biểu đồ (`scripts/ui/metric_chart.gd`): nhãn trục dọc (giá trị nhỏ nhất, lớn nhất) và nhãn trục ngang (số tuần). Khi mới có 1 điểm dữ liệu thì hiện điểm kèm nhãn, không để trống.
 
 File được sửa: `scenes/end.tscn`, `scenes/game.tscn` (chỉ phần chuyển màn), `scripts/ui/*`, `data/strings.json`, `assets/CREDITS.md`, `tests/test_ui.gd`.
