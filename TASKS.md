@@ -15,11 +15,14 @@ Trạng thái: Backlog -> In progress -> Review -> Done. Bị chặn thì chuy�
 
 | ID | Việc | Owner | Nhánh | File được sửa | Tiêu chí hoàn thành |
 |---|---|---|---|---|---|
-| T-005c | Giao diện: màn kết thúc, nhãn trục biểu đồ, hoàn thiện (T-005b đã xong) | Codex | codex/T-005c | game-studio/godot/scenes/end.tscn, scenes/game.tscn, scripts/ui/*, data/strings.json, assets/CREDITS.md, tests/test_ui.gd | Xem game-studio/godot/docs/SPEC-T-005-split.md |
+
+(chưa có)
 
 ## Review
 
-(chưa có)
+| ID | Việc | Owner | Nhánh | File được sửa | Tiêu chí hoàn thành |
+|---|---|---|---|---|---|
+| T-005c | Giao diện: màn kết thúc, nhãn trục biểu đồ, hoàn thiện (T-005b đã xong) | Codex | codex/T-005c | game-studio/godot/scenes/end.tscn, scenes/game.tscn, scripts/ui/*, data/strings.json, assets/CREDITS.md, tests/test_ui.gd | Xem game-studio/godot/docs/SPEC-T-005-split.md |
 
 ## Done
 
@@ -35,6 +38,15 @@ Trạng thái: Backlog -> In progress -> Review -> Done. Bị chặn thì chuy�
 (chưa có)
 
 ## Ghi chú bàn giao
+
+### T-005c | Codex | 2026-11-09 | Review
+
+- Đã nhận: owner Codex/In progress có sẵn khi bắt đầu; nhánh codex/T-005c cùng HEAD master (6d1699c), cây làm việc ban đầu sạch.
+- Đã làm: màn kết thúc riêng thắng/thua, điểm, số sự kiện xử lý đúng, bảng 8 chỉ số thực/đã thấy, nút Chơi lại/Về tiêu đề; chỉ end_screen đọc chỉ số thực. Biểu đồ có min/max, nhãn tuần, đơn vị phần trăm, một điểm kèm nhãn; giữ mọi report và tránh nhãn tuần chồng nhau.
+- File đổi (dưới game-studio/godot/): scenes/end.tscn (mới), scenes/game.tscn (bỏ nhãn kết thúc tạm), scripts/ui/end_screen.gd (mới), scripts/ui/game_controller.gd, scripts/ui/metric_chart.gd, data/strings.json, tests/test_ui.gd; TASKS.md cho bàn giao. Không sửa sim hoặc ba JSON lõi.
+- Kiểm tra thực tế: Godot console 4.7.2, --headless --path game-studio/godot --script res://tests/<script>. test_ui.gd: 106 checks, 0 failures (thắng/thua, điểm, bảng thật/báo cáo, replay, về tiêu đề, kích thước bảng và glyph tiếng Việt); test_sim.gd: 118 checks, 0 failures; balance_sim.gd: 2.000 ván/chiến lược, balanced 40,85%, các baseline khác giữ nguyên; cả ba exit 0. git diff --check qua. Console vẫn báo Failed to open log file for writing và Failed to read the root certificate store; không lỗi script. Không chụp ảnh; chưa review trực quan bằng mắt, Claude cần xem khi review.
+- Tự quyết: so số thực sau tuần kết thúc với report cuối người chơi đã thấy trước khi kết thúc tuần, ghi rõ chênh lệch gồm nhiễu và diễn biến tuần cuối; không gọi report mới khi kết thúc. Dùng font mặc định Godot, không thêm font ngoài nên không cần CREDITS.md. Nhánh thua dùng fixture tiền âm qua apply_effect() công khai vì seed 105 không hành động vẫn thắng; không đổi dữ liệu mô phỏng.
+- Git: git add bị `fatal: Unable to create 'D:/Dev/ai-company/.git/worktrees/ai-company-codex/index.lock': Permission denied`. Chưa commit; để nguyên file trong worktree, không vượt sandbox, không push, không merge.
 
 Mỗi việc xong thì thêm một mục theo mẫu:
 

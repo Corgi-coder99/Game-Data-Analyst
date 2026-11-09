@@ -93,5 +93,23 @@
     "loyalty_program": "Retention +8 điểm phần trăm và chi phí +80 mỗi tuần trong 4 tuần; xử lý phản ứng giá hoặc đối thủ giảm giá.",
     "seo_content": "CAC giảm 0,8 sau 2 tuần; xử lý đổi xu hướng.",
     "discount": "Conversion +1,5 điểm phần trăm, ARPU -5 trong 3 tuần; xử lý phản ứng giá hoặc đối thủ giảm giá."
-  }
+  },
+  "truth_names": {
+    "ratio": "LTV/CAC",
+    "cash": "Tiền mặt",
+    "cac": "CAC",
+    "users": "Người dùng",
+    "retention": "Tỷ lệ giữ chân",
+    "conversion": "Tỷ lệ chuyển đổi",
+    "integrity": "Độ tin cậy dữ liệu",
+    "arpu": "ARPU"
+  },
+  "replay": "Chơi lại",
+  "truth_explanation": "Bảng sự thật: số thực sau tuần cuối so với báo cáo cuối đã thấy trước khi kết thúc tuần. Chênh lệch gồm nhiễu và diễn biến tuần cuối.",
+  "truth_seen": "Đã thấy trên bảng",
+  "back_to_title": "Về tiêu đề",
+  "truth_metric": "Chỉ số",
+  "resolved_events": "Sự kiện xử lý đúng: %d",
+  "chart_week": "Tuần %d",
+  "truth_actual": "Thực khi kết thúc"
 }

@@ -36,7 +36,10 @@ func start_game(seed_value: int = -1) -> void:
 	history.clear()
 	previous_week.clear()
 	selected_metric = "users"
-	$End.hide()
+	if has_node("End"):
+		var old_end = get_node("End")
+		remove_child(old_end)
+		old_end.queue_free()
 	$Layout.show()
 	$Layout/Status.text = ""
 	details.get_node("Journal").text = strings.no_journal
@@ -82,8 +85,10 @@ func finish_week() -> void:
 	if simulation.state.lost or simulation.state.won:
 		ended = true
 		$Layout.hide()
-		$End.text = strings.end % [strings.won if simulation.state.won else strings.lost, simulation.score()]
-		$End.show()
+		var end_screen = load("res://scenes/end.tscn").instantiate()
+		add_child(end_screen)
+		end_screen.show_result(simulation, displayed_report)
+		end_screen.replay_requested.connect(start_game)
 		return
 	simulation.begin_week()
 	$Layout/Status.text = ""
@@ -97,9 +102,11 @@ func metric_value(report: Dictionary, metric: String) -> float:
 func select_metric(metric: String) -> void:
 	selected_metric = metric
 	var samples: Array = []
+	var weeks: Array = []
 	for snapshot in history:
 		samples.append(metric_value(snapshot.report, metric))
-	dashboard.get_node("Chart").set_values(samples)
+		weeks.append(snapshot.week)
+	dashboard.get_node("Chart").set_values(samples, weeks, strings.chart_week, strings.metric_formats[metric], 100.0 if metric in ["retention", "conversion"] else 1.0)
 	var low: float = samples.min() if not samples.is_empty() else 0.0
 	var high: float = samples.max() if not samples.is_empty() else 0.0
 	dashboard.get_node("ChartTitle").text = strings.chart % [strings.metric_names[metric], low, high]
