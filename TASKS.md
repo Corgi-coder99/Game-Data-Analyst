@@ -15,11 +15,14 @@ Trạng thái: Backlog -> In progress -> Review -> Done. Bị chặn thì chuy�
 
 | ID | Việc | Owner | Nhánh | File được sửa | Tiêu chí hoàn thành |
 |---|---|---|---|---|---|
-| T-007 | Landing page trung thực cho Data Corp (HTML/CSS tĩnh, không CDN, không form) | Codex | codex/T-007 | media-marketing/web/index.html, style.css, check_web.py | Xem media-marketing/web/SPEC-T-007.md |
+
+(chưa có)
 
 ## Review
 
-(chưa có)
+| ID | Việc | Owner | Nhánh | File được sửa | Tiêu chí hoàn thành |
+|---|---|---|---|---|---|
+| T-007 | Landing page trung thực cho Data Corp (HTML/CSS tĩnh, không CDN, không form) | Codex | codex/T-007 | media-marketing/web/index.html, style.css, check_web.py | Xem media-marketing/web/SPEC-T-007.md; cần chạy kiểm thử khi Python được phép thực thi |
 
 ## Done
 
@@ -37,6 +40,16 @@ Trạng thái: Backlog -> In progress -> Review -> Done. Bị chặn thì chuy�
 (chưa có)
 
 ## Ghi chú bàn giao
+
+### T-007 | Codex | 2026-11-10 | Review
+
+- Đã nhận: owner Codex/In progress có sẵn, nhánh codex/T-007, master là tổ tiên HEAD; cây làm việc ban đầu sạch.
+- Đã làm: landing page HTML/CSS thuần với đủ 9 mục, nội dung nguyên văn theo spec, metadata, liên kết neo, font hệ thống, responsive, focus bàn phím và reduced motion. Không form, JavaScript hay tài nguyên ngoài; không sửa assets. Script kiểm tra 6 mục bằng thư viện chuẩn, đối chiếu số liệu từ nguồn game và thoát khác 0 khi FAIL.
+- File đổi: media-marketing/web/index.html, media-marketing/web/style.css, media-marketing/web/check_web.py; TASKS.md cho bàn giao/trạng thái.
+- Kiểm tra: git diff --check qua. PNG đọc header được 640x360; CSS giới hạn 1280px và pixelated. Chưa kiểm tra bằng trình duyệt, không chụp ảnh; Claude cần xem 360px/1280px và console khi review.
+- Chưa có kết quả PASS/FAIL thực tế của check_web.py: cả 6 mục (tài nguyên, 9 mục, ảnh/alt, số liệu, nội dung cấm/form, metadata) chưa chạy được. Worktree không có .venv. Đã thử `& D:\Dev\ai-company\.venv\Scripts\python.exe media-marketing\web\check_web.py`, báo Access is denied; Python gốc ghi trong pyvenv.cfg cũng bị Access is denied. Không thay quyền hay vượt sandbox. Chạy lại lệnh trên khi môi trường cho phép; chưa xác nhận tiêu chí toàn PASS.
+- Tự quyết: bố cục tối, màu nhấn phụ #a9dec9, ảnh giữ tỷ lệ gốc, các khối chuyển cột theo chiều rộng. Nhãn mục lấy từ spec; alt mô tả tuần 4/10, nguyên nhân đã lộ, biểu đồ Users. Spec vừa cấm “bảng xếp hạng” vừa bắt buộc liệt kê trong “Chưa có”: giữ đúng nội dung bắt buộc, checker chỉ miễn trừ đúng dòng li này trong #not-yet; mọi ngữ cảnh khác vẫn cấm. Không thêm tuyên bố mới.
+- Git: git add bị `fatal: Unable to create 'D:/Dev/ai-company/.git/worktrees/ai-company-codex/index.lock': Permission denied`. Để nguyên file chưa commit trong worktree; không vượt sandbox, không push, không merge.
 
 ### T-005c | Codex | 2026-11-09 | Review
 
