@@ -10,12 +10,13 @@ Trạng thái: Backlog -> In progress -> Review -> Done. Bị chặn thì chuy�
 |---|---|---|---|---|---|
 | T-001 (ví dụ) | Viết spec tính năng X | Claude | claude/T-001 | docs/spec-x.md | Spec có mô tả, đầu vào, đầu ra, ví dụ |
 | T-002 (ví dụ) | Cài đặt tính năng X theo spec T-001 | Codex | codex/T-002 | src/x.py, tests/test_x.py | Kiểm thử qua, đúng spec |
-| T-005b | Giao diện: dashboard đầy đủ (T-005a đã xong, sẵn sàng giao) | Codex | codex/T-005b | game-studio/godot/scenes/game.tscn, scripts/ui/*, data/strings.json, tests/test_ui.gd | Xem game-studio/godot/docs/SPEC-T-005-split.md |
 | T-005c | Giao diện: màn kết thúc, hoàn thiện (chỉ giao sau khi T-005b xong) | Codex | codex/T-005c | game-studio/godot/scenes/end.tscn, scenes/game.tscn, scripts/ui/*, data/strings.json, assets/CREDITS.md, tests/test_ui.gd | Xem game-studio/godot/docs/SPEC-T-005-split.md |
 
 ## In progress
 
-(chưa có)
+| ID | Việc | Owner | Nhánh | File được sửa | Tiêu chí hoàn thành |
+|---|---|---|---|---|---|
+| T-005b | Giao diện: dashboard đầy đủ (T-005a đã xong) | Codex | codex/T-005b | game-studio/godot/scenes/game.tscn, scripts/ui/*, data/strings.json, tests/test_ui.gd | Xem game-studio/godot/docs/SPEC-T-005-split.md |
 
 ## Review
 
