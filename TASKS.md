@@ -17,7 +17,9 @@ Trạng thái: Backlog -> In progress -> Review -> Done. Bị chặn thì chuy�
 
 ## Review
 
-(chưa có)
+| ID | Việc | Owner | Nhánh | File được sửa | Tiêu chí hoàn thành |
+|---|---|---|---|---|---|
+| T-003 | Viết GDD Data Corp | Claude | master | game-studio/godot/docs/GDD.md | GDD có vòng chơi, chỉ số, công thức, thẻ, sự kiện, phạm vi demo; VU duyệt |
 
 ## Done
 
