@@ -13,6 +13,7 @@ var hand: Array = []
 var active_events: Array = []
 var prediction_multiplier := 1.0
 var next_source := 0
+var upgrade_plays: Dictionary = {}
 var horizon: int
 
 func _init(seed_value: int = 0, data: Dictionary = {}, weeks: int = 0) -> void:
@@ -91,7 +92,11 @@ func play(card_id: String) -> bool:
 				active_events.erase(event)
 				state.resolved += 1
 		for effect in card.effects:
-			apply_effect(effect, 0)
+			var scaled: Dictionary = effect.duplicate(true)
+			if card.get("diminishing", false):
+				scaled.add = float(effect.add) * pow(0.5, upgrade_plays.get(card_id, 0))
+			apply_effect(scaled, 0)
+		upgrade_plays[card_id] = upgrade_plays.get(card_id, 0) + 1
 		if card.has("sets_flag"):
 			state.flags[card.sets_flag] = true
 		prediction_multiplier = float(card.get("prediction_multiplier", 1.0))
@@ -133,7 +138,13 @@ func finish_week() -> Dictionary:
 	state.base.cash += revenue - fixed_cost
 	state.bad_ratio_weeks = state.bad_ratio_weeks + 1 if state.ratio(config) < config.loss.ratio else 0
 	state.lost = state.base.cash <= config.loss.cash or (state.bad_ratio_weeks >= config.loss.streak and state.base.cash < config.loss.low_cash)
-	state.won = not state.lost and state.week >= horizon
+	if not state.lost and state.week >= horizon:
+		if horizon == int(config.weeks.demo):
+			var requirements: Dictionary = config.get("win", {})
+			state.lost = state.base.cash < float(requirements.get("min_cash", 0))
+			state.lost = state.lost or state.ratio(config) < float(requirements.get("min_ratio", 0))
+			state.lost = state.lost or state.base.users < float(requirements.get("min_users", 0))
+		state.won = not state.lost
 	return {"new_users":new_users,"churned":churned,"revenue":revenue,"fixed_cost":fixed_cost,"cash":state.base.cash}
 
 func score() -> float:
