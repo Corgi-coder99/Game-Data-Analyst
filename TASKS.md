@@ -11,18 +11,15 @@ Trạng thái: Backlog -> In progress -> Review -> Done. Bị chặn thì chuy�
 | T-001 (ví dụ) | Viết spec tính năng X | Claude | claude/T-001 | docs/spec-x.md | Spec có mô tả, đầu vào, đầu ra, ví dụ |
 | T-002 (ví dụ) | Cài đặt tính năng X theo spec T-001 | Codex | codex/T-002 | src/x.py, tests/test_x.py | Kiểm thử qua, đúng spec |
 
-## In progress
+| T-006 | Sửa công thức điểm: giới hạn LTV/CAC khi tính điểm, ván thua điểm thấp hơn ván thắng (ván thua Cash -444 hiện được 6.598 điểm vì LTV/CAC 70). Cần spec trước khi giao | Codex | codex/T-006 | game-studio/godot/scripts/sim/simulation.gd, data/config.json, tests/test_sim.gd | Chưa có spec |
 
-| ID | Việc | Owner | Nhánh | File được sửa | Tiêu chí hoàn thành |
-|---|---|---|---|---|---|
+## In progress
 
 (chưa có)
 
 ## Review
 
-| ID | Việc | Owner | Nhánh | File được sửa | Tiêu chí hoàn thành |
-|---|---|---|---|---|---|
-| T-005c | Giao diện: màn kết thúc, nhãn trục biểu đồ, hoàn thiện (T-005b đã xong) | Codex | codex/T-005c | game-studio/godot/scenes/end.tscn, scenes/game.tscn, scripts/ui/*, data/strings.json, assets/CREDITS.md, tests/test_ui.gd | Xem game-studio/godot/docs/SPEC-T-005-split.md |
+(chưa có)
 
 ## Done
 
@@ -32,6 +29,7 @@ Trạng thái: Backlog -> In progress -> Review -> Done. Bị chặn thì chuy�
 | T-004 | Lõi mô phỏng Data Corp + balance_sim headless (Codex). Claude đã review, VU duyệt merge vào master | Codex | 2026-11-09 |
 | T-005a | Giao diện: khung và vòng tuần (Codex). Claude đã review, VU duyệt merge vào master | Codex | 2026-11-09 |
 | T-005b | Giao diện: dashboard đầy đủ (Codex). Claude đã review, VU duyệt merge vào master | Codex | 2026-11-09 |
+| T-005c | Giao diện: màn kết thúc, nhãn trục biểu đồ (Codex). Claude đã review, VU duyệt merge vào master | Codex | 2026-11-09 |
 
 ## Blocked
 
