@@ -10,6 +10,7 @@ Trạng thái: Backlog -> In progress -> Review -> Done. Bị chặn thì chuy�
 |---|---|---|---|---|---|
 | T-001 (ví dụ) | Viết spec tính năng X | Claude | claude/T-001 | docs/spec-x.md | Spec có mô tả, đầu vào, đầu ra, ví dụ |
 | T-002 (ví dụ) | Cài đặt tính năng X theo spec T-001 | Codex | codex/T-002 | src/x.py, tests/test_x.py | Kiểm thử qua, đúng spec |
+| T-005 | Giao diện game Data Corp (bản demo 10 tuần). Spec xong, chờ VU duyệt để giao | Codex | codex/T-005 | game-studio/godot/scenes/*, scripts/ui/*, assets/*, data/strings.json, tests/test_ui.gd, 1 dòng run/main_scene trong project.godot | Xem game-studio/godot/docs/SPEC-T-005.md |
 
 ## In progress
 
