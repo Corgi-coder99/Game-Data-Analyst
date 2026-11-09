@@ -13,22 +13,18 @@ Trạng thái: Backlog -> In progress -> Review -> Done. Bị chặn thì chuy�
 
 ## In progress
 
-| ID | Việc | Owner | Nhánh | File được sửa | Tiêu chí hoàn thành |
-|---|---|---|---|---|---|
-
 (chưa có)
 
 ## Review
 
-| ID | Việc | Owner | Nhánh | File được sửa | Tiêu chí hoàn thành |
-|---|---|---|---|---|---|
-| T-004 | Lõi mô phỏng Data Corp + balance_sim headless | Codex | codex/T-004 | game-studio/godot/data/*.json, game-studio/godot/scripts/sim/*, game-studio/godot/tests/*, game-studio/godot/scripts/data.gd | Xem game-studio/godot/docs/SPEC-T-004.md |
+(chưa có)
 
 ## Done
 
 | ID | Việc | Owner | Ngày |
 |---|---|---|---|
 | T-003 | Viết GDD Data Corp (game-studio/godot/docs/GDD.md), VU đã duyệt | Claude | 2026-11-09 |
+| T-004 | Lõi mô phỏng Data Corp + balance_sim headless (Codex). Claude đã review, VU duyệt merge vào master | Codex | 2026-11-09 |
 
 ## Blocked
 
