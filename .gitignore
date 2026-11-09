@@ -1,4 +1,5 @@
 .venv/
 __pycache__/
 *.pyc
-game-studio/
+game-studio/*
+!game-studio/godot/
