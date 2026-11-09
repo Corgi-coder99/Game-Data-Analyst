@@ -1,0 +1,14 @@
+{"cards":[
+ {"id":"sql_deep_dive","name":"SQL Deep-Dive","category":"analysis","budget":50,"energy":1,"effects":[],"reveals":["app_bug","competitor_discount","logging_error","bad_traffic"]},
+ {"id":"ab_test","name":"A/B Test","category":"analysis","budget":100,"energy":1,"effects":[],"prediction_multiplier":0.1,"reveals":["trend_shift","price_fatigue"]},
+ {"id":"funnel_report","name":"Funnel Report","category":"analysis","budget":50,"energy":1,"effects":[],"reveals":["checkout_outage","server_outage"]},
+ {"id":"clean_data","name":"Clean Data","category":"analysis","budget":100,"energy":1,"effects":[{"stat":"integrity","add":25}]},
+ {"id":"fix_checkout_bug","name":"Fix Checkout Bug","category":"optimization","budget":250,"energy":1,"effects":[{"stat":"conversion","add":0.042}]},
+ {"id":"onboarding_redesign","name":"Onboarding Redesign","category":"optimization","budget":300,"energy":1,"effects":[{"stat":"retention","add":0.25}],"sets_flag":"onboarding"},
+ {"id":"support_automation","name":"Support Automation","category":"optimization","budget":250,"energy":1,"effects":[{"stat":"fixed_cost","add":-100}]},
+ {"id":"ads_campaign","name":"Ads Campaign","category":"growth","budget":700,"energy":1,"effects":[{"stat":"ad_spend","add":700}]},
+ {"id":"influencer_campaign","name":"Influencer Campaign","category":"growth","budget":1000,"energy":2,"effects":[{"stat":"users","add":200},{"stat":"retention","add":-0.12,"duration":3,"unless_flag":"onboarding"}]},
+ {"id":"loyalty_program","name":"Loyalty Program","category":"growth","budget":150,"energy":1,"effects":[{"stat":"retention","add":0.08,"duration":4},{"stat":"fixed_cost","add":80,"duration":4}]},
+ {"id":"seo_content","name":"SEO Content","category":"growth","budget":150,"energy":1,"effects":[{"stat":"cac","add":-0.8,"delay":2}]},
+ {"id":"discount","name":"Giảm giá","category":"risk","budget":0,"energy":1,"effects":[{"stat":"conversion","add":0.015,"duration":3},{"stat":"arpu","add":-5,"duration":3}]}
+]}
