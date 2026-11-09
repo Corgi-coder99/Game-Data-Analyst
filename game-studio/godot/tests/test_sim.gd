@@ -19,11 +19,11 @@ func _init() -> void:
 	sim.state.base.ad_spend = 1000.0
 	sim.state.base.cash -= 1000.0
 	var result := sim.finish_week()
-	near(result.new_users, 60.6060606061, "effective CAC = 16.5")
+	near(result.new_users, 66.0066006601, "effective CAC = 15.15")
 	near(result.churned, 600.0, "churn")
-	near(sim.state.base.users, 460.6060606061, "users")
-	near(result.revenue, 230.303030303, "revenue")
-	near(result.cash, 8407.2727272727, "cash including variable server cost")
+	near(sim.state.base.users, 466.0066006601, "users")
+	near(result.revenue, 233.0033003300, "revenue")
+	near(result.cash, 6759.7029702970, "cash including variable server cost")
 	var a := Sim.new(789)
 	var b := Sim.new(789)
 	while not a.state.lost and not a.state.won:
@@ -47,7 +47,7 @@ func _init() -> void:
 	check(event_sim.event_reports()[0].has("root_cause"), "analysis reveals root cause")
 	check(event_sim.play("onboarding_redesign"), "resolution playable")
 	check(event_sim.active_events.is_empty() and event_sim.state.resolved == 1, "resolved once")
-	near(event_sim.state.value("retention", event_sim.config), 0.65, "remove event modifier")
+	near(event_sim.state.value("retention", event_sim.config), 0.55, "remove event modifier")
 	check(not event_sim.play("onboarding_redesign"), "cannot replay consumed card")
 	var timed := Sim.new(1)
 	timed.begin_week(false)
@@ -82,6 +82,8 @@ func _init() -> void:
 	check(low_ratio.state.lost and low_ratio.state.bad_ratio_weeks == 4, "four low ratio weeks")
 	var demo := Sim.new(1, {}, 10)
 	demo.state.base.cash = 1000000
+	demo.config = demo.config.duplicate(true)
+	demo.config.win = {}
 	for i in 10:
 		demo.begin_week(false)
 		demo.finish_week()
@@ -95,12 +97,12 @@ func _init() -> void:
 	boundaries.state.energy = 0
 	check(not boundaries.play("ads_campaign"), "energy enforced")
 	boundaries.state.energy = 3
-	boundaries.state.base.cash = 699
+	boundaries.state.base.cash = 299
 	check(not boundaries.play("ads_campaign"), "budget enforced")
 	boundaries.state.base.cash = 10000
 	boundaries.play("ads_campaign")
 	var charged := boundaries.finish_week()
-	near(charged.cash, 10000 - 700 + charged.revenue - charged.fixed_cost, "campaign charged once")
+	near(charged.cash, 10000 - 300 + charged.revenue - charged.fixed_cost, "campaign charged once")
 	check(boundaries.finish_week().is_empty(), "cannot settle twice")
 	var clean := Sim.new(19)
 	clean.state.base.integrity = 100
@@ -152,12 +154,65 @@ func _init() -> void:
 	near(noisy.state.base.integrity, 25, "clean data restores integrity")
 	near(noisy.prediction_multiplier, 1, "A/B consumed by next action")
 	near(a.score(), b.score(), "same seed and actions produce same score")
+	test_balance_rules()
 	test_scores()
 	print("test_sim: %d checks, %d failures" % [checks, failures])
 	quit(0 if failures == 0 else 1)
 
+func test_balance_rules() -> void:
+	var sim := Sim.new(42)
+	sim.begin_week(false)
+	for index in [4, 5, 6, 10]:
+		var card: Dictionary = sim.cards[index]
+		var effect: Dictionary = card.effects[0]
+		var initial: float = sim.state.base[effect.stat]
+		for repetition in 3:
+			sim.hand = [card]
+			sim.state.energy = 3
+			sim.state.base.cash = 1000000
+			check(sim.play(card.id), "upgrade remains playable to resolve future incidents")
+			near(sim.state.base[effect.stat] if index != 10 else sim.state.modifiers.back().add,
+				initial + float(effect.add) * (2.0 - pow(0.5, repetition)) if index != 10 else float(effect.add) * pow(0.5, repetition),
+				"upgrade effect halves on each repeat including delayed SEO")
+		near(sim.upgrade_plays[card.id], 3, "successful upgrades counted")
+	# A rejected play must not consume the next upgrade's strength.
+	sim.hand = [sim.cards[5]]
+	sim.state.energy = 0
+	check(not sim.play("onboarding_redesign"), "reject upgrade without energy")
+	near(sim.upgrade_plays.onboarding_redesign, 3, "rejected upgrade not counted")
+	sim.state.energy = 3
+	sim.apply_event(sim.events[0])
+	check(sim.play("onboarding_redesign"), "repeated upgrade can still resolve")
+	check(sim.active_events.is_empty() and sim.state.resolved == 1, "diminishing does not weaken resolution")
+	for stat in ["retention", "conversion", "cac", "fixed_cost"]:
+		sim.state.base[stat] = 1000000
+		near(sim.state.value(stat, sim.config), sim.config.limits[stat][1], "upper stat cap")
+		sim.state.base[stat] = -1000000
+		near(sim.state.value(stat, sim.config), sim.config.limits[stat][0], "lower stat cap")
+	# Settle the final week with a controlled economy to test each independent gate.
+	for failed_gate in ["none", "min_cash", "min_ratio", "min_users"]:
+		var demo := Sim.new(42, {}, 10)
+		demo.config = demo.config.duplicate(true)
+		demo.state.week = 9
+		demo.state.base.cash = 1000000
+		demo.state.base.users = 1000
+		demo.state.base.retention = 0.75
+		if failed_gate != "none":
+			demo.config.win[failed_gate] = 1000000000
+		demo.begin_week(false)
+		demo.finish_week()
+		check(demo.state.won == (failed_gate == "none"), "demo final gate " + failed_gate)
+		check(demo.state.lost != demo.state.won, "horizon always ends in exactly one outcome")
+		check(demo.score() >= demo.config.score.win_bonus if demo.state.won else demo.score() <= demo.config.score.loss_cap, "gate failure preserves score ordering")
+	var definitions := Sim.new()
+	check(definitions.cards.size() == 12 and definitions.events.size() == 8, "content counts preserved")
+	check(definitions.config.weeks.demo == 10, "demo remains ten weeks")
+
 func test_scores() -> void:
 	var fixture := Sim.new(104)
+	# Isolate score arithmetic from gameplay stat caps.
+	fixture.config = fixture.config.duplicate(true)
+	fixture.config.limits.retention[1] = 0.98
 	check(fixture.config.score.loss_cap < fixture.config.score.win_bonus, "loss cap below win bonus")
 	fixture.state.base.cash = -444.0
 	fixture.state.base.retention = 0.98
