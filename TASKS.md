@@ -12,11 +12,12 @@ Trạng thái: Backlog -> In progress -> Review -> Done. Bị chặn thì chuy�
 | T-002 (ví dụ) | Cài đặt tính năng X theo spec T-001 | Codex | codex/T-002 | src/x.py, tests/test_x.py | Kiểm thử qua, đúng spec |
 | T-008 | check_web.py: ép stdout UTF-8 để không lỗi UnicodeEncodeError trên console Windows mặc định | Codex | codex/T-008 | media-marketing/web/check_web.py | Chạy `python -I check_web.py` (không cần -X utf8) qua 6 mục |
 | T-010 | Kịch bản và video quảng cáo 30 giây (làm sau T-011 để quảng cáo đúng với cơ chế cuối) | Claude/Codex | chưa chốt | media-marketing/video/* | Chưa có spec |
-| T-011 | Phân tích phải có lợi (thẻ xử lý chỉ gỡ sự kiện khi nguyên nhân đã lộ) và sửa ván 30 tuần. Spec xong, chờ VU duyệt để giao | Codex | codex/T-011 | game-studio/godot/scripts/sim/*, data/cards.json, events.json, config.json, tests/balance_sim.gd, tests/test_sim.gd | Xem game-studio/godot/docs/SPEC-T-011.md |
 
 ## In progress
 
-(chưa có)
+| ID | Việc | Owner | Nhánh | File được sửa | Tiêu chí hoàn thành |
+|---|---|---|---|---|---|
+| T-011 | Phân tích phải có lợi (thẻ xử lý chỉ gỡ sự kiện khi nguyên nhân đã lộ) và sửa ván 30 tuần. VU đã duyệt spec | Codex | codex/T-011 | game-studio/godot/scripts/sim/*, data/cards.json, events.json, config.json, tests/balance_sim.gd, tests/test_sim.gd | Xem game-studio/godot/docs/SPEC-T-011.md |
 
 ## Review
 
