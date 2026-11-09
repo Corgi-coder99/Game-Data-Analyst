@@ -19,3 +19,12 @@ static func apply_to(control: Control) -> void:
 	button.content_margin_bottom = 6
 	shared.set_stylebox("normal", "Button", button)
 	control.theme = shared
+
+
+const SELECTED = Color("73c8d6")
+const CATEGORIES = {
+	"analysis": Color("73c8d6"),
+	"optimization": Color("91c788"),
+	"growth": Color("e2bf75"),
+	"risk": Color("da8c95")
+}
