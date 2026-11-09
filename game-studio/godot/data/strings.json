@@ -1,0 +1,27 @@
+{
+  "title": "Data Corp",
+  "play": "Chơi",
+  "quit": "Thoát",
+  "hud": "Tuần %d/%d   Cash %.0f   Energy %d",
+  "finish_week": "Kết thúc tuần",
+  "card": "%s\nBudget %.0f\nEnergy %d",
+  "metrics": "Users: %.0f\nRetention: %.1f%%\nConversion: %.1f%%\nCAC: %.2f\nARPU: %.2f\nLTV/CAC: %.2f\nData Integrity: %.1f%%",
+  "rejected": "Không thể chơi thẻ: thiếu Budget thực hoặc Energy, hoặc thẻ không còn trong tay.",
+  "won": "Thắng",
+  "lost": "Thua",
+  "end": "%s — Điểm: %.0f",
+  "cards": {
+    "sql_deep_dive": "Phân tích SQL",
+    "ab_test": "Thử nghiệm A/B",
+    "funnel_report": "Báo cáo phễu",
+    "clean_data": "Làm sạch dữ liệu",
+    "fix_checkout_bug": "Sửa lỗi thanh toán",
+    "onboarding_redesign": "Cải tiến nhập môn",
+    "support_automation": "Tự động hỗ trợ",
+    "ads_campaign": "Quảng cáo",
+    "influencer_campaign": "Người ảnh hưởng",
+    "loyalty_program": "Khách hàng thân thiết",
+    "seo_content": "Nội dung SEO",
+    "discount": "Giảm giá"
+  }
+}
