@@ -11,18 +11,16 @@ Trạng thái: Backlog -> In progress -> Review -> Done. Bị chặn thì chuy�
 | T-001 (ví dụ) | Viết spec tính năng X | Claude | claude/T-001 | docs/spec-x.md | Spec có mô tả, đầu vào, đầu ra, ví dụ |
 | T-002 (ví dụ) | Cài đặt tính năng X theo spec T-001 | Codex | codex/T-002 | src/x.py, tests/test_x.py | Kiểm thử qua, đúng spec |
 | T-008 | check_web.py: ép stdout UTF-8 để không lỗi UnicodeEncodeError trên console Windows mặc định | Codex | codex/T-008 | media-marketing/web/check_web.py | Chạy `python -I check_web.py` (không cần -X utf8) qua 6 mục |
-| T-010 | Kịch bản và video quảng cáo 30 giây (nên làm sau T-009 để cảnh thắng không vô lý) | Claude/Codex | chưa chốt | media-marketing/video/* | Chưa có spec |
+| T-010 | Kịch bản và video quảng cáo 30 giây (làm sau T-011 để quảng cáo đúng với cơ chế cuối) | Claude/Codex | chưa chốt | media-marketing/video/* | Chưa có spec |
+| T-011 | Phân tích phải có lợi (thẻ xử lý chỉ gỡ sự kiện khi nguyên nhân đã lộ) và sửa ván 30 tuần. Spec xong, chờ VU duyệt để giao | Codex | codex/T-011 | game-studio/godot/scripts/sim/*, data/cards.json, events.json, config.json, tests/balance_sim.gd, tests/test_sim.gd | Xem game-studio/godot/docs/SPEC-T-011.md |
 
 ## In progress
 
-| ID | Việc | Owner | Nhánh | File được sửa | Tiêu chí hoàn thành |
-|---|---|---|---|---|---|
+(chưa có)
 
 ## Review
 
-| ID | Việc | Owner | Nhánh | File được sửa | Tiêu chí hoàn thành |
-|---|---|---|---|---|---|
-| T-009 | Cân bằng lại: bản demo 10 tuần quá dễ (chỉ quảng cáo thắng 53%), thẻ nâng cấp cộng dồn làm Retention 98%, LTV/CAC 50 đến 100. VU đã duyệt spec | Codex | codex/T-009 | game-studio/godot/scripts/sim/*, data/cards.json, events.json, config.json, tests/balance_sim.gd, tests/test_sim.gd | Xem game-studio/godot/docs/SPEC-T-009.md |
+(chưa có)
 
 ## Done
 
@@ -35,6 +33,7 @@ Trạng thái: Backlog -> In progress -> Review -> Done. Bị chặn thì chuy�
 | T-005c | Giao diện: màn kết thúc, nhãn trục biểu đồ (Codex). Claude đã review, VU duyệt merge vào master | Codex | 2026-11-09 |
 | T-006 | Sửa công thức điểm: giới hạn LTV/CAC, ván thua tối đa 900 điểm (Codex). Claude đã review, VU duyệt merge vào master | Codex | 2026-11-10 |
 | T-007 | Landing page trung thực (media-marketing/web). Claude đã chạy check_web.py (6/6 PASS khi dùng UTF-8) và kiểm tra trình duyệt 360px/1280px; VU duyệt merge vào master | Codex | 2026-11-10 |
+| T-009 | Cân bằng lại bản demo 10 tuần (Codex). Đạt 4/5 mục tiêu demo; chưa đạt: analyst không hơn balanced, 30 tuần quá khó (chuyển sang T-011). Claude đã review, VU duyệt merge vào master | Codex | 2026-11-10 |
 
 ## Blocked
 
