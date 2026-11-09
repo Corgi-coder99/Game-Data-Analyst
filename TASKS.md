@@ -11,7 +11,7 @@ Trạng thái: Backlog -> In progress -> Review -> Done. Bị chặn thì chuy�
 | T-001 (ví dụ) | Viết spec tính năng X | Claude | claude/T-001 | docs/spec-x.md | Spec có mô tả, đầu vào, đầu ra, ví dụ |
 | T-002 (ví dụ) | Cài đặt tính năng X theo spec T-001 | Codex | codex/T-002 | src/x.py, tests/test_x.py | Kiểm thử qua, đúng spec |
 
-| T-006 | Sửa công thức điểm: giới hạn LTV/CAC khi tính điểm, ván thua điểm thấp hơn ván thắng (ván thua Cash -444 hiện được 6.598 điểm vì LTV/CAC 70). Cần spec trước khi giao | Codex | codex/T-006 | game-studio/godot/scripts/sim/simulation.gd, data/config.json, tests/test_sim.gd | Chưa có spec |
+| T-006 | Sửa công thức điểm: giới hạn LTV/CAC khi tính điểm, ván thua điểm thấp hơn ván thắng (ván thua Cash -444 hiện được 6.598 điểm vì LTV/CAC 70). Spec xong, chờ VU duyệt để giao | Codex | codex/T-006 | game-studio/godot/scripts/sim/simulation.gd (hàm score), data/config.json (mục score), tests/test_sim.gd, tests/balance_sim.gd (tùy chọn) | Xem game-studio/godot/docs/SPEC-T-006.md |
 
 ## In progress
 
