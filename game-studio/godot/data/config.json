@@ -6,7 +6,7 @@
  "limits":{"retention":[0,0.98],"conversion":[0,1],"integrity":[0,100],"cac":[1,1000],"arpu":[0,1000],"fixed_cost":[100,100000]},
  "loss":{"cash":0,"ratio":1,"streak":4,"low_cash":2000},
  "draw":4,"energy":3,"noise_scale":0.5,
- "score":{"cash":1,"ratio":100,"resolved":500},
+ "score":{"win_bonus":1000,"cash":0.1,"ratio":100,"ratio_cap":5,"resolved":100,"week":40,"resolved_loss":50,"loss_cap":900},
  "phases":[{"through":10,"event_chance":0.3,"event_count":1,"integrity_decay":0},{"through":20,"event_chance":0.6,"event_count":1,"integrity_decay":1},{"through":30,"event_chance":0.8,"event_count":2,"integrity_decay":2}],
  "balance":{"games":2000,"seed":104,"quantiles":[0,0.25,0.5,0.75,1],"priorities":{
  "ads_only":["ads_campaign"],
