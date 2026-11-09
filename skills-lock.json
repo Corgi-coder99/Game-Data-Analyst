@@ -1,0 +1,191 @@
+{
+  "version": 1,
+  "skills": {
+    "ab-test-analysis": {
+      "source": "nimrodfisher/data-analytics-skills",
+      "sourceType": "github",
+      "skillPath": "03-data-analysis-investigation/ab-test-analysis/SKILL.md",
+      "computedHash": "202960ea669c04fa7bd7d75745e50da22be49f4d4c8e2f39b5d9f7c7064ce988"
+    },
+    "analysis-assumptions-log": {
+      "source": "nimrodfisher/data-analytics-skills",
+      "sourceType": "github",
+      "skillPath": "02-documentation-knowledge/analysis-assumptions-log/SKILL.md",
+      "computedHash": "764d95cc24005a9e850b2f9877d4382f9bced50820a03d239dfcc891f94a3c04"
+    },
+    "analysis-documentation": {
+      "source": "nimrodfisher/data-analytics-skills",
+      "sourceType": "github",
+      "skillPath": "02-documentation-knowledge/analysis-documentation/SKILL.md",
+      "computedHash": "c93a22300a31f12399a330217d211cf4558b35be75db832694bb5dd70cb90f6e"
+    },
+    "analysis-planning": {
+      "source": "nimrodfisher/data-analytics-skills",
+      "sourceType": "github",
+      "skillPath": "06-workflow-optimization/analysis-planning/SKILL.md",
+      "computedHash": "a265dc602c78fe4e4bd084b2380ce4b3eb1257953bc958628130520e33624f56"
+    },
+    "analysis-qa-checklist": {
+      "source": "nimrodfisher/data-analytics-skills",
+      "sourceType": "github",
+      "skillPath": "05-stakeholder-communication/analysis-qa-checklist/SKILL.md",
+      "computedHash": "ca937bcd24df6d135eb79cdb93721d7e2df718134fb22b96a801ac0bcf92972b"
+    },
+    "analysis-retrospective": {
+      "source": "nimrodfisher/data-analytics-skills",
+      "sourceType": "github",
+      "skillPath": "06-workflow-optimization/analysis-retrospective/SKILL.md",
+      "computedHash": "8fbefc8729385c019580478adc6c99b703e511b97b0a8991049ad2d749b84ae0"
+    },
+    "business-metrics-calculator": {
+      "source": "nimrodfisher/data-analytics-skills",
+      "sourceType": "github",
+      "skillPath": "03-data-analysis-investigation/business-metrics-calculator/SKILL.md",
+      "computedHash": "be80cb5b028413caa5feab1d903e2bb8fb5c5c3f4fb2da83b99859b95baec3a0"
+    },
+    "cohort-analysis": {
+      "source": "nimrodfisher/data-analytics-skills",
+      "sourceType": "github",
+      "skillPath": "03-data-analysis-investigation/cohort-analysis/SKILL.md",
+      "computedHash": "d52fb183df789622eb3b16fed0262488231ebf36fffb839a06aa9520a1473430"
+    },
+    "context-packager": {
+      "source": "nimrodfisher/data-analytics-skills",
+      "sourceType": "github",
+      "skillPath": "06-workflow-optimization/context-packager/SKILL.md",
+      "computedHash": "6be9314002c7a4e2888580cc6a56d618688b254a0158503e18d9215e0b50f3c0"
+    },
+    "dashboard-specification": {
+      "source": "nimrodfisher/data-analytics-skills",
+      "sourceType": "github",
+      "skillPath": "04-data-storytelling-visualization/dashboard-specification/SKILL.md",
+      "computedHash": "f61d9e586f0fa3b368b932276f4b485ec448f106fe35b0cf31051622dd02ff13"
+    },
+    "data-catalog-entry": {
+      "source": "nimrodfisher/data-analytics-skills",
+      "sourceType": "github",
+      "skillPath": "02-documentation-knowledge/data-catalog-entry/SKILL.md",
+      "computedHash": "3179108ccb7da784e134daf5ad9218eb0b59a263847d0a5f854889b39d63f524"
+    },
+    "data-narrative-builder": {
+      "source": "nimrodfisher/data-analytics-skills",
+      "sourceType": "github",
+      "skillPath": "04-data-storytelling-visualization/data-narrative-builder/SKILL.md",
+      "computedHash": "a9b6e7492c0d514a14abba75efdaec69b6c53c62cba1d64bb81b852489966883"
+    },
+    "data-quality-audit": {
+      "source": "nimrodfisher/data-analytics-skills",
+      "sourceType": "github",
+      "skillPath": "01-data-quality-validation/data-quality-audit/SKILL.md",
+      "computedHash": "829f1ff7dd50780b8649011595025c776305c5a81b29be7ce00e3b17a0a5889a"
+    },
+    "executive-summary-generator": {
+      "source": "nimrodfisher/data-analytics-skills",
+      "sourceType": "github",
+      "skillPath": "04-data-storytelling-visualization/executive-summary-generator/SKILL.md",
+      "computedHash": "ccf10d2b30684392714b9e3b8d06e2cd5e627a76904400f15bd5d8ea92708a93"
+    },
+    "funnel-analysis": {
+      "source": "nimrodfisher/data-analytics-skills",
+      "sourceType": "github",
+      "skillPath": "03-data-analysis-investigation/funnel-analysis/SKILL.md",
+      "computedHash": "6ef5801ce0942f428c4b37b1a241481894a3373b99a65dee7d19f5428bfbefeb"
+    },
+    "impact-quantification": {
+      "source": "nimrodfisher/data-analytics-skills",
+      "sourceType": "github",
+      "skillPath": "05-stakeholder-communication/impact-quantification/SKILL.md",
+      "computedHash": "2239259bc35aa44cd5e4c2414fc05cd4c7572097f3be3096a54afaa8d240d2f4"
+    },
+    "insight-synthesis": {
+      "source": "nimrodfisher/data-analytics-skills",
+      "sourceType": "github",
+      "skillPath": "04-data-storytelling-visualization/insight-synthesis/SKILL.md",
+      "computedHash": "3d09888ed6dd618c301247e6095b0feb7e7fc72bd9f446db57e0df4a32c612e7"
+    },
+    "methodology-explainer": {
+      "source": "nimrodfisher/data-analytics-skills",
+      "sourceType": "github",
+      "skillPath": "05-stakeholder-communication/methodology-explainer/SKILL.md",
+      "computedHash": "50f32561231f9d3fb72d36cadce7609d5853cba67c7a3460d5e8d5a66ff85d62"
+    },
+    "metric-reconciliation": {
+      "source": "nimrodfisher/data-analytics-skills",
+      "sourceType": "github",
+      "skillPath": "02-documentation-knowledge/metric-reconciliation/SKILL.md",
+      "computedHash": "206ea8b18b4f4a838226395750c9cf0376b4f2aee86c9ff4e98128a0428eed6e"
+    },
+    "peer-review-template": {
+      "source": "nimrodfisher/data-analytics-skills",
+      "sourceType": "github",
+      "skillPath": "06-workflow-optimization/peer-review-template/SKILL.md",
+      "computedHash": "e96c3bbae2bde196ac18a1b88317ea5032a12f651b9febdbe04348a8e79917e3"
+    },
+    "programmatic-eda": {
+      "source": "nimrodfisher/data-analytics-skills",
+      "sourceType": "github",
+      "skillPath": "01-data-quality-validation/programmatic-eda/SKILL.md",
+      "computedHash": "272bd1a0bd8389c37493b6f9cb06db5d6cfafe4fd7eade66bef429cc97bed1fa"
+    },
+    "query-validation": {
+      "source": "nimrodfisher/data-analytics-skills",
+      "sourceType": "github",
+      "skillPath": "01-data-quality-validation/query-validation/SKILL.md",
+      "computedHash": "a9e98eaea1a2d5c45f73b1e4a68a59847b28e1564a4e0c31ccbd6a46ceb05341"
+    },
+    "root-cause-investigation": {
+      "source": "nimrodfisher/data-analytics-skills",
+      "sourceType": "github",
+      "skillPath": "03-data-analysis-investigation/root-cause-investigation/SKILL.md",
+      "computedHash": "001e753ff791c6ad14af4c32b12e7420365f3f186a5b9171d82d79801950c6b9"
+    },
+    "schema-mapper": {
+      "source": "nimrodfisher/data-analytics-skills",
+      "sourceType": "github",
+      "skillPath": "02-documentation-knowledge/schema-mapper/SKILL.md",
+      "computedHash": "5d304853bd986281bd07fd555f220628915ba63e0b9badbbcaa1ec8f52b7b101"
+    },
+    "segmentation-analysis": {
+      "source": "nimrodfisher/data-analytics-skills",
+      "sourceType": "github",
+      "skillPath": "03-data-analysis-investigation/segmentation-analysis/SKILL.md",
+      "computedHash": "85cda79bd7be0ca6af0c62b79f97b06a794cd18ad08803406bd1ae65893e430a"
+    },
+    "semantic-model-builder": {
+      "source": "nimrodfisher/data-analytics-skills",
+      "sourceType": "github",
+      "skillPath": "02-documentation-knowledge/semantic-model-builder/SKILL.md",
+      "computedHash": "37d282242b30485ba568660ba399d324a3975098588d763804ed0d174a5dd6fd"
+    },
+    "sql-to-business-logic": {
+      "source": "nimrodfisher/data-analytics-skills",
+      "sourceType": "github",
+      "skillPath": "02-documentation-knowledge/sql-to-business-logic/SKILL.md",
+      "computedHash": "6d9ce359ca94979316a97f7f8a3067f653040db36355b73109578047de141959"
+    },
+    "stakeholder-requirements-gathering": {
+      "source": "nimrodfisher/data-analytics-skills",
+      "sourceType": "github",
+      "skillPath": "05-stakeholder-communication/stakeholder-requirements-gathering/SKILL.md",
+      "computedHash": "38ad0cc5f16711c3f849bcc55cd54266f7abefec2a3b55838c0d22d34ad6b022"
+    },
+    "technical-to-business-translator": {
+      "source": "nimrodfisher/data-analytics-skills",
+      "sourceType": "github",
+      "skillPath": "05-stakeholder-communication/technical-to-business-translator/SKILL.md",
+      "computedHash": "a61a9f9072e1dce7d03a84a6e9282b1f1ccf13b1a219af3e1a270d9e63f6a865"
+    },
+    "time-series-analysis": {
+      "source": "nimrodfisher/data-analytics-skills",
+      "sourceType": "github",
+      "skillPath": "03-data-analysis-investigation/time-series-analysis/SKILL.md",
+      "computedHash": "55f42aabf823471746f6a1ff574861747a10dbbe8e7b79eac1a5c26f52ff471e"
+    },
+    "visualization-builder": {
+      "source": "nimrodfisher/data-analytics-skills",
+      "sourceType": "github",
+      "skillPath": "04-data-storytelling-visualization/visualization-builder/SKILL.md",
+      "computedHash": "df47e87f655be280f9e3938d9f022aa6ced8db05342ee4ccd51fe17e3f6dd0cc"
+    }
+  }
+}
