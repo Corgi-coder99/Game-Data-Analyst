@@ -37,13 +37,27 @@ func run() -> void:
 		weeks += 1
 	check(weeks == 10, "controller plays all ten weeks")
 	check(game.ended and game.simulation.state.won, "demo win")
-	check(game.get_node("End").visible and not game.get_node("Layout").visible, "temporary end screen")
-	check(game.get_node("End").text.begins_with(game.strings.won), "result agrees with simulation")
+	var end_screen = game.get_node("End")
+	check(end_screen.visible and not game.get_node("Layout").visible, "dedicated end screen")
+	check(end_screen.get_node("Layout/Result").text == game.strings.end % [game.strings.won, game.simulation.score()], "win result and score agree with simulation")
+	check(end_screen.get_node("Layout/Resolved").text == game.strings.resolved_events % game.simulation.state.resolved, "correctly handled event count")
+	check(end_screen.observed.cash == game.displayed_report.cash, "truth table preserves last seen cash")
+	check(end_screen.truth.cash == game.simulation.state.value("cash", game.simulation.config), "truth table shows actual final cash")
+	check(end_screen.get_node("Layout/Table").get_child_count() == 27, "truth table contains eight metrics and headers")
+	await process_frame
+	check(end_screen.get_node("Layout").size.x <= 608 and end_screen.get_node("Layout").size.y <= 344, "end layout fits viewport")
+	for cell in end_screen.get_node("Layout/Table").get_children():
+		check(cell.get_minimum_size().x <= cell.size.x, "truth cell text fits width")
+	var font: Font = end_screen.get_theme_font("font")
+	for character in "ắằẳẵặấầẩẫậếềểễệốồổỗộớờởỡợứừửữựđĐ":
+		check(font.has_char(character.unicode_at(0)), "Vietnamese glyph supported: " + character)
 	var final_week: int = game.simulation.state.week
 	game.finish_week()
 	check(game.simulation.state.week == final_week, "end is terminal")
 	check(not game.play_card("discount"), "cannot play after end")
 		# Synthetic fixtures use only public simulation APIs to control event visibility.
+	end_screen.get_node("Layout/Buttons/Replay").pressed.emit()
+	check(not game.ended and not game.has_node("End") and game.get_node("Layout").visible, "replay button starts a new game")
 	game.start_game(105)
 	game.simulation.active_events.clear()
 	var fixture_event: Dictionary = game.simulation.events[0]
@@ -69,6 +83,11 @@ func run() -> void:
 	check(game.get_node("Layout/Body/Dashboard/Metrics").get_child(0).text.ends_with(game.strings.uncertain), "low integrity question mark")
 	game.start_game(105)
 	check(game.history.size() == 1 and game.previous_week.is_empty(), "restart clears chart and weekly baseline")
+	var chart = game.get_node("Layout/Body/Dashboard/Chart")
+	check(chart.values.size() == 1 and chart.weeks == [1], "single point has week coordinate")
+	check(chart.axis_labels.has("Tuần 1") and chart.axis_labels.size() == 3, "single point has min max and week labels")
+	game.select_metric("retention")
+	check(chart.axis_labels[0].ends_with("%"), "chart uses metric percentage units")
 	game.simulation.hand = [game.simulation.cards[0]]
 	game.refresh()
 	check(not game.get_node("Layout/Hand").get_child(0).tooltip_text.is_empty(), "card hover details")
@@ -85,6 +104,26 @@ func run() -> void:
 	await process_frame
 	check(game.get_node("Layout").size.y <= 360, "dashboard fits viewport height")
 	check(game.get_node("Layout").size.x <= 640, "dashboard fits viewport width")
+	game.start_game(105)
+	# Synthetic bankruptcy fixture uses the public effect API, without changing sim data.
+	game.simulation.apply_effect({"stat": "cash", "add": -1000000}, 0)
+	game.refresh()
+	weeks = 0
+	while not game.ended and weeks < 10:
+		game.finish_week()
+		weeks += 1
+	check(game.ended and game.simulation.state.lost, "bankruptcy fixture reaches lose branch")
+	end_screen = game.get_node("End")
+	check(end_screen.get_node("Layout/Result").text == game.strings.end % [game.strings.lost, game.simulation.score()], "lose result and score agree with simulation")
+	check(end_screen.observed.users == game.displayed_report.users, "lose table preserves observed users")
+	check(end_screen.truth.users == game.simulation.state.value("users", game.simulation.config), "lose table shows actual users")
+	check(end_screen.get_node("Layout/Buttons/Replay").text == "Chơi lại" and end_screen.get_node("Layout/Buttons/Title").text == "Về tiêu đề", "Vietnamese navigation buttons")
+	end_screen.get_node("Layout/Buttons/Title").pressed.emit()
+	await process_frame
+	await process_frame
+	check(current_scene != null and current_scene.scene_file_path == "res://scenes/title.tscn", "title button navigates to title scene")
+	if current_scene != null:
+		current_scene.queue_free()
 	game.queue_free()
 	await process_frame
 	print("test_ui: %d checks, %d failures" % [checks, failures])
