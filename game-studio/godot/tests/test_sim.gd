@@ -151,5 +151,74 @@ func _init() -> void:
 	noisy.play("clean_data")
 	near(noisy.state.base.integrity, 25, "clean data restores integrity")
 	near(noisy.prediction_multiplier, 1, "A/B consumed by next action")
+	near(a.score(), b.score(), "same seed and actions produce same score")
+	test_scores()
 	print("test_sim: %d checks, %d failures" % [checks, failures])
 	quit(0 if failures == 0 else 1)
+
+func test_scores() -> void:
+	var fixture := Sim.new(104)
+	check(fixture.config.score.loss_cap < fixture.config.score.win_bonus, "loss cap below win bonus")
+	fixture.state.base.cash = -444.0
+	fixture.state.base.retention = 0.98
+	fixture.state.base.cac = 15.0
+	fixture.state.base.arpu = 21.0
+	fixture.state.week = 30
+	fixture.state.resolved = 20
+	fixture.state.lost = true
+	near(fixture.state.ratio(fixture.config), 70.0, "high ratio loss fixture")
+	near(fixture.score(), 900.0, "high ratio loss capped without cash or ratio")
+	fixture.state.week = 2
+	fixture.state.resolved = 1
+	near(fixture.score(), 130.0, "uncapped loss uses week and resolved weights")
+	fixture.state.lost = false
+	fixture.state.won = true
+	fixture.state.base.cash = 1.0
+	fixture.state.resolved = 0
+	fixture.state.base.arpu = 1.5
+	near(fixture.state.ratio(fixture.config), 5.0, "ratio cap boundary fixture")
+	var capped_score := fixture.score()
+	near(capped_score, 1500.1, "winning score uses configured weights")
+	check(capped_score > fixture.config.score.loss_cap, "small cash win exceeds every loss")
+	fixture.state.base.arpu = 21.0
+	near(fixture.score(), capped_score, "ratio from 5 to 70 does not change score")
+	fixture.state.won = false
+	near(fixture.score(), 500.1, "unfinished game excludes win bonus")
+	fixture.state.base.cash = -444.0
+	near(fixture.score(), 500.0, "unfinished negative cash clamped")
+	print("score fixtures: loss cash=-444 ratio=70 week=30 resolved=20 score=900; loss week=2 resolved=1 score=130; win cash=1 ratio=5/70 resolved=0 score=1500.1")
+	var min_win := INF
+	var max_loss := -INF
+	var wins := 0
+	var losses := 0
+	for strategy in ["random", "ads_only", "optimization_only", "balanced"]:
+		for game in 500:
+			var sim := Sim.new(int(fixture.config.balance.seed) + game)
+			while not sim.state.lost and not sim.state.won:
+				sim.begin_week()
+				var choices: Array = []
+				if strategy == "random":
+					var pool := sim.hand.duplicate()
+					while not pool.is_empty():
+						var index := sim.rng.randi_range(0, pool.size() - 1)
+						choices.append(pool[index].id)
+						pool.remove_at(index)
+				else:
+					choices = sim.config.balance.priorities[strategy]
+				for id in choices:
+					sim.play(id)
+				sim.finish_week()
+			var points := sim.score()
+			if sim.state.won:
+				wins += 1
+				min_win = minf(min_win, points)
+				check(points >= sim.config.score.win_bonus, "swept win above bonus")
+			else:
+				losses += 1
+				max_loss = maxf(max_loss, points)
+				check(points <= sim.config.score.loss_cap, "swept loss below cap")
+			if game == 0:
+				print("score sample: strategy=%s seed=%d won=%s cash=%.2f score=%.2f" % [strategy, int(fixture.config.balance.seed), sim.state.won, sim.state.base.cash, points])
+	check(wins > 0 and losses > 0, "sweep includes wins and losses")
+	check(max_loss < min_win, "all swept losses below minimum win across strategies")
+	print("score sweep: 500 games/strategy; wins=%d losses=%d min_win=%.2f max_loss=%.2f" % [wins, losses, min_win, max_loss])

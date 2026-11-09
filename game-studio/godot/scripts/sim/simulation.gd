@@ -137,4 +137,7 @@ func finish_week() -> Dictionary:
 	return {"new_users":new_users,"churned":churned,"revenue":revenue,"fixed_cost":fixed_cost,"cash":state.base.cash}
 
 func score() -> float:
-	return state.base.cash * config.score.cash + state.ratio(config) * config.score.ratio + state.resolved * config.score.resolved
+	if state.lost:
+		return minf(config.score.loss_cap, state.week * config.score.week + state.resolved * config.score.resolved_loss)
+	var bonus: float = config.score.win_bonus if state.won else 0.0
+	return bonus + maxf(0.0, state.base.cash) * config.score.cash + minf(state.ratio(config), config.score.ratio_cap) * config.score.ratio + state.resolved * config.score.resolved
