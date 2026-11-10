@@ -9,11 +9,11 @@ const SKIES := {
 
 static var cache := {}
 
-static func backdrop(kind: String) -> ImageTexture:
-	if cache.has(kind):
-		return cache[kind]
-	var tex := _build(kind)
-	cache[kind] = tex
+static func backdrop(variety: String) -> ImageTexture:
+	if cache.has(variety):
+		return cache[variety]
+	var tex := _build(variety)
+	cache[variety] = tex
 	return tex
 
 static func _sky(p: Pen, bands: Array, height: int) -> void:
@@ -47,11 +47,11 @@ static func _layer(p: Pen, seed_value: int, baseline: int, min_h: int, max_h: in
 					p.r(wx, wy, 3, 3, lit)
 		x += bw + local.randi_range(0, 3)
 
-static func _build(kind: String) -> ImageTexture:
+static func _build(variety: String) -> ImageTexture:
 	var image := Pen.canvas(640, 360)
 	var p := Pen.new(image)
 	var sky_key := "dusk"
-	match kind:
+	match variety:
 		"ending_good":
 			sky_key = "dawn"
 		"ending_bad":
@@ -80,7 +80,7 @@ static func _build(kind: String) -> ImageTexture:
 	_layer(p, 11, 250, 60, 150, far, 36, 0.08)
 	_layer(p, 23, 275, 50, 120, mid, 52, 0.25)
 	_layer(p, 37, 300, 40, 100, near, 52, 0.3)
-	if kind == "title":
+	if variety == "title":
 		# The company tower, with a glowing crown.
 		var x := 470
 		var top := 60

@@ -51,8 +51,8 @@ func image_ok(image: Image, label: String) -> void:
 	check(image != null and image.get_width() > 0 and Checker.validate_image(image, label, true), "procedural art uses only v3 colors and binary alpha: " + label)
 
 func test_art_colors() -> void:
-	for kind in ["wallpaper", "title", "review", "ending_good", "ending_bad"]:
-		image_ok(CityArt.backdrop(kind).get_image(), "city " + kind)
+	for variety in ["wallpaper", "title", "review", "ending_good", "ending_bad"]:
+		image_ok(CityArt.backdrop(variety).get_image(), "city " + variety)
 	var office: Node2D = OfficeScene.instantiate()
 	root.add_child(office)
 	image_ok(office.floor_image, "office floor plan")
@@ -163,12 +163,12 @@ func test_commute() -> void:
 	for s in late.signs: late_text += s.text + "|"
 	check(not "CLOSING" in early_text and "CLOSING" in late_text, "closing-down sign appears only on late days")
 	check("FRESH START" in early_text and "CRISIS DEEPENS" in late_text, "newsstand headline follows the day number")
-	check(late.walkers.filter(func(w): return w.kind == "queue").size() >= 5 and early.walkers.filter(func(w): return w.kind == "queue").is_empty(), "bank queue only on crisis days")
+	check(late.walkers.filter(func(w): return w.variety == "queue").size() >= 5 and early.walkers.filter(func(w): return w.variety == "queue").is_empty(), "bank queue only on crisis days")
 	for name in ["MOONBEAN CAFE", "SIZZLE NOODLES", "CORNER MART", "HARBOR BANK", "DAILY NEWS", "MOTH BOOKS"]:
 		check(name in early_text, "shop sign: " + name)
 	check(early.vehicles.size() >= 9 and early.walkers.size() >= 12, "traffic and pedestrians present")
 	var kinds := {}
-	for v in early.vehicles: kinds[v.kind] = true
+	for v in early.vehicles: kinds[v.variety] = true
 	check(kinds.has("car") and kinds.has("bus") and kinds.has("moto") and kinds.has("bike"), "cars, bus, motorbikes and bicycles: " + str(kinds.keys()))
 	early.free()
 	late.free()

@@ -262,7 +262,7 @@ func pan_to(key: String) -> bool:
 func _apply_camera() -> void:
 	world.position = Vector2(-camera.x, -camera.y)
 	desk_button.position = Vector2(DESK_POS - camera)
-	desk_button.visible = camera.x < 640
+	desk_button.visible = Rect2(0, 0, 640, 360).encloses(Rect2(desk_button.position, desk_button.size))
 	if hint_label != null:
 		hint_label.position = Vector2(Vector2i(262, 198) - camera)
 		hint_label.visible = hint_enabled and camera == Vector2i.ZERO

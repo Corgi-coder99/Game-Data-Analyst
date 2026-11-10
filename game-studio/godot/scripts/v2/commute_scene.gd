@@ -202,12 +202,12 @@ func _build_street(p: Pen) -> void:
 	p.r(0, 330, W, 2, 61)
 	# Shops.
 	var shops := [
-		{"x": 0, "wall": [43, 44, 42], "awn": [53, 64], "plate": 9, "ink": 45, "kind": "cafe"},
-		{"x": 84, "wall": [23, 24, 46], "awn": [51, 52], "plate": 46, "ink": 52, "kind": "noodle"},
-		{"x": 168, "wall": [56, 33, 17], "awn": [52, 64], "plate": 7, "ink": 56, "kind": "mart"},
-		{"x": 252, "wall": [13, 64, 12], "awn": [17, 28], "plate": 17, "ink": 28, "kind": "bank"},
-		{"x": 336, "wall": [59, 54, 38], "awn": [54, 64], "plate": 2, "ink": 52, "kind": "news"},
-		{"x": 420, "wall": [38, 30, 29], "awn": [55, 64], "plate": 10, "ink": 45, "kind": "books"}]
+		{"x": 0, "wall": [43, 44, 42], "awn": [53, 64], "plate": 9, "ink": 45, "variety": "cafe"},
+		{"x": 84, "wall": [23, 24, 46], "awn": [51, 52], "plate": 46, "ink": 52, "variety": "noodle"},
+		{"x": 168, "wall": [56, 33, 17], "awn": [52, 64], "plate": 7, "ink": 56, "variety": "mart"},
+		{"x": 252, "wall": [13, 64, 12], "awn": [17, 28], "plate": 17, "ink": 28, "variety": "bank"},
+		{"x": 336, "wall": [59, 54, 38], "awn": [54, 64], "plate": 2, "ink": 52, "variety": "news"},
+		{"x": 420, "wall": [38, 30, 29], "awn": [55, 64], "plate": 10, "ink": 45, "variety": "books"}]
 	for i in range(shops.size()):
 		_shop(p, shops[i], i)
 	_tower(p)
@@ -235,7 +235,7 @@ func _shop(p: Pen, s: Dictionary, index: int) -> void:
 	p.r(x, top, w, 1, wall[1])
 	var closed := crisis >= 2 and index in [0, 5]
 	var window_xs: Array = [x + 10, x + 54]
-	if s.kind == "news":
+	if s.variety == "news":
 		window_xs = []
 		p.box(x + 4, top + 10, 76, 22, 1, 2, 1)
 		p.r(x + 6, top + 12, 72, 1, 51)
@@ -262,7 +262,7 @@ func _shop(p: Pen, s: Dictionary, index: int) -> void:
 	# Awning with scalloped edge.
 	var awn: Array = s.awn
 	var awning_y := sign_y + 17
-	if s.kind != "bank":
+	if s.variety != "bank":
 		for sx in range(0, w, 8):
 			p.r(x + sx, awning_y, 8, 8, awn[(sx / 8) % 2])
 			p.r(x + sx, awning_y, 8, 1, 64 if awn[(sx / 8) % 2] != 64 else 6)
@@ -277,7 +277,7 @@ func _shop(p: Pen, s: Dictionary, index: int) -> void:
 			p.box(cx, awning_y + 4, 8, 36, 64, 7, 12)
 	var win_top := awning_y + 12
 	var win_h := bottom - win_top - 2
-	match s.kind:
+	match s.variety:
 		"cafe":
 			p.box(x + 6, win_top, 44, win_h, 34, 35, 5)
 			p.r(x + 6, win_top + win_h - 12, 44, 12, 10)
@@ -348,7 +348,7 @@ func _shop(p: Pen, s: Dictionary, index: int) -> void:
 					bx += bwid + 1
 			_door(p, x + 56, awning_y + 12, 22, bottom, 9)
 	# Crisis banners are drawn here so they stay on the facade.
-	if s.kind == "books" and day >= 4:
+	if s.variety == "books" and day >= 4:
 		p.box(x + 4, 120, 76, 10, 51, 26, 25)
 		signs.append({"text": "CLOSING SALE", "x": x + 6, "y": 121, "ink": 64, "size": 8})
 		for tx in [x + 12, x + 34, x + 58]:
@@ -431,9 +431,9 @@ func _build_front(p: Pen) -> void:
 func _outfit(local: RandomNumberGenerator) -> Dictionary:
 	return {"shirt": SHIRTS[local.randi_range(0, SHIRTS.size() - 1)], "pants": PANTS[local.randi_range(0, PANTS.size() - 1)], "hair": HAIRS[local.randi_range(0, HAIRS.size() - 1)], "skin": SKINS[local.randi_range(0, SKINS.size() - 1)]}
 
-func _make_walker(local: RandomNumberGenerator, x: float, y: float, vx: float, kind: String) -> Dictionary:
+func _make_walker(local: RandomNumberGenerator, x: float, y: float, vx: float, variety: String) -> Dictionary:
 	var out := _outfit(local)
-	out.merge({"x": x, "y": y, "vx": vx, "kind": kind, "phase": local.randf_range(0.0, 3.0)})
+	out.merge({"x": x, "y": y, "vx": vx, "variety": variety, "phase": local.randf_range(0.0, 3.0)})
 	return out
 
 func _build_actors() -> void:
@@ -453,12 +453,12 @@ func _build_actors() -> void:
 		var dir := 1 if lane == 0 else -1
 		var cursor := 0.0
 		for i in range(kinds.size()):
-			var kind: String = kinds[i]
-			var length: int = {"car": 30, "bus": 56, "moto": 14, "bike": 12}[kind]
-			var speed: float = {"car": 86.0, "bus": 64.0, "moto": 92.0, "bike": 38.0}[kind] * local.randf_range(0.85, 1.1)
+			var variety: String = kinds[i]
+			var length: int = {"car": 30, "bus": 56, "moto": 14, "bike": 12}[variety]
+			var speed: float = {"car": 86.0, "bus": 64.0, "moto": 92.0, "bike": 38.0}[variety] * local.randf_range(0.85, 1.1)
 			var color: int = colors[local.randi_range(0, colors.size() - 1)]
 			var vx: float = cursor if dir > 0 else float(W) - cursor - length
-			vehicles.append({"kind": kind, "dir": dir, "x": vx, "len": length, "speed": speed, "max": speed, "color": color, "shade": shades[color], "light": lights[color], "rider": local.randi_range(0, SHIRTS.size() - 1), "bottom": LANE_DOWN if dir > 0 else LANE_UP})
+			vehicles.append({"variety": variety, "dir": dir, "x": vx, "len": length, "speed": speed, "max": speed, "color": color, "shade": shades[color], "light": lights[color], "rider": local.randi_range(0, SHIRTS.size() - 1), "bottom": LANE_DOWN if dir > 0 else LANE_UP})
 			cursor += length + local.randf_range(36.0, 90.0)
 	# Pedestrians walking along the sidewalk.
 	var count := 9 if crisis < 2 else 5
@@ -467,11 +467,11 @@ func _build_actors() -> void:
 		var direction := 1.0 if i % 3 != 0 else -1.0
 		var w := _make_walker(local, local.randf_range(20.0, 600.0), y, direction * local.randf_range(14.0, 26.0), "walk")
 		if i == 1 or i == 6:
-			w.kind = "cup"
+			w.variety = "cup"
 		if i == 3:
-			w.kind = "phone"
+			w.variety = "phone"
 		if crisis >= 1 and i % 2 == 0:
-			w.kind = "umbrella"
+			w.variety = "umbrella"
 		walkers.append(w)
 	# Customers standing at shops.
 	walkers.append(_make_walker(local, 48.0, 252.0, 0.0, "cup"))
@@ -695,7 +695,7 @@ func _walk_frame(time: float) -> int:
 func _draw_walker(p: Pen, w: Dictionary) -> void:
 	var x := roundi(w.x)
 	var y := roundi(w.y)
-	var moving: bool = absf(w.vx) > 0.0 or w.kind == "cross"
+	var moving: bool = absf(w.vx) > 0.0 or w.variety == "cross"
 	var step := (int((elapsed + w.phase) * 4.0) % 2) if moving else 0
 	var skin: int = w.skin
 	p.r(x - 1, y - 1, 10, 2, 63 if y > 262 else 5)
@@ -718,7 +718,7 @@ func _draw_walker(p: Pen, w: Dictionary) -> void:
 	p.r(x + 1, y - 18, 1, 3, w.hair)
 	p.px(x + 3, y - 17, 1)
 	p.px(x + 5, y - 17, 1)
-	match w.kind:
+	match w.variety:
 		"umbrella":
 			var col: int = [54, 56, 51, 52][roundi(w.phase) % 4]
 			p.r(x - 4, y - 26, 16, 2, col)
@@ -748,7 +748,7 @@ func _draw_vehicle(p: Pen, v: Dictionary) -> void:
 	var light: int = v.light
 	var length: int = v.len
 	p.r(x + 1, y - 1, length - 2, 2, 1)
-	match v.kind:
+	match v.variety:
 		"car":
 			p.r(x, y - 9, length, 6, base)
 			p.r(x, y - 9, length, 1, light)

@@ -55,6 +55,7 @@ func _build() -> void:
 	strings = JSON.parse_string(FileAccess.get_file_as_string("res://data/strings_v2.json"))
 	var background := TextureRect.new()
 	background.texture = CityArt.backdrop("review")
+	background.set_meta("overlay", true)
 	background.size = size
 	background.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(background)
