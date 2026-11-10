@@ -772,3 +772,7 @@ Kết quả chạy thật (worktree, Godot 4.7.2 console):
 
 ### T-028 | Claude subagent | 2026-11-10 | Done
 - Art cozy hiện đại phần A (palette v4, văn phòng, nhà, desktop, nhân vật, tiêu đề). Tham khảo phong cách ảnh VU gửi, không sao chép. Spec docs/SPEC-T-028.md, worktree ai-company-t028, nhánh codex/T-028. Phần B (phố, cửa hàng) sau T-027.
+
+
+### T-029 | Claude subagent | 2026-11-10 | In progress
+- Art cozy phần B: phố, cửa hàng, cảnh đi làm, nội thất cửa hàng, thumbnail tin tức. Spec docs/SPEC-T-029.md, worktree ai-company-t029, nhánh codex/T-029. Handoff: docs/HANDOFF-T-029.md.
