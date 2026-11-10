@@ -76,7 +76,7 @@ func show_ending(final_status: Dictionary) -> void:
 		strings.ending.trust % float(status.trust),
 		strings.ending.days % int(status.day),
 		strings.ending.pay % float(status.personal_pay),
-		strings.ending.score % float(status.score)]
+		strings.ending.score % maxf(0.0, float(status.score))]
 	for line in lines:
 		_text(panel, line, Rect2(12, y, 376, 12), 22)
 		summary_lines.append(line)
