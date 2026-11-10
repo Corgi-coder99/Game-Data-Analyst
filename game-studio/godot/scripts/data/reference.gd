@@ -43,8 +43,8 @@ func steps(file: Dictionary) -> Array:
 		out.append({"op":"convert", "kind":"currency", "col":"price", "currency_col":"currency", "rates":{"VND":1.0 / float(cfg.vnd_per_usd), "USD":1.0}})
 		out.append({"op":"standardize", "col":"currency", "map":{"VND":"USD"}})
 	if has.call("mixed_dates"): out.append({"op":"parse_date", "col":r.date_col, "format":"auto"})
-	if has.call("outliers"): out.append({"op":"outliers", "col":r.outlier_col, "method":"iqr", "k":3.0, "action":"remove"})
 	if r.last_date != "": out.append({"op":"filter", "col":r.date_col, "cmp":"<", "value":r.last_date})
+	if has.call("outliers"): out.append({"op":"outliers", "col":r.outlier_col, "method":"iqr", "k":r.outlier_k, "action":"remove"})
 	return out
 
 func naive_steps(_file: Dictionary) -> Array:

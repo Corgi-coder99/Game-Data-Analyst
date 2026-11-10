@@ -81,8 +81,8 @@ func _finding_score(ref: RefCounted, truth_item: Dictionary, given: Variant) -> 
 		if want == null or not (given is Dictionary): return 0.0
 		if given.get("direction", "") != want.direction: return 0.0
 		var score := float(cfg.grader.direction_only)
-		var gb := ref.band_index(str(given.get("band", "")))
-		var wb := ref.band_index(want.band)
+		var gb: int = ref.band_index(str(given.get("band", "")))
+		var wb: int = ref.band_index(want.band)
 		if gb >= 0 and gb == wb: score = 1.0
 		elif gb >= 0 and absi(gb - wb) == 1: score += (1.0 - float(cfg.grader.direction_only)) * float(cfg.grader.adjacent_band)
 		return score
@@ -105,7 +105,7 @@ func chart(final_table: RefCounted, spec: Dictionary) -> Dictionary:
 	return {"flags":flags, "score":score, "present":true}
 
 func grade(file: Dictionary, ref: RefCounted, truth_list: Array, submission: Dictionary) -> Dictionary:
-	var run := Pipeline.from_array(file.raw, submission.get("pipeline", []), file.aux).run()
+	var run: Dictionary = Pipeline.from_array(file.raw, submission.get("pipeline", []), file.aux).run()
 	var c := cleaning(file, run.row_level)
 	var f := findings(ref, truth_list, submission.get("findings", {}))
 	var ch := chart(run.dataset, submission.get("chart", {}))

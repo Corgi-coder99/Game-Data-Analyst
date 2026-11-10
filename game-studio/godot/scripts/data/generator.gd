@@ -201,7 +201,7 @@ func build_file(name: String, day: int, index: int, dirt_count: int, scale: floa
 	var complete_last := hist - 2 if late else hist - 1
 	var order: Array = cfg.dirt.order
 	var ctx := {"name":name, "spec":spec, "dates":dates, "info":info, "complete_last":complete_last, "day":day, "counter":0}
-	var recipe := {"name":name, "defects":[], "missing":[], "typo_cols":[], "currency":false, "suffix_cols":[], "outlier_col":"", "last_date":"", "date_col":DATE_COL[name], "id_col":ID_COL[name], "header":COLS[name], "complete_last":complete_last}
+	var recipe := {"name":name, "defects":[], "missing":[], "typo_cols":[], "currency":false, "suffix_cols":[], "outlier_col":"", "outlier_k":3.0, "last_date":"", "date_col":DATE_COL[name], "id_col":ID_COL[name], "header":COLS[name], "complete_last":complete_last}
 	for defect in order:
 		if not chosen.has(defect): continue
 		_inject(defect, recs, rng, ctx, recipe)
@@ -371,7 +371,7 @@ func _inject(defect: String, recs: Array, rng: RandomNumberGenerator, ctx: Dicti
 			var idx: Array = []
 			for i in recs.size():
 				if recs[i].day == last: idx.append(i)
-			var keep := maxi(1, int(ceil(float(cfg.late_keep) * idx.size())))
+			var keep := maxi(1, int(floor(float(cfg.late_keep) * idx.size())))
 			var drop: Array = idx.slice(keep)
 			drop.reverse()
 			for i in drop: recs.remove_at(i)
@@ -387,11 +387,17 @@ func _inject(defect: String, recs: Array, rng: RandomNumberGenerator, ctx: Dicti
 			vals.sort()
 			var q1 := Ops.quantile(vals, 0.25)
 			var q3 := Ops.quantile(vals, 0.75)
-			var fence := q3 + 5.0 * maxf(q3 - q1, 0.05 * absf(q3))
-			for i in _pick(rng, pool, _amount(rng, defect, total)):
+			var iqr := maxf(q3 - q1, 0.000001 * absf(q3) + 0.000000001)
+			# The reference fence is placed above every legitimate value and below every injected one.
+			var k_legit := maxf(0.0, maxf((float(vals[vals.size() - 1]) - q3) / iqr, (q1 - float(vals[0])) / iqr))
+			var k := maxf(3.0, 1.5 * k_legit + 0.5)
+			recipe.outlier_k = k
+			var fence := maxf(q3 + 2.0 * (k + 3.0) * iqr, 3.0 * float(vals[vals.size() - 1]))
+			var targets: Array = pool.filter(func(i): return not recs[i].marks.has("mixed_units"))
+			for i in _pick(rng, targets, _amount(rng, defect, total)):
 				var v: float = float(recs[i].clean[c])
 				var mult := 10.0
-				while v * mult <= fence and mult < 100000.0: mult *= 10.0
+				while v * mult <= fence and mult < 100000000.0: mult *= 10.0
 				recs[i].raw[c] = int(v * mult) if TYPES[name][c] == "int" else v * mult
 				recs[i].clean = null
 				_mark(recs[i], "outliers", [col])
@@ -482,9 +488,9 @@ func _inject(defect: String, recs: Array, rng: RandomNumberGenerator, ctx: Dicti
 				var c := _col(name, col)
 				var pool: Array = _cands(recs).filter(func(i): return float(recs[i].clean[c]) >= 1000.0)
 				for i in _pick(rng, pool, _amount(rng, defect, total)):
-					var v100: float = round(float(recs[i].clean[c]) / 100.0) * 100.0
-					recs[i].raw[c] = "%.1fk" % (v100 / 1000.0)
-					recs[i].clean[c] = v100
+					var v10: float = round(float(recs[i].clean[c]) / 10.0) * 10.0
+					recs[i].raw[c] = "%.2fk" % (v10 / 1000.0)
+					recs[i].clean[c] = v10
 					_mark(recs[i], "mixed_units", [col])
 				recipe.suffix_cols.append(col)
 		"mixed_dates":

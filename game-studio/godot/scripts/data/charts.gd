@@ -101,7 +101,7 @@ func series(ds: RefCounted, spec: Dictionary) -> Dictionary:
 		counts.fill(0)
 		for v in nums: counts[mini(bins - 1, int((v - lo) / width))] += 1
 		var pts: Array = []
-		for b in bins: pts.append({"x":"%.4g..%.4g" % [lo + b * width, lo + (b + 1) * width], "y":counts[b]})
+		for b in bins: pts.append({"x":"%s..%s" % [snappedf(lo + b * width, 0.01), snappedf(lo + (b + 1) * width, 0.01)], "y":counts[b]})
 		return {"ok":true, "type":type, "series":[{"name":"count", "points":pts}], "categories":pts.map(func(p): return p.x)}
 	var grouped := _grouped(ds, spec)
 	if not grouped.ok: return grouped

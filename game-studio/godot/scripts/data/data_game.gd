@@ -95,7 +95,7 @@ func review(day: int) -> Dictionary:
 		var ev: Dictionary = _ref.evaluate_reference(f)
 		var key := "%d|%s" % [day, f.id]
 		var submission: Dictionary = _submissions.get(key, {})
-		var grade := _grader.grade(f, _ref, ev.truth, submission)
+		var grade: Dictionary = _grader.grade(f, _ref, ev.truth, submission)
 		var manifest: Array = f.manifest.map(func(m): return {"type":m.type, "columns":m.columns, "rows":m.rows.size(), "row_ids":m.rows})
 		out.append({"id":f.id, "name":f.name, "submitted":_submissions.has(key), "dirt":f.dirt_types, "manifest":manifest, "reference_steps":_ref.steps(f), "reference_table":ev.dataset.to_dict(), "truth":ev.truth, "hidden":f.hidden.duplicate(), "grade":grade})
 	return {"ok":true, "day":day, "files":out}
