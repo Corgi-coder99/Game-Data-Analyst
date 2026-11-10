@@ -20,12 +20,12 @@ Trạng thái: Backlog -> In progress -> Review -> Done. Bị chặn thì chuy�
 
 | ID | Việc | Owner | Nhánh | File được sửa | Tiêu chí hoàn thành |
 |---|---|---|---|---|---|
-| T-019a | Giao diện v2 phần a: đường ống sprite bằng GDScript (ảnh chữ, sinh PNG, kiểm tra 32 màu) và cảnh văn phòng pixel. Claude tự quyết giao (VU ủy quyền) | Codex | codex/T-019a | game-studio/godot/tools/*, scripts/v2/*, scenes/v2/*, assets/v2/*, data/palette_v2.json, tests/test_v2_assets.gd | Xem game-studio/godot/docs/SPEC-T-019a.md |
 
 ## Review
 
 | ID | Việc | Owner | Nhánh | File được sửa | Tiêu chí hoàn thành |
 |---|---|---|---|---|---|
+| T-019a | Giao diện v2 phần a: đường ống sprite bằng GDScript (ảnh chữ, sinh PNG, kiểm tra 32 màu) và cảnh văn phòng pixel. Claude tự quyết giao (VU ủy quyền) | Codex | codex/T-019a | game-studio/godot/tools/*, scripts/v2/*, scenes/v2/*, assets/v2/*, data/palette_v2.json, tests/test_v2_assets.gd | Xem game-studio/godot/docs/SPEC-T-019a.md |
 | T-016 | Style bible pixel mới: bảng màu 32 màu, kích thước sprite, ánh sáng, giao diện máy tính, hoạt ảnh, kiểm tra tự động. Chờ VU xem | Claude | v2 | shared/style-bible/pixel-office-v2.md, palette-v2.json | VU duyệt style bible; quyết định có sửa CLAUDE.md mục 4 không |
 | T-017 | Content bible v2 (thế giới hư cấu Tân Lạc, công ty Lục Châu, nhân vật, 10 nguồn tin, ánh xạ 8 cú sốc) và data/news.json (41 mẫu tin, đã kiểm hợp lệ). Chờ VU xem | Claude | v2 | game-studio/godot/docs/CONTENT-BIBLE-v2.md, data/news.json | VU duyệt nội dung |
 
@@ -629,3 +629,13 @@ world.json cuối đầy đủ:
 ```
 
 - Git: git add bị fatal: Unable to create 'D:/Dev/ai-company/.git/worktrees/ai-company-codex/index.lock': Permission denied. Không stage/commit được; giữ nguyên file chưa commit trong worktree. Không đổi quyền, không vượt sandbox, không push/merge.
+### T-019a | Codex | 2026-11-10 | Review
+
+- Đã nhận: owner Codex, trạng thái In progress; nhánh codex/T-019a, cây làm việc ban đầu sạch. Triển khai đúng SPEC-T-019a, không gọi mạng.
+- Đã làm: đường ống GDScript thuần, ảnh chữ theo 0-9a-v/dot, 26 dải PNG xác định; bản sao palette khớp byte với shared. Cảnh office 640x360 có đủ bốn bàn, hai cây, tủ, cửa sổ, đồng hồ, cửa sếp; API set_phase/set_clock/play_arrival/play_boss_appears/show_dialog/hide_dialog và seated/dialog_closed/desk_clicked. Không đổi main_scene, mã hoặc dữ liệu lõi, không gọi mạng hay dùng tài nguyên ngoài.
+- File thêm (dưới game-studio/godot): tools/gen_sprites.gd, tools/check_palette.gd, tools/sprites/{characters,furniture,icons}.gd; scripts/v2/{palette,sprite_lib,office}.gd; scenes/v2/office.tscn; data/palette_v2.json; assets/v2/*.png (26 ảnh và metadata Godot nếu có); tests/test_v2_assets.gd. TASKS.md cập nhật trạng thái và bàn giao.
+- Cách chạy từ gốc worktree trong PowerShell: đặt $godot = 'D:\Godot_v4.7.2-stable_win64.exe\Godot_v4.7.2-stable_win64_console.exe'; chạy & $godot --headless --path game-studio/godot -s res://tools/gen_sprites.gd rồi & $godot --headless --path game-studio/godot -s res://tools/check_palette.gd. Test tương tự với -s res://tests/test_v2_assets.gd. Xem cảnh riêng: & $godot --path game-studio/godot res://scenes/v2/office.tscn.
+- Kiểm tra: gen_sprites và check_palette exit 0; 26 PNG đúng kích thước/số khung, palette 32 màu, alpha 0/255; hai lượt sinh có SHA-256 giống nhau, không ghi lại PNG nếu bytes không đổi. test_v2_assets 2.255/0 failures; test_sim 2.630/0; test_ui 134/0; test_world 32.419/0, gồm hai kỳ và quét 500 seed/bot. balance_sim chạy trước/sau: toàn bộ số liệu giữ nguyên (chỉ elapsed_seconds 28,822 -> 35,079), không đổi file đầu vào/mã bot/mô phỏng. Ví dụ balanced 10/30 ngày 43,05%/32,05%, analyst 55,50%/53,30%.
+- Tự quyết: bốn bàn tại x=136/248/360/472, y=200; tường cao 128, lối vào trái và lối đi trước bàn. Người chơi áo xanh/cà vạt vàng; Khôi tóc tối/áo xám/kính; Mai tóc nâu/áo tím/kẹp tóc; Tư tóc bạc/áo xanh rêu/mũ; Hạnh áo xanh đậm/cổ áo sáng. Bóng phía dưới phải màu 3, viền màn hình người chơi màu 21; cửa sổ sáng/trưa/chiều tương ứng sáng/nhiều mây/hoàng hôn. Hoạt ảnh dùng thời lượng riêng, chân chạm đất 160 ms; vị trí làm tròn từng khung, đến bàn khoảng 207 khung 60 FPS; API advance(delta) hỗ trợ kiểm thử không chờ thời gian thật.
+- Hạn chế/duyệt: dùng font Godot mặc định cỡ 8/12; sprite không anti-alias, chữ vẫn theo font mặc định chưa phải font pixel. Hộp thoại 300 ký tự giữ nguyên nội dung, tự xuống dòng và cuộn trong khung 592x80; chưa phân trang. Đã chạy render thật và xem ảnh TEMP/T-019a-office.png (cờ --capture của test, ảnh ngoài assets); Claude cần chụp/duyệt mỹ thuật ở 1x và 2x, đặc biệt độ đọc nhân vật nhỏ và mật độ họa tiết sàn. Console có cảnh báo môi trường không ghi được user://logs, không đọc được kho chứng chỉ; render thật thêm cảnh báo cache shader, không có lỗi script trong lượt cuối.
+- Git: git add bị Permission denied khi tạo D:/Dev/ai-company/.git/worktrees/ai-company-codex/index.lock (metadata ngoài vùng ghi). Chưa stage/commit; để nguyên file chưa commit, không vượt sandbox, không push, không merge.
