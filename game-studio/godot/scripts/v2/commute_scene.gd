@@ -554,14 +554,23 @@ func _update_vehicle(v: Dictionary, state: String, delta: float) -> void:
 		if u == v or u.dir != dir:
 			continue
 		var gap: float = (u.x - (v.x + length)) if dir > 0 else (v.x - (u.x + u.len))
-		if gap >= -1.0 and gap < 14.0:
-			target = minf(target, 0.0 if gap < 5.0 else u.speed)
+		var closing: float = maxf(0.0, v.speed - u.speed)
+		if gap >= -1.0 and gap < closing * closing / 200.0 + 12.0:
+			target = minf(target, 0.0 if gap < 6.0 else u.speed * 0.8)
 	v.speed = move_toward(v.speed, target, 150.0 * delta)
 	v.x += float(dir) * v.speed * delta
 	if dir > 0 and v.x > W + 4:
-		v.x = -length - 4.0
+		var spawn := -length - 4.0
+		for u in vehicles:
+			if u != v and u.dir == dir:
+				spawn = minf(spawn, u.x - length - 14.0)
+		v.x = spawn
 	elif dir < 0 and v.x < -length - 4:
-		v.x = W + 4.0
+		var spawn_left := float(W) + 4.0
+		for u in vehicles:
+			if u != v and u.dir == dir:
+				spawn_left = maxf(spawn_left, u.x + u.len + 14.0)
+		v.x = spawn_left
 
 func skip() -> void:
 	if done:
