@@ -741,10 +741,10 @@ Kết quả chạy thật (worktree, Godot 4.7.2 console):
 
 - Art overhaul theo feedback VU: palette v3 (additive, không sửa CLAUDE.md, chỉ có đề xuất), cảnh đi làm qua thành phố, văn phòng nhiều phòng ban, màu sinh động. Spec: game-studio/godot/docs/SPEC-T-022.md. Nhánh codex/T-022. Có luật chống treo (dừng sau 2 lần sửa cùng test lỗi).
 
-### T-023 | Claude subagent | 2026-11-10 | In progress
+### T-023 | Claude subagent | 2026-11-10 | Done
 - Báo cáo hạn giờ (nộp muộn thị trường đã đổi). Spec docs/SPEC-T-023.md, worktree ai-company-t023, nhánh codex/T-023. Handoff: docs/HANDOFF-T-023.md.
 
-### T-024 | Claude subagent | 2026-11-10 | In progress
+### T-024 | Claude subagent | 2026-11-10 | Done
 - Cuộc sống sau giờ làm: tiêu tiền (đồ ăn vặt, vàng, tiết kiệm, đất, nhà). Spec docs/SPEC-T-024.md, worktree ai-company-t024, nhánh codex/T-024. Handoff: docs/HANDOFF-T-024.md.
 
 ### T-025 | Claude subagent | 2026-11-10 | Done
