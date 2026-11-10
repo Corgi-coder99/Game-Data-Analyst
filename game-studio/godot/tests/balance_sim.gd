@@ -42,7 +42,12 @@ func _init() -> void:
 					else:
 						choices = template.config.balance.priorities["balanced" if strategy == "analyst" else strategy]
 					for id in choices:
-						sim.play(id)
+						if strategy == "analyst" and id in ["sql_deep_dive", "funnel_report", "ab_test"]:
+							continue
+						if strategy in ["balanced", "analyst"] and id == "influencer_campaign" and sim.report().retention < 0.7:
+							continue
+						if strategy == "random" or useful_upgrade(sim, id):
+							sim.play(id)
 					sim.finish_week()
 				if sim.state.won:
 					wins += 1
@@ -83,6 +88,13 @@ func play_analyst(sim: RefCounted) -> void:
 				for id in definition.resolved_by:
 					if sim.play(id):
 						break
+
+# Counts are public action history; remedies bypass this filter in play_analyst.
+func useful_upgrade(sim: RefCounted, id: String) -> bool:
+	for card in sim.cards:
+		if card.id == id and card.get("diminishing", false):
+			return sim.upgrade_plays.get(id, 0) < 3
+	return true
 
 func median_of(values: Array) -> String:
 	if values.is_empty():

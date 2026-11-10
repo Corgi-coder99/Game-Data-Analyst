@@ -17,11 +17,13 @@ Trạng thái: Backlog -> In progress -> Review -> Done. Bị chặn thì chuy�
 
 | ID | Việc | Owner | Nhánh | File được sửa | Tiêu chí hoàn thành |
 |---|---|---|---|---|---|
-| T-011 | Phân tích phải có lợi (thẻ xử lý chỉ gỡ sự kiện khi nguyên nhân đã lộ) và sửa ván 30 tuần. VU đã duyệt spec | Codex | codex/T-011 | game-studio/godot/scripts/sim/*, data/cards.json, events.json, config.json, tests/balance_sim.gd, tests/test_sim.gd | Xem game-studio/godot/docs/SPEC-T-011.md |
+(chưa có)
 
 ## Review
 
-(chưa có)
+| ID | Việc | Owner | Nhánh | File được sửa | Tiêu chí hoàn thành |
+|---|---|---|---|---|---|
+| T-011 | Phân tích phải có lợi (thẻ xử lý chỉ gỡ sự kiện khi nguyên nhân đã lộ) và sửa ván 30 tuần. VU đã duyệt spec | Codex | codex/T-011 | game-studio/godot/scripts/sim/*, data/cards.json, events.json, config.json, tests/balance_sim.gd, tests/test_sim.gd | Xem game-studio/godot/docs/SPEC-T-011.md |
 
 ## Done
 
@@ -205,3 +207,67 @@ Lịch sử chỉnh số (mọi vòng đủ 2.000 ván mỗi chiến lược; th
 - Chưa đạt: analyst 45,35% thấp hơn balanced 1,10 điểm %, cần >=56,45%; balanced 30 tuần 0%, yêu cầu 30–55%. Bốn baseline demo và mọi trung vị ván thắng đạt. Không coi đây là bản đủ điều kiện merge. Nguyên nhân quan sát: xử lý sự kiện không cần lộ nguyên nhân nên bot balanced vẫn sửa được lỗi; phân tích dùng thêm Energy/Budget, còn tay 4 thẻ giới hạn cặp phân tích/xử lý. Về kinh tế dài hạn, ratio hiện tại = ARPU/((1-Retention)*CAC), nhưng doanh thu còn nhân Conversion <=8%; với ratio trung vị khoảng 6–7, hoàn vốn doanh thu của mua user chỉ khoảng 0,5 lần chi phí trước fixed cost. Giảm cộng dồn đã bỏ nguồn lợi nhuận ảo cũ; các bot tiếp tục mua nâng cấp đắt dù tác dụng gần 0, dẫn đến cạn Cash. Đây là chẩn đoán từ các vòng thử, không khẳng định không tồn tại bộ số đạt trong phạm vi công cụ cho phép.
 - Cần Claude/VU xem: giữ bản này làm mốc đo/demo để chỉnh tiếp hay duyệt spec bổ sung về định nghĩa LTV, vai trò bắt buộc của chẩn đoán, hoặc bot tránh mua nâng cấp gần hết tác dụng. Đây là các hướng ngoài công cụ hiện được duyệt, chưa triển khai; không tự sửa công thức kinh tế, điều kiện xử lý hay cơ chế rút bài.
 - Git: git add bị `fatal: Unable to create 'D:/Dev/ai-company/.git/worktrees/ai-company-codex/index.lock': Permission denied`. Không thể stage/commit; để nguyên sáu file chưa commit trong worktree codex/T-009, không vượt sandbox, không push, không merge.
+
+### T-011 | Codex | 2026-11-10 | Review
+
+- Nhận việc: đã đọc AGENTS.md, docs/collaboration.md, TASKS.md (cả T-009), SPEC-T-011 và SPEC-T-009. Owner Codex/In progress đã có sẵn. Nhánh codex/T-011 tồn tại, đang checkout và cùng master 8d01d24 (đã có T-009), cây ban đầu sạch. Lệnh tạo nhánh báo đã tồn tại nên dùng nhánh này, không reset.
+- Đã làm: play() chỉ gỡ incident khi event.revealed và thẻ thuộc resolved_by. Chơi mù vẫn tính tiền, Energy, hiệu ứng và diminishing bình thường, không cộng resolved; chẩn đoán không hồi tố lần chơi mù. Lộ rồi xử lý cùng tuần hoặc tuần sau đều được; hết hạn tự nhiên không cộng resolved. Giữ score() T-006, 12 thẻ, 8 sự kiện, 7 chỉ số, demo 10 tuần.
+- File đổi: game-studio/godot/scripts/sim/simulation.gd; game-studio/godot/data/{cards,events,config}.json; game-studio/godot/tests/{balance_sim,test_sim}.gd; TASKS.md cho trạng thái/bàn giao. Không sửa UI, scenes, test_ui.gd, media-marketing.
+
+Bảng trước/sau: trước lấy từ baseline master T-009 đã ghi trong spec/bàn giao, không coi là phép đo lại ở T-011; sau là output thật vòng 9, 2.000 ván/chiến lược, seed 104..2103. Trung vị chỉ tính ván thắng, thứ tự Retention % / Conversion % / LTV-CAC.
+
+| Tuần | Bot | Thắng trước | Thắng sau | Trung vị trước | Trung vị sau |
+|---|---|---:|---:|---|---|
+| 10 | random | 17,05% | 12,50% | 75 / 6,50 / 5,97 | 70,50 / 6,50 / 4,77 |
+| 10 | ads_only | 0% | 0% | n/a | n/a |
+| 10 | optimization_only | 27,90% | 26,25% | 75 / 7,25 / 7,14 | 66,25 / 2,25 / 4,62 |
+| 10 | balanced | 46,45% | 41,80% | 75 / 7,25 / 6,84 | 74,25 / 3,75 / 4,41 |
+| 10 | analyst | 45,35% | 53,35% | 75 / 7,25 / 6,67 | 74,25 / 7,25 / 4,99 |
+| 30 | random | 0% | 9,30% | n/a | 75 / 8 / 5,97 |
+| 30 | ads_only | 0% | 0% | n/a | n/a |
+| 30 | optimization_only | 9,95% | 0% | 44,53 / 4,49 / 2,68 | n/a |
+| 30 | balanced | 0% | 34,80% | n/a | 74,25 / 7,25 / 5,45 |
+| 30 | analyst | 0% | 55,00% | n/a | 75 / 8 / 5,88 |
+
+Lịch sử chỉnh số: mọi vòng chạy đủ ba script, balance 20.000 ván/vòng; R/A/O/B/P = random/ads/optimization/balanced/analyst, đơn vị %. Giá trị không nêu giữ vòng trước. S/U là failures sim/UI; lỗi fixture được sửa ở vòng sau, không bỏ kiểm tra.
+
+| Vòng | Thay đổi | Demo R/A/O/B/P | Full R/B/P | S/U |
+|---|---|---|---|---|
+| 0 | Bắt buộc revealed; bot xác định ngừng nâng cấp sau 3 lần, random giữ ngẫu nhiên | 13,65 / 0 / 18,25 / 34,50 / 37,45 | 0 / 0 / 0,05 | 0/2 |
+| 1 | Cash 8.400; demo ratio 4,5; ba thẻ lộ Budget/Energy 0/0; modifier Retention/Conversion/CAC của sự kiện kéo dài 8 tuần; chi phí vận hành từ tuần 11 nhân 0,1 | 20,95 / 0 / 15,05 / 32,25 / 38 | 45 / 62,35 / 65 | 1/0 |
+| 2 | Chance demo 0,6; tách win.demo=Cash 1.400/ratio 3,5/users 8, win.full=0/3/8; Budget từ tuần 11 nhân 0,1; sửa kỳ vọng Cash test theo vốn mới | 9 / 0 / 6,55 / 22,60 / 30,10 | 16,40 / 3,70 / 30,80 | 1/2 |
+| 3 | Chance demo 0,3; demo gates 500/3,5/3; full Cash 1.000; penalty Retention -0,3, Conversion -0,05; fixture full horizon tắt gate riêng | 23,65 / 0 / 23,35 / 38,90 / 46,80 | 2 / 0,45 / 9,25 | 0/2 |
+| 4 | Cash 9.000; demo gates 500/4/2; chance tuần 11–30 =0,3, count=1; Influencer 1.600; price_fatigue ưu tiên Loyalty trước Discount | 16,90 / 0 / 21,90 / 34,40 / 43,55 | 22,20 / 39,15 / 61,35 | 0/2 |
+| 5 | Demo gates 300/3,5/2; full Cash 2.500; Budget từ tuần 11 nhân 0,05 | 23,35 / 0 / 25,60 / 41,25 / 49,90 | 16,60 / 28,85 / 51,70 | 0/0 |
+| 6 | Chance demo 0,4, full 0,2; demo gates 300/3/1; full Cash 3.500; Influencer 2.400 | 13,45 / 0 / 19,95 / 33,90 / 42,80 | 7,70 / 18,25 / 33,10 | 0/0 |
+| 7 | Demo users >=0,1; ba thẻ lộ Budget 50/Energy 0; analyst bỏ chẩn đoán thừa; balanced/analyst chỉ mua Influencer nếu Retention báo cáo >=70% | 10,80 / 0 / 26,20 / 40,55 / 51,30 | 5,30 / 20,85 / 40,50 | 0/2 |
+| 8 | Cash 9.400, cập nhật fixture Cash; full Cash 2.500 | 12,50 / 0 / 26,25 / 41,80 / 53,35 | 11,90 / 42,05 / 61,85 | 0/0 |
+| 9 (cuối) | Full Cash 3.000; thêm test cả 8 sự kiện, gate full, chi phí phase và hồi quy seed105; thu gọn định dạng JSON | 12,50 / 0 / 26,25 / 41,80 / 53,35 | 9,30 / 34,80 / 55 | 0/0 |
+
+- Bot: random vẫn chơi mọi thẻ theo thứ tự RNG, không dùng tri thức nâng cấp. Các bot có priority bỏ nâng cấp diminishing sau 3 lần thành công (lần thứ tư còn 12,5% hiệu ứng gốc), dựa vào lịch sử hành động công khai upgrade_plays. Analyst bỏ giới hạn này khi chữa nguyên nhân đã lộ vì gỡ sự kiện vẫn đủ hiệu lực. Analyst dùng event_reports và định nghĩa công khai để lộ trước, chữa sau; xét hai ứng viên khi triệu chứng Conversion mơ hồ. Lượt dự phòng dùng priority balanced nhưng bỏ ba thẻ lộ vì đã chẩn đoán có mục tiêu đầu tuần. Balanced vẫn có thể lộ cuối priority rồi chữa tuần sau. Balanced và analyst cùng chỉ xét Influencer nếu report().retention >=0,7, dùng số nhiễu người chơi thấy. Không đọc state.base/active_events để quyết định. Report dùng RNG riêng nên không đổi RNG rút bài/sự kiện. Số thật chỉ đọc khi ván kết thúc để thống kê. Giữ bot score sweep cũ để kiểm chứng điểm cả với policy cũ.
+- Tự quyết cân bằng: ba thẻ lộ tốn 50 Budget/0 Energy để không mất lượt chữa; phạt Retention -30 điểm %, Conversion -5 điểm % trong 8 tuần làm việc chữa nguyên nhân có giá trị; logging_error giữ nguyên. Influencer giá 2.400, tác dụng +200 users giữ nguyên. price_fatigue ưu tiên Loyalty khi cả hai remedy có sẵn. Giữ diminishing 1/2, caps 75%/8%, công thức LTV/CAC, doanh thu/churn.
+- Tự quyết ván dài: theo quyền tách chi phí phase ở T-011, từ tuần 11 chi phí vận hành thực trả (fixed + variable) nhân 0,1; mọi Budget thực trả nhân 0,05, cho mọi chiến lược, không đổi Energy/hiệu ứng. Ads từ tuần 11 trả 15 để tạo ad_spend=300, không trừ 300 lần nữa: đây là giảm giá phase chủ ý theo config mới, không phải baseline T-009. Demo Ads vẫn trả đúng 300. Hệ số giảm chi phí khá lớn; demo min_users=0,1 chỉ chặn công ty gần như hết user, không mang nghĩa một người nguyên. Claude cần xem các lựa chọn này khi review/playtest; đạt đích thống kê không suy ra đã tối ưu trải nghiệm chơi tay.
+- Test cũ đổi: Cash kỳ vọng 6.759,702970297 -> 8.159,702970297 theo vốn đầu; repeated-upgrade thêm SQL trước chữa vì cơ chế mới; gate sang win.demo. Fixture full horizon tắt win trong config bản sao để kiểm tra thời lượng; test_full_rules kiểm tra từng gate demo/full độc lập. Không xóa test cũ; giữ tái lập seed/report, diminishing và toàn bộ fixture/sweep điểm T-006. Thêm test chơi mù rồi lộ không chữa hồi tố, chữa cùng/khác tuần, đúng nguồn modifier, không đếm hai lần và hết hạn không cộng resolved cho cả cơ chế.
+- Kết quả cuối thực tế: Godot 4.7.2 console đúng đường dẫn VU cung cấp, --headless --path game-studio/godot --script res://tests/<script>. test_sim.gd: 2.326 checks, 0 failures, exit 0; test_ui.gd: 106 checks, 0 failures, exit 0; balance_sim.gd: đủ 10 dòng, 2.000 ván/dòng, 31,540 giây, exit 0. Analyst hơn balanced demo 11,55 điểm %, full 20,20 điểm %. Mọi trung vị ván thắng đạt Retention <=75%, Conversion <=8%, ratio 2..8; không thắng in n/a. Score sweep policy cũ: 122 thắng/1.878 thua, min_win=1.894,31 > max_loss=900. UI seed105 thắng Cash 414,43, Users 2,06, ratio 5,32. git diff --check qua. Console vẫn báo lỗi log user://logs/godot.log và root certificate store, không lỗi script.
+- check_web.py chưa xác nhận: D:\Dev\ai-company\.venv\Scripts\python.exe -X utf8 -I media-marketing/web/check_web.py báo Unable to create process ... Access is denied. Claude cần tự chạy 6 mục; không thay quyền, không vượt sandbox. Không còn mục tiêu cân bằng chưa đạt; kiểm tra web bị chặn môi trường.
+- Git: git add sáu file mã/data/test bị fatal: Unable to create 'D:/Dev/ai-company/.git/worktrees/ai-company-codex/index.lock': Permission denied. Để cả bảy file (kể cả TASKS.md) chưa commit trên codex/T-011; không vượt sandbox, không push, không merge.
+
+Giá trị config.json cuối đầy đủ để cập nhật GDD (hai khóa economy mới áp dụng từ tuần 11; win chọn theo horizon):
+
+```json
+{
+ "version":1,
+ "initial":{"cash":9400,"users":1000,"arpu":25,"conversion":0.02,"retention":0.4,"cac":15,"integrity":80,"fixed_cost":450,"ad_spend":0},
+ "weeks":{"demo":10,"full":30},
+ "economy":{"ad_diminishing":0.01,"ad_unit":1000,"cost_per_user":0.05,"churn_floor":0.01,"full_cost_multiplier":0.1,"full_card_cost_multiplier":0.05},
+ "limits":{"retention":[0,0.75],"conversion":[0,0.08],"integrity":[0,100],"cac":[1,1000],"arpu":[0,1000],"fixed_cost":[10,100000]},
+ "loss":{"cash":0,"ratio":1,"streak":4,"low_cash":2000},
+ "draw":4,
+ "energy":3,
+ "noise_scale":0.5,
+ "score":{"win_bonus":1000,"cash":0.1,"ratio":100,"ratio_cap":5,"resolved":100,"week":40,"resolved_loss":50,"loss_cap":900},
+ "phases":[{"through":10,"event_chance":0.4,"event_count":1,"integrity_decay":0},{"through":20,"event_chance":0.2,"event_count":1,"integrity_decay":1},{"through":30,"event_chance":0.2,"event_count":1,"integrity_decay":2}],
+ "balance":{"games":2000,"seed":104,"quantiles":[0,0.25,0.5,0.75,1],"priorities":{"ads_only":["ads_campaign"],"optimization_only":["onboarding_redesign","fix_checkout_bug","support_automation","loyalty_program","seo_content"],"balanced":["onboarding_redesign","fix_checkout_bug","ads_campaign","support_automation","seo_content","loyalty_program","clean_data","sql_deep_dive","funnel_report","ab_test","discount","influencer_campaign"]}},
+ "win":{"demo":{"min_cash":300,"min_ratio":3,"min_users":0.1},"full":{"min_cash":3000,"min_ratio":3,"min_users":8}}
+}
+```
