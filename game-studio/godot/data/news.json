@@ -79,6 +79,7 @@
    "delay_days": 0
   }
  ],
+ "schema_note": "direction = hướng thay đổi của đại lượng nêu trong tiêu đề. state_direction = hướng của biến trạng thái ẩn tương ứng (lai_suat tăng = vay đắt hơn; ty_gia tăng = áp lực lên doanh nghiệp nhập khẩu, tức đồng lạc yếu đi; nguyen_lieu tăng = giá vốn đắt hơn; suc_mua tăng = nhu cầu tốt hơn; chung_khoan tăng = chỉ số tăng; tin_dung tăng = dễ vay hơn, giảm = khó vay). link = state:<biến> hoặc event:<id sự kiện> hoặc null. exaggerates = tin phóng đại, đủ điều kiện làm bẫy kể cả khi hướng đúng.",
  "kinds": {
   "signal": "tin phản ánh đúng trạng thái hoặc cú sốc thật",
   "trap": "tin sai hoặc phóng đại, dễ gây hiểu lầm",
@@ -101,6 +102,8 @@
     "doi_chieu_nguon",
     "truy_van_lich_su"
    ],
+   "state_direction": "tang",
+   "exaggerates": false,
    "magnitude_pct": {
     "low": 1,
     "mid": 3,
@@ -120,7 +123,9 @@
    "verify_with": [
     "doi_chieu_nguon",
     "truy_van_lich_su"
-   ]
+   ],
+   "state_direction": "tang",
+   "exaggerates": false
   },
   {
    "id": "lai_suat_don_tang_manh",
@@ -135,7 +140,9 @@
    "verify_with": [
     "doi_chieu_nguon",
     "truy_van_lich_su"
-   ]
+   ],
+   "state_direction": "tang",
+   "exaggerates": true
   },
   {
    "id": "lai_suat_nhtw_giu",
@@ -150,7 +157,9 @@
    "verify_with": [
     "doi_chieu_nguon",
     "truy_van_lich_su"
-   ]
+   ],
+   "state_direction": "ngang",
+   "exaggerates": false
   },
   {
    "id": "lai_suat_hai_chuyen_gia",
@@ -165,7 +174,9 @@
    "verify_with": [
     "doi_chieu_nguon",
     "truy_van_lich_su"
-   ]
+   ],
+   "state_direction": null,
+   "exaggerates": false
   },
   {
    "id": "ty_gia_mat_gia",
@@ -181,6 +192,8 @@
     "doi_chieu_nguon",
     "truy_van_lich_su"
    ],
+   "state_direction": "tang",
+   "exaggerates": false,
    "magnitude_pct": {
     "low": 1,
     "mid": 2,
@@ -200,7 +213,9 @@
    "verify_with": [
     "doi_chieu_nguon",
     "truy_van_lich_su"
-   ]
+   ],
+   "state_direction": "tang",
+   "exaggerates": false
   },
   {
    "id": "ty_gia_don_sup",
@@ -215,14 +230,16 @@
    "verify_with": [
     "doi_chieu_nguon",
     "truy_van_lich_su"
-   ]
+   ],
+   "state_direction": "tang",
+   "exaggerates": true
   },
   {
    "id": "ty_gia_noi_bo_can_thiep",
    "topic": "ty_gia",
    "source_id": "noi_bo_nac_danh",
    "source_tier": "noi_bo",
-   "headline": "Nguồn tin nội bộ ngân hàng: chiều nay sẽ có can thiệp tỷ giá",
+   "headline": "Nguồn tin nội bộ ngân hàng: chiều nay sẽ có can thiệp mạnh để hạ áp lực tỷ giá",
    "direction": "giam",
    "kind": "trap",
    "truth": "sai",
@@ -230,7 +247,9 @@
    "verify_with": [
     "doi_chieu_nguon",
     "truy_van_lich_su"
-   ]
+   ],
+   "state_direction": "giam",
+   "exaggerates": false
   },
   {
    "id": "ty_gia_on_dinh",
@@ -245,7 +264,9 @@
    "verify_with": [
     "doi_chieu_nguon",
     "truy_van_lich_su"
-   ]
+   ],
+   "state_direction": "ngang",
+   "exaggerates": false
   },
   {
    "id": "ty_gia_hoi_nghi",
@@ -260,7 +281,9 @@
    "verify_with": [
     "doi_chieu_nguon",
     "truy_van_lich_su"
-   ]
+   ],
+   "state_direction": null,
+   "exaggerates": false
   },
   {
    "id": "nguyen_lieu_chi_so_tang",
@@ -276,6 +299,8 @@
     "truy_van_lich_su",
     "kiem_dinh_gia_thuyet"
    ],
+   "state_direction": "tang",
+   "exaggerates": false,
    "magnitude_pct": {
     "low": 1,
     "mid": 3,
@@ -296,6 +321,8 @@
     "truy_van_lich_su",
     "kiem_dinh_gia_thuyet"
    ],
+   "state_direction": "tang",
+   "exaggerates": false,
    "magnitude_pct": {
     "low": 1,
     "mid": 3,
@@ -315,7 +342,9 @@
    "verify_with": [
     "truy_van_lich_su",
     "kiem_dinh_gia_thuyet"
-   ]
+   ],
+   "state_direction": "tang",
+   "exaggerates": true
   },
   {
    "id": "nguyen_lieu_ha_nhiet",
@@ -330,7 +359,9 @@
    "verify_with": [
     "truy_van_lich_su",
     "kiem_dinh_gia_thuyet"
-   ]
+   ],
+   "state_direction": "giam",
+   "exaggerates": false
   },
   {
    "id": "nguyen_lieu_nha_cung_cap",
@@ -345,7 +376,9 @@
    "verify_with": [
     "truy_van_lich_su",
     "kiem_dinh_gia_thuyet"
-   ]
+   ],
+   "state_direction": "tang",
+   "exaggerates": false
   },
   {
    "id": "nguyen_lieu_cho_dia_phuong",
@@ -360,7 +393,9 @@
    "verify_with": [
     "truy_van_lich_su",
     "kiem_dinh_gia_thuyet"
-   ]
+   ],
+   "state_direction": null,
+   "exaggerates": false
   },
   {
    "id": "suc_mua_ban_le_giam",
@@ -376,6 +411,8 @@
     "truy_van_lich_su",
     "kiem_dinh_gia_thuyet"
    ],
+   "state_direction": "giam",
+   "exaggerates": false,
    "magnitude_pct": {
     "low": 1,
     "mid": 3,
@@ -395,7 +432,9 @@
    "verify_with": [
     "truy_van_lich_su",
     "kiem_dinh_gia_thuyet"
-   ]
+   ],
+   "state_direction": null,
+   "exaggerates": false
   },
   {
    "id": "suc_mua_pho_vang",
@@ -410,7 +449,9 @@
    "verify_with": [
     "truy_van_lich_su",
     "kiem_dinh_gia_thuyet"
-   ]
+   ],
+   "state_direction": "giam",
+   "exaggerates": false
   },
   {
    "id": "suc_mua_mua_le",
@@ -425,7 +466,9 @@
    "verify_with": [
     "truy_van_lich_su",
     "kiem_dinh_gia_thuyet"
-   ]
+   ],
+   "state_direction": "tang",
+   "exaggerates": false
   },
   {
    "id": "suc_mua_doi_thu_giam_gia",
@@ -440,7 +483,9 @@
    "verify_with": [
     "truy_van_lich_su",
     "kiem_dinh_gia_thuyet"
-   ]
+   ],
+   "state_direction": null,
+   "exaggerates": false
   },
   {
    "id": "suc_mua_giam_gia_quang_cao",
@@ -455,7 +500,9 @@
    "verify_with": [
     "truy_van_lich_su",
     "kiem_dinh_gia_thuyet"
-   ]
+   ],
+   "state_direction": null,
+   "exaggerates": false
   },
   {
    "id": "suc_mua_khach_phan_nan_gia",
@@ -470,7 +517,9 @@
    "verify_with": [
     "truy_van_lich_su",
     "kiem_dinh_gia_thuyet"
-   ]
+   ],
+   "state_direction": null,
+   "exaggerates": false
   },
   {
    "id": "suc_mua_dong_nghiep_dong",
@@ -485,7 +534,9 @@
    "verify_with": [
     "truy_van_lich_su",
     "kiem_dinh_gia_thuyet"
-   ]
+   ],
+   "state_direction": "tang",
+   "exaggerates": false
   },
   {
    "id": "suc_mua_chi_so_niem_tin",
@@ -500,7 +551,9 @@
    "verify_with": [
     "truy_van_lich_su",
     "kiem_dinh_gia_thuyet"
-   ]
+   ],
+   "state_direction": "ngang",
+   "exaggerates": false
   },
   {
    "id": "chung_khoan_tlx_giam",
@@ -516,6 +569,8 @@
     "doi_chieu_nguon",
     "truy_van_lich_su"
    ],
+   "state_direction": "giam",
+   "exaggerates": false,
    "magnitude_pct": {
     "low": 1,
     "mid": 3,
@@ -535,7 +590,9 @@
    "verify_with": [
     "doi_chieu_nguon",
     "truy_van_lich_su"
-   ]
+   ],
+   "state_direction": "giam",
+   "exaggerates": false
   },
   {
    "id": "chung_khoan_don_bay_50",
@@ -550,7 +607,9 @@
    "verify_with": [
     "doi_chieu_nguon",
     "truy_van_lich_su"
-   ]
+   ],
+   "state_direction": "tang",
+   "exaggerates": true
   },
   {
    "id": "chung_khoan_quy_gom",
@@ -565,7 +624,9 @@
    "verify_with": [
     "doi_chieu_nguon",
     "truy_van_lich_su"
-   ]
+   ],
+   "state_direction": "tang",
+   "exaggerates": false
   },
   {
    "id": "chung_khoan_cong_nghe",
@@ -580,7 +641,9 @@
    "verify_with": [
     "doi_chieu_nguon",
     "truy_van_lich_su"
-   ]
+   ],
+   "state_direction": null,
+   "exaggerates": false
   },
   {
    "id": "chung_khoan_so_may_man",
@@ -595,7 +658,9 @@
    "verify_with": [
     "doi_chieu_nguon",
     "truy_van_lich_su"
-   ]
+   ],
+   "state_direction": null,
+   "exaggerates": false
   },
   {
    "id": "tin_dung_siet_cho_vay",
@@ -609,7 +674,9 @@
    "link": "state:tin_dung",
    "verify_with": [
     "doi_chieu_nguon"
-   ]
+   ],
+   "state_direction": "giam",
+   "exaggerates": false
   },
   {
    "id": "tin_dung_no_xau",
@@ -623,7 +690,9 @@
    "link": "state:tin_dung",
    "verify_with": [
     "doi_chieu_nguon"
-   ]
+   ],
+   "state_direction": "giam",
+   "exaggerates": false
   },
   {
    "id": "tin_dung_don_pha_san",
@@ -637,7 +706,9 @@
    "link": "state:tin_dung",
    "verify_with": [
     "doi_chieu_nguon"
-   ]
+   ],
+   "state_direction": "giam",
+   "exaggerates": true
   },
   {
    "id": "tin_dung_bao_tri_thanh_toan",
@@ -651,7 +722,9 @@
    "link": "event:checkout_outage",
    "verify_with": [
     "doi_chieu_nguon"
-   ]
+   ],
+   "state_direction": null,
+   "exaggerates": false
   },
   {
    "id": "tin_dung_thong_bao_bao_tri",
@@ -665,7 +738,9 @@
    "link": null,
    "verify_with": [
     "doi_chieu_nguon"
-   ]
+   ],
+   "state_direction": null,
+   "exaggerates": false
   },
   {
    "id": "noi_bo_cong_dat_hang_loi",
@@ -680,7 +755,9 @@
    "verify_with": [
     "lam_sach_du_lieu",
     "truy_van_lich_su"
-   ]
+   ],
+   "state_direction": null,
+   "exaggerates": false
   },
   {
    "id": "noi_bo_kho_cham",
@@ -695,7 +772,9 @@
    "verify_with": [
     "lam_sach_du_lieu",
     "truy_van_lich_su"
-   ]
+   ],
+   "state_direction": null,
+   "exaggerates": false
   },
   {
    "id": "noi_bo_bang_so_trung",
@@ -710,7 +789,9 @@
    "verify_with": [
     "lam_sach_du_lieu",
     "truy_van_lich_su"
-   ]
+   ],
+   "state_direction": null,
+   "exaggerates": false
   },
   {
    "id": "noi_bo_quang_cao_it_don",
@@ -725,7 +806,9 @@
    "verify_with": [
     "lam_sach_du_lieu",
     "truy_van_lich_su"
-   ]
+   ],
+   "state_direction": null,
+   "exaggerates": false
   }
  ]
 }
