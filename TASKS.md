@@ -778,5 +778,5 @@ Kết quả chạy thật (worktree, Godot 4.7.2 console):
 - Art cozy phần B: phố, cửa hàng, cảnh đi làm, nội thất cửa hàng, thumbnail tin tức. Spec docs/SPEC-T-029.md, worktree ai-company-t029, nhánh codex/T-029. Handoff: docs/HANDOFF-T-029.md.
 
 
-### T-030 | Claude subagent | 2026-11-10 | In progress
+### T-030 | Claude subagent | 2026-11-10 | Done
 - Online giai đoạn 0 (offline): hồ sơ cục bộ, Wall of Fame, Employee of the Month, thành tích, thang điểm danh mô phỏng + ngày nghỉ, thư HR hài hước, Daily Shift. Spec docs/SPEC-T-030.md, thiết kế docs/DESIGN-online.md, worktree ai-company-t030, nhánh codex/T-030. Chạy song song với T-029.
