@@ -102,7 +102,14 @@ func _ready() -> void:
 	toast_view = Toast.new()
 	toast_layer.add_child(toast_view)
 	if autostart and meta_enabled and meta == null: meta = Meta.new()
+	announce_rollover()
 	if autostart: start_title()
+
+# A month ended since the last session: its Employee of the Month plaque was just settled.
+func announce_rollover() -> void:
+	if meta == null: return
+	for winner in meta.rollover_winners: toast("Employee of the Month: %s" % winner.month)
+	meta.rollover_winners = []
 
 func toast(text: String) -> void:
 	toast_log.append(text)

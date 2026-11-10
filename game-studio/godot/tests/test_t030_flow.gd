@@ -6,6 +6,7 @@ const Flow = preload("res://scripts/v2/game_flow.gd")
 const Game = preload("res://scripts/world/world_game.gd")
 const Meta = preload("res://scripts/meta/meta.gd")
 const Clock = preload("res://scripts/meta/clock.gd")
+const InputLog = preload("res://scripts/meta/input_log.gd")
 const LocalDaySource = preload("res://scripts/meta/local_day_source.gd")
 const PATH := "user://t030_flow_profile.json"
 var checks := 0
@@ -72,6 +73,7 @@ func run() -> void:
 	test_letter_flow()
 	test_attendance_off()
 	test_full_game_and_score()
+	test_rollover_toast()
 	test_replay_and_no_meta()
 	wipe()
 	print("test_t030_flow: %d checks, %d failures" % [checks, failures])
@@ -250,6 +252,17 @@ func test_full_game_and_score() -> void:
 			if flow.game.status().ending == "survived": check(flow.toast_log.has("Achievement: Survived 10 Days"), "survived toast")
 		flow.queue_free()
 	check(scores[0] == scores[1], "score identical with meta off and on: %s vs %s" % [str(scores[0]), str(scores[1])])
+
+func test_rollover_toast() -> void:
+	wipe()
+	var october := Meta.new(PATH, Clock.new("2026-10-30"))
+	october.sink.submit_day(InputLog.build("run", "2026-10-30", 9, 1, {"question_id": "q", "forecast": "tang", "confidence": "vua", "evidence": [], "actions": []}, 540, {"focus_bonus": 0, "late_minutes": 0}, {"accuracy": 1.0, "evidence_quality": 0.0, "trust_delta": 3.0, "timing": "on_time", "pay": 100, "bonus": 0, "rank": "thuc_tap", "trust": 49, "day_score": 115}))
+	check(october.profile.data.winners.is_empty(), "no winner in the running month")
+	var flow := new_flow("2026-11-02")
+	check(flow.meta.rollover_winners.size() == 1, "loading in November settles October")
+	flow.announce_rollover()
+	check(flow.toast_log == ["Employee of the Month: 2026-10"] and flow.meta.rollover_winners.is_empty(), "the winner is announced once as a toast: " + str(flow.toast_log))
+	flow.queue_free()
 
 func test_replay_and_no_meta() -> void:
 	wipe()
