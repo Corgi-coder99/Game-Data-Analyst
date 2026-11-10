@@ -711,7 +711,7 @@ Kết quả chạy thật (worktree, Godot 4.7.2 console):
 - Git: git add/commit chạy được trong worktree này (lần này không bị Permission denied), commit trên nhánh codex/T-019c, không push, không merge.
 
 
-### T-020 | Claude subagent (thay Codex) | 2026-11-10 | Review
+### T-020 | Claude subagent (thay Codex) | 2026-11-10 | Done
 
 - Wave 1/4 theo feedback playtest của VU: English UI, popup tiền/emote, đồng nghiệp phản ứng. Spec: game-studio/godot/docs/SPEC-T-020.md. Nhánh codex/T-020. Waves 2-4 (desktop apps + báo cáo hạn giờ; thành phố + văn phòng + palette v3; tiêu tiền) chờ T-020 xong. Online: để sau.
 
