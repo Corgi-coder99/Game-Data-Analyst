@@ -153,6 +153,8 @@ func run() -> void:
 	flow = Flow.new()
 	flow.autostart = false
 	flow.fade_enabled = false
+	# T-024: the evening is rendered in its own section at the end.
+	flow.evening_enabled = false
 	root.add_child(flow)
 	# 1. Title.
 	flow.start_title()

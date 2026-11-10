@@ -9,6 +9,8 @@ var ending := ""
 var boss_category := ""
 var boss_line := ""
 var summary_lines: Array = []
+# T-024: extra summary lines from the after-work life (net worth, mood, flavor); empty hides them.
+var life_lines: Array = []
 var replay_button: Button
 var title_button: Button
 var built := false
@@ -56,7 +58,7 @@ func show_ending(final_status: Dictionary) -> void:
 	if ending == "fired": office.player.hide()
 	var panel := Panel.new()
 	panel.position = Vector2(120, 28)
-	panel.size = Vector2(400, 244)
+	panel.size = Vector2(400, 268 if not life_lines.is_empty() else 244)
 	panel.add_theme_stylebox_override("panel", WindowTheme.box(2, 21))
 	add_child(panel)
 	var heading := _text(panel, strings.ending[ending], Rect2(12, 8, 376, 17), 8, 12)
@@ -77,6 +79,7 @@ func show_ending(final_status: Dictionary) -> void:
 		strings.ending.days % int(status.day),
 		strings.ending.pay % float(status.personal_pay),
 		strings.ending.score % maxf(0.0, float(status.score))]
+	lines.append_array(life_lines)
 	for line in lines:
 		_text(panel, line, Rect2(12, y, 376, 12), 22)
 		summary_lines.append(line)
@@ -86,8 +89,8 @@ func show_ending(final_status: Dictionary) -> void:
 	icon(panel, "check" if won else "cross", Vector2(12, y + 4))
 	var verdict := _text(panel, strings.ending.won if won else strings.ending.lost, Rect2(26, y, 360, 17), 24 if won else 26, 12)
 	summary_lines.append(verdict.text)
-	replay_button = button(panel, strings.ending.replay, Rect2(12, 208, 180, 24))
-	title_button = button(panel, strings.ending.to_title, Rect2(208, 208, 180, 24))
+	replay_button = button(panel, strings.ending.replay, Rect2(12, 208 + (24 if not life_lines.is_empty() else 0), 180, 24))
+	title_button = button(panel, strings.ending.to_title, Rect2(208, 208 + (24 if not life_lines.is_empty() else 0), 180, 24))
 	replay_button.focus_mode = Control.FOCUS_NONE
 	title_button.focus_mode = Control.FOCUS_NONE
 	replay_button.pressed.connect(func(): replay_requested.emit())

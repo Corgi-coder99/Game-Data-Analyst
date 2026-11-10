@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "mood": {"start": 50, "max": 100, "evening_decay": 6, "high": 70, "low": 30},
+  "food": [
+    {"id": "noodle_cart", "price": 6, "mood": 9},
+    {"id": "skewer_stall", "price": 4, "mood": 6},
+    {"id": "rice_roll", "price": 9, "mood": 13},
+    {"id": "sweet_soup", "price": 3, "mood": 4}
+  ],
+  "splurge": [
+    {"id": "gadget", "price": 40, "mood": 20},
+    {"id": "holiday", "price": 90, "mood": 40}
+  ],
+  "gold": {"start_price": 50, "min_price": 20, "max_price": 140, "drift": 0.0, "weak_drift": 0.05, "volatility": 0.05, "sell_fee": 0.02, "crash_factor": 0.8},
+  "weakness": {"trust_ref": 50, "trust_span": 30, "cash_span": 0.3, "trust_weight": 0.5, "cash_weight": 0.5},
+  "savings": {"daily_rate": 0.01},
+  "land": {"price": 400, "daily_rate": 0.015, "sell_fee": 0.1},
+  "house": {"price": 900, "daily_rate": 0.01, "rent": 12, "sell_fee": 0.12},
+  "events": {
+    "none": 0.30,
+    "lost_wallet": 0.22,
+    "gold_crash": 0.10,
+    "vendor_hike": 0.14,
+    "found_cash": 0.12,
+    "street_fine": 0.12
+  },
+  "event_params": {
+    "lost_wallet": {"fraction": 0.1, "min": 3, "max": 40},
+    "street_fine": {"min": 4, "max": 12},
+    "found_cash": {"min": 5, "max": 20},
+    "vendor_hike": {"factor": 1.5}
+  }
+}

@@ -1,6 +1,6 @@
 extends Node
 # Orchestrates one ten-day game: TITLE -> NEW_GAME -> DAY_START -> WORK -> SUBMITTED -> REVIEW
-# -> (DAY_START | ENDING) -> END_SCREEN. Only the public WorldGame API is used here;
+# -> (EVENING -> DAY_START | ENDING) -> END_SCREEN. Only the public WorldGame API is used here;
 # the hidden labels are read solely by review_scene.gd after a day has ended.
 const Game = preload("res://scripts/world/world_game.gd")
 const Palette = preload("res://scripts/v2/palette.gd")
@@ -9,6 +9,8 @@ const DesktopScene = preload("res://scenes/v2/desktop.tscn")
 const TitleScene = preload("res://scenes/v2/title.tscn")
 const ReviewScene = preload("res://scenes/v2/review.tscn")
 const EndingScene = preload("res://scenes/v2/ending.tscn")
+const EveningScene = preload("res://scripts/life/evening_scene.gd")
+const LifeGame = preload("res://scripts/life/life_game.gd")
 const HORIZON := 10
 const FADE_STEP := 0.035
 const NOON := 12 * 60
@@ -27,6 +29,9 @@ var office: Node2D
 var title_view: Control
 var review_view: Control
 var ending_view: Control
+var evening_view: Control
+var life: RefCounted
+var evening_enabled := true
 var submission: Dictionary = {}
 var before_status: Dictionary = {}
 var last_message := ""
@@ -115,6 +120,7 @@ func _reset_game() -> void:
 	office = null
 	review_view = null
 	ending_view = null
+	evening_view = null
 	submission = {}
 	before_status = {}
 	boss_shown = false
@@ -147,6 +153,7 @@ func start_with_game(value: RefCounted) -> void:
 	visited.clear()
 	last_message = ""
 	game = value
+	life = LifeGame.new(seed_used)
 	_set_state("NEW_GAME")
 	_enter_day_start()
 
@@ -253,6 +260,7 @@ func _build_review(day: int) -> void:
 	_swap(review_view)
 	review_view.line_shown.connect(func(category, text): boss_log.append({"category":category, "text":text}))
 	review_view.finished.connect(_after_review)
+	review_view.life_text = strings.life.review_line % [life.projected_net_worth(game.status()), life.mood]
 	review_view.show_review(game, day, submission, before_status)
 
 # Used by tests and scripts: one press of Continue.
@@ -262,11 +270,30 @@ func continue_review() -> void:
 func _after_review() -> void:
 	if state != "REVIEW": return
 	if bool(game.status().finished): _enter_ending()
+	elif evening_enabled: _enter_evening()
 	else: _enter_day_start()
+
+# T-024: after-work life between two working days.
+func _enter_evening() -> void:
+	_set_state("EVENING")
+	var public: Dictionary = game.status()
+	_show(func(): _build_evening(public))
+
+func _build_evening(public: Dictionary) -> void:
+	evening_view = EveningScene.new()
+	_swap(evening_view)
+	evening_view.finished.connect(_after_evening)
+	evening_view.open(life, public)
+
+func _after_evening(_skipped: bool = false) -> void:
+	if state != "EVENING": return
+	life.end_evening()
+	_enter_day_start()
 
 func _enter_ending() -> void:
 	_set_state("ENDING")
 	var final_status: Dictionary = game.status()
+	life.settle_for_ending(final_status)
 	_show(func(): _build_ending(final_status))
 	_set_state("END_SCREEN")
 
@@ -275,5 +302,6 @@ func _build_ending(final_status: Dictionary) -> void:
 	_swap(ending_view)
 	ending_view.replay_requested.connect(new_game.bind(-1, {}))
 	ending_view.title_requested.connect(start_title)
+	ending_view.life_lines = [strings.life.ending_net % life.net_worth(), strings.life.ending_mood % [life.mood, strings.life.mood_names[life.mood_band()]], strings.life.ending_flavor[life.mood_band()]]
 	ending_view.show_ending(final_status)
 	boss_log.append({"category":ending_view.boss_category, "text":ending_view.boss_line})
