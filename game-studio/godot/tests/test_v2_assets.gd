@@ -37,7 +37,7 @@ func run() -> void:
 	"desk":[48,24,2],"chair":[16,24,1],"plant":[16,24,2],"cabinet":[24,32,1],
 	"window":[32,32,3],"door":[24,40,2],"floor":[16,16,1],"wall":[16,16,1],
 	"baseboard":[16,16,1],"clock":[16,16,1]}
-	for icon in ["arrow_up","arrow_down","arrow_flat","check","cross","question","lock","shield","newspaper","bubble","flag","dash","clock_old"]:
+	for icon in ["arrow_up","arrow_down","arrow_flat","check","cross","question","lock","shield","newspaper","bubble","flag","dash","clock_old","emote_happy","emote_sad","emote_angry","emote_neutral","thumb"]:
 		expected[icon] = [8,8,1]
 	check(first.size() == expected.size(),"complete sprite inventory")
 	for id in expected:
@@ -71,7 +71,7 @@ func run() -> void:
 	check(not office.set_phase("invalid") and office.phase == "chieu","invalid phase rejected without mutation")
 	office.set_clock(15,45)
 	check(office.clock_hour == 15 and office.clock_minute == 45,"clock API")
-	office.play_boss_appears("Tôi cần căn cứ.")
+	office.play_boss_appears("I need evidence.")
 	check(office.boss.visible and office.dialog.visible,"boss appears")
 	var enter := InputEventKey.new()
 	enter.keycode = KEY_ENTER
@@ -84,10 +84,10 @@ func run() -> void:
 	check(desk_count == 1,"Enter opens desk")
 	office.desk_button.pressed.emit()
 	check(desk_count == 2,"desk click")
-	var text := "Tiếng Việt: dữ liệu, bằng chứng, chắc chắn. ".repeat(8).substr(0,300)
-	office.show_dialog("Anh Khôi",text)
+	var text := "Long English line: data, evidence, certainty. ".repeat(8).substr(0,300)
+	office.show_dialog("Khoi",text)
 	await process_frame
-	check(office.dialog_text.text == text,"Vietnamese retained")
+	check(office.dialog_text.text == text,"long dialogue text retained")
 	for control in [office.dialog,office.speaker_label,office.dialog_text]:
 		check(Rect2(Vector2.ZERO,Vector2(640,360)).encloses(control.get_global_rect()),"dialog inside viewport")
 	check(office.dialog_text.scroll_active,"long dialogue scrolls within bounds")

@@ -52,9 +52,9 @@ func _ready() -> void:
 	place("cabinet",Vector2i(480,112))
 	place("plant",Vector2i(32,120))
 	place("plant",Vector2i(608,128),1)
-	add_label("LỤC CHÂU / PHÒNG PHÂN TÍCH",Vector2i(48,16),12,8)
-	add_label("TÀI CHÍNH",Vector2i(544,72),8,7)
-	var names := ["Bạn","Anh Khôi","Bé Mai","Chú Tư"]
+	add_label("LUC CHAU / ANALYTICS DEPT",Vector2i(48,16),12,8)
+	add_label("FINANCE",Vector2i(544,72),8,7)
+	var names := ["You","Khoi","Mai","Tu"]
 	var ids := ["player","khoi","mai","tu"]
 	for i in range(4):
 		var x := 136 + i*112
@@ -79,8 +79,8 @@ func _ready() -> void:
 	desk_button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	desk_button.pressed.connect(func(): desk_clicked.emit())
 	add_child(desk_button)
-	add_label("LỐI VÀO  →",Vector2i(8,280),8,7)
-	hint_label = add_label("Enter : mở bàn làm việc",Vector2i(136,264),8,7)
+	add_label("ENTRANCE  →",Vector2i(8,280),8,7)
+	hint_label = add_label("Enter: open your desk",Vector2i(136,264),8,7)
 	_build_dialog()
 	set_phase("sang")
 	play_arrival()
@@ -180,7 +180,7 @@ func seat_now() -> void:
 func play_boss_appears(line: String) -> void:
 	door.texture = lib.frame("door",1)
 	boss.show()
-	show_dialog("Chị Hạnh",line)
+	show_dialog("Ms. Hanh",line)
 
 func show_dialog(speaker: String, text: String) -> void:
 	speaker_label.text = speaker
