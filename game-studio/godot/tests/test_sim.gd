@@ -448,3 +448,15 @@ func test_use_tool() -> void:
 	sim.state.base.cash = cash
 	sim.finish_week()
 	check(not sim.use_tool("sql_deep_dive"), "closed week tool refusal")
+	var discounted := Sim.new(42)
+	discounted.begin_week(false)
+	discounted.state.base.cash = 60
+	var original_hand: Array = discounted.hand.duplicate(true)
+	var original_energy: int = discounted.state.energy
+	check(discounted.use_tool("sql_deep_dive", 60), "override affordable when default is not")
+	near(discounted.state.base.cash, 0, "override charges exact amount")
+	check(discounted.state.energy == original_energy and discounted.hand == original_hand, "override preserves energy cost and hand")
+	check(not discounted.use_tool("ab_test", 80), "override rejects insufficient budget")
+	check(discounted.state.energy == original_energy and discounted.state.base.cash == 0, "override refusal atomic")
+	check(discounted.use_tool("ab_test", 0), "zero override supported")
+	check(not discounted.use_tool("onboarding_redesign", 0), "override cannot bypass category")

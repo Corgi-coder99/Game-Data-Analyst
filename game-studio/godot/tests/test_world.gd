@@ -33,10 +33,10 @@ func public_only(value: Variant) -> bool:
 func submission(game: RefCounted) -> Dictionary:
 	return {"question_id":game.question_today().id,"forecast":"ngang","confidence":"thap","evidence":[],"actions":[]}
 
-func test_public_and_replay() -> void:
-	var a := Game.new(104, 10)
-	var b := Game.new(104, 10, {"world":{}})
-	var cached := Game.new(104, 10)
+func test_public_and_replay(horizon: int = 10) -> void:
+	var a := Game.new(104, horizon)
+	var b := Game.new(104, horizon, {"world":{}})
+	var cached := Game.new(104, horizon)
 	check(cached._scenario._days == a._scenario._days and cached._news._items == a._news._items, "cache matches fresh generation")
 	cached._news._items[0].headline = "mutated"
 	check(a._news._items[0].headline != "mutated", "cache isolated by deep copy")
@@ -78,7 +78,8 @@ func test_public_and_replay() -> void:
 		copy.news.clear()
 		check(not a.review(day).news.is_empty(), "review defensive copy")
 	check(hash(log_a) == hash(log_b), "whole log reproducible hash")
-	check(a.status().ending == "survived", "complete public ten day integration")
+	if horizon == 10: check(a.status().ending == "survived", "complete public ten day integration")
+	else: check(a.status().finished, "public full game terminates consistently")
 	var first := Game.new(4, 10)
 	first.begin_day()
 	var news: Array = first.news_today()
@@ -158,17 +159,37 @@ func test_grade() -> void:
 	nominal.grading.base = 10
 	nominal.grading.confidence = {"thap":0.5,"vua":1.0,"cao":1.5}
 	nominal.grading.evidence_factor = 0.25
+	nominal.grading.wrong_factor = 1.8
+	nominal.grading.adjacent_effect = -0.3
 	var confirmed := [{"uid":"one","truth":"dung","verification":"xac_nhan"}]
 	near(Grade.grade({"forecast":"tang","confidence":"cao","evidence":["one"]}, "tang", confirmed, nominal).delta, 18.8, "hand computed nominal correct high with evidence")
-	near(Grade.grade({"forecast":"giam","confidence":"vua","evidence":["one"]}, "tang", confirmed, nominal).delta, -12.5, "hand computed nominal opposite")
-	near(Grade.grade({"forecast":"tang","confidence":"vua","evidence":["one"]}, "ngang", confirmed, nominal).delta, 3.8, "hand computed nominal adjacent")
+	near(Grade.grade({"forecast":"giam","confidence":"vua","evidence":["one"]}, "tang", confirmed, nominal).delta, -13.5, "hand computed nominal opposite: -10*1.8*(1-0.25)")
+	near(Grade.grade({"forecast":"tang","confidence":"vua","evidence":["one"]}, "ngang", confirmed, nominal).delta, -2.2, "hand computed nominal adjacent: -10*0.3*(1-0.25)")
+	var bad := [{"uid":"one","truth":"sai","verification":"bac_bo"}]
+	near(Grade.grade({"forecast":"giam","confidence":"vua","evidence":["one"]}, "tang", bad, nominal).delta, -22.5, "bad evidence increases opposite penalty: -18*1.25")
+	near(Grade.grade({"forecast":"tang","confidence":"vua","evidence":[]}, "ngang", [], nominal).delta, -3, "adjacent without evidence is penalized")
+	var production := config.duplicate(true)
+	production.grading.base = 10
+	production.grading.confidence.vua = 0.85
+	production.grading.evidence_factor = 0.4
+	production.grading.wrong_factor = 2.3
+	production.grading.adjacent_effect = -0.55
+	near(Grade.grade({"forecast":"tang","confidence":"vua","evidence":["one"]}, "tang", confirmed, production).delta, 11.9, "hand computed tuned correct: 10*0.85*1.4")
+	near(Grade.grade({"forecast":"giam","confidence":"vua","evidence":["one"]}, "tang", confirmed, production).delta, -11.7, "hand computed tuned opposite: -10*0.85*2.3*0.6")
+	near(Grade.grade({"forecast":"tang","confidence":"vua","evidence":["one"]}, "ngang", confirmed, production).delta, -2.8, "hand computed tuned adjacent: -10*0.85*0.55*0.6")
+	near(Grade.grade({"forecast":"giam","confidence":"vua","evidence":["one"]}, "tang", bad, production).delta, -27.4, "hand computed tuned bad evidence: -10*0.85*2.3*1.4")
+	var random_expectation := 0.0
+	for forecast in nominal.directions:
+		for answer in nominal.directions:
+			random_expectation += Grade.grade({"forecast":forecast,"confidence":"vua","evidence":[]}, answer, [], nominal).delta / 9.0
+	check(random_expectation < 0, "uniform guessing has negative expected trust")
 	for forecast in config.directions:
 		for answer in config.directions:
 			for confidence in config.grading.confidence:
 				var r: Dictionary = Grade.grade({"forecast":forecast,"confidence":confidence,"evidence":[]}, answer, [], config)
 				var expected_acc := 1.0 if forecast == answer else (0.4 if forecast == "ngang" or answer == "ngang" else 0.0)
 				near(r.acc, expected_acc, "accuracy table")
-				var expected: float = config.grading.base * config.grading.confidence[confidence] * (1 if expected_acc == 1 else (0.3 if expected_acc > 0 else -1))
+				var expected: float = config.grading.base * config.grading.confidence[confidence] * (1 if expected_acc == 1 else (config.grading.adjacent_effect if expected_acc > 0 else -config.grading.wrong_factor))
 				near(r.delta, snappedf(expected, 0.1), "confidence grade table")
 	for truth in ["dung", "sai", "mot_phan", "cu", "khong_lien_quan"]:
 		for verification in ["chua_kiem_chung", "xac_nhan", "bac_bo", "chua_du_can_cu", "cu"]:
@@ -176,7 +197,7 @@ func test_grade() -> void:
 			var result: Dictionary = Grade.grade({"forecast":"tang","confidence":"vua","evidence":["one"]}, "tang", items, config)
 			var expected: float = config.grading.unverified[truth] if verification == "chua_kiem_chung" else config.grading.evidence[verification]
 			near(result.ev, expected, "evidence table")
-			near(result.delta, snappedf(config.grading.base * (1 + float(config.grading.evidence_factor) * expected), 0.1), "evidence delta")
+			near(result.delta, snappedf(config.grading.base * config.grading.confidence.vua * (1 + float(config.grading.evidence_factor) * expected), 0.1), "evidence delta includes medium confidence")
 	var game := Game.new(42, 10)
 	game.begin_day()
 	var input := submission(game)
@@ -225,14 +246,22 @@ func test_verification() -> void:
 		check(Verify.new(i, config).verify(test, "truy_van_lich_su", dirty).result in ["xac_nhan", "chua_du_can_cu"], "noise never inverts truth")
 
 func test_career() -> void:
-	var career := Career.new(config)
+	# Fixed hand-calculation fixture, independent of balance tuning.
+	var career_config := config.duplicate(true)
+	career_config.career.initial_trust = 42
+	career_config.career.warning = 35
+	career_config.career.demote = 25
+	career_config.career.low_trust_days = 2
+	career_config.career.minimum_days = 2
+	career_config.ranks[0].promote = 70
+	var career := Career.new(career_config)
 	var good := {"acc":1.0,"ev":1.0,"delta":15.0}
 	career.update(good)
 	check(career.rank == 0, "minimum tenure")
 	career.update(good)
-	check(career.rank == 1 and career.trust == config.career.reset_promotion, "promotion and reset")
+	check(career.rank == 1 and career.trust == maxf(career_config.career.initial_trust + 30, career_config.career.reset_promotion), "promotion preserves earned trust")
 	near(career.personal_pay, 300, "salary and half salary bonus")
-	var warning := Career.new(config)
+	var warning := Career.new(career_config)
 	warning.trust = 50
 	warning.update({"acc":0.4,"ev":0,"delta":-16})
 	warning.update({"acc":0.4,"ev":0,"delta":0})
@@ -247,13 +276,20 @@ func test_career() -> void:
 	career.trust = 26
 	career.update({"acc":0,"ev":0,"delta":-2})
 	check(career.fired and career.demotions == 2, "two demotions fired")
-	var intern := Career.new(config)
+	var intern := Career.new(career_config)
 	intern.trust = 25
 	intern.update({"acc":0,"ev":0,"delta":0})
 	check(not intern.fired, "intern first wrong")
 	intern.update({"acc":0,"ev":0,"delta":0})
 	check(intern.fired, "intern two wrong fired")
-	var zero := Career.new(config)
+	var recovery := Career.new(career_config)
+	recovery.trust = 20
+	for day in 3:
+		recovery.update({"acc":1,"ev":0,"delta":0})
+		check(not recovery.fired and recovery.demotions == 0, "correct report protected during low-trust recovery")
+	recovery.update({"acc":0.4,"ev":0,"delta":0})
+	check(recovery.fired, "prolonged low trust with adjacent error triggers dismissal")
+	var zero := Career.new(career_config)
 	zero.update({"acc":0,"ev":0,"delta":-100})
 	check(zero.fired, "zero trust fired")
 	var previous := -1.0
@@ -270,26 +306,33 @@ func test_score_sweep() -> void:
 	var max_loss := -INF
 	var wins := 0
 	var losses := 0
-	for seed_value in range(104, 604):
-		for bot in ["random_reporter", "rumor_follower", "official_only", "verifier", "careful_hedger"]:
-			var result: Dictionary = Bots.run_game(seed_value, 10, bot)
-			if result.won:
-				wins += 1
-				min_win = minf(min_win, result.score)
-			else:
-				losses += 1
-				max_loss = maxf(max_loss, result.score)
-	check(wins > 0 and losses > 0 and min_win > max_loss, "all losing scores below all winning scores")
-	print("score sweep 500/bot: wins=%d losses=%d min_win=%.2f max_loss=%.2f" % [wins, losses, min_win, max_loss])
+	for days in [10, 30]:
+		min_win = INF
+		max_loss = -INF
+		wins = 0
+		losses = 0
+		for seed_value in range(104, 604):
+			for bot in ["random_reporter", "rumor_follower", "official_only", "verifier", "careful_hedger"]:
+				var result: Dictionary = Bots.run_game(seed_value, days, bot)
+				if result.won:
+					wins += 1
+					min_win = minf(min_win, result.score)
+				else:
+					losses += 1
+					max_loss = maxf(max_loss, result.score)
+		check(wins > 0 and losses > 0 and min_win > max_loss, "all losing scores below all winning scores, days=%d" % days)
+		print("score sweep %d days 500/bot: wins=%d losses=%d min_win=%.2f max_loss=%.2f" % [days, wins, losses, min_win, max_loss])
 
 func _init() -> void:
 	config = Loader.load_json("res://data/world.json")
 	test_public_and_replay()
+	test_public_and_replay(30)
 	test_news_questions()
 	test_grade()
 	test_verification()
 	test_career()
 	test_overrides_and_endings()
+	test_world_cost_and_correct_chain()
 	if "--quick" not in OS.get_cmdline_user_args(): test_score_sweep()
 	print("test_world: %d checks, %d failures" % [checks, failures])
 	quit(1 if failures > 0 else 0)
@@ -349,8 +392,53 @@ func test_overrides_and_endings() -> void:
 		win.begin_day()
 		input = submission(win)
 		input.forecast = "tang"
+		var trust_before: float = win.status().trust
+		var warnings_before: int = win.status().warnings
 		win.submit_report(input)
 		win.end_day()
+		check(win.status().trust >= trust_before, "correct fixed reports never decrease trust, including promotions")
+		check(win.status().warnings == warnings_before and win.status().demotions == 0 and win.status().ending != "fired", "correct fixed reports never punished")
 	check(win.status().ending == "survived" and win.status().won, "promoted survival wins")
 	near(fired.status().score, fired._career.trust * float(config.score.trust) + fired._career.positive_delta * float(config.score.positive_delta) - float(config.score.fired), "exact score formula without loss cap")
 	check(win.status().score > fired.status().score and win.status().score > bankrupt.status().score, "ending score separation fixtures")
+
+func test_world_cost_and_correct_chain() -> void:
+	for horizon in [10, 30]:
+		var states: Array = []
+		for day in horizon + 1:
+			var values := {}
+			for variable in config.variables: values[variable] = {"direction":"tang","magnitude":"low"}
+			states.append(values)
+		var questions: Array = []
+		for i in 7:
+			questions.append({"id":"fixed%d" % i,"text":"Fixture","variable":"lai_suat","window_days":0,"answer_rule":"state"})
+		var company: Dictionary = Loader.load_json("res://data/config.json").duplicate(true)
+		company.initial.cash = 1000000
+		var game := Game.new(77, horizon, {"world":{"macro":{},"noise_factor":0},"simulation":{"config":company},"questions":questions,"scenario":{"days":states,"shocks":[]}})
+		while not game.status().finished:
+			game.begin_day()
+			var before: Dictionary = game.status()
+			var tool: Dictionary = game.tools()[0]
+			var cash: float = game._sim.state.base.cash
+			var uid: String = game.news_today().filter(func(n): return n.day == game.status().day)[0].uid
+			check(game.verify(uid, tool.id).ok, "world cost fixture verification")
+			near(game._sim.state.base.cash, cash - tool.budget, "advertised tool price matches actual cash charge")
+			near(game.status().cash_report, before.cash_report - tool.budget, "public cash subtracts overridden cost")
+			check(game.verify(uid, tool.id).ok, "world cached verification")
+			near(game._sim.state.base.cash, cash - tool.budget, "world cached verification free")
+			var input := submission(game)
+			input.forecast = "tang"
+			input.confidence = "cao"
+			check(game.submit_report(input).ok and game.end_day().ok, "correct fixed chain submission")
+			check(game.status().trust >= before.trust, "correct fixed chain trust monotonic")
+			check(game.status().warnings == 0 and game.status().demotions == 0 and game.status().ending != "fired", "correct fixed chain has no punishment")
+		check(game.status().day == horizon and game.status().ending == "survived", "complete correct chain for both horizons")
+		var required: String = config.win.demo if horizon == 10 else config.win.full
+		var rank_index := 0
+		for i in config.ranks.size():
+			if config.ranks[i].id == required: rank_index = i
+		check(game.status().won == (game._career.rank >= rank_index), "win uses horizon-specific rank")
+		var expected_wins := [false, true, true, true, true] if horizon == 10 else [false, false, false, true, true]
+		for index in config.ranks.size():
+			game._career.rank = index
+			check(game.status().won == expected_wins[index], "demo/full victory boundary for each rank")

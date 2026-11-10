@@ -31,7 +31,10 @@ static func grade(input: Dictionary, answer: String, items: Array, config: Dicti
 			else: evidence += float(g.evidence[item.verification])
 	if not input.evidence.is_empty(): evidence /= input.evidence.size()
 	var points: float = g.base * g.confidence[input.confidence]
-	if acc == 0: points = -points
-	elif acc < 1: points *= float(g.partial_reward)
-	var delta := snappedf(points * (1.0 + float(g.evidence_factor) * evidence), 0.1)
+	if acc == 0: points *= -float(g.wrong_factor)
+	elif acc < 1: points *= float(g.adjacent_effect)
+	# Bad evidence increases penalties; confirmed evidence mitigates an error.
+	var evidence_effect := float(g.evidence_factor) * evidence
+	var multiplier := 1.0 + evidence_effect if points >= 0 else 1.0 - evidence_effect
+	var delta := snappedf(points * maxf(0, multiplier), 0.1)
 	return {"acc":acc,"ev":evidence,"delta":delta,"label":"reward" if delta > 0 else "penalty"}

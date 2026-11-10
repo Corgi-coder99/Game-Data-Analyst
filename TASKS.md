@@ -23,6 +23,7 @@ Trạng thái: Backlog -> In progress -> Review -> Done. Bị chặn thì chuy�
 
 | ID | Việc | Owner | Nhánh | File được sửa | Tiêu chí hoàn thành |
 |---|---|---|---|---|---|
+| T-018b | Siết thưởng phạt và sửa ván 30 ngày theo SPEC-T-018b | Codex | codex/T-018b | game-studio/godot/data/world.json, game-studio/godot/scripts/world/*, game-studio/godot/scripts/sim/simulation.gd (chỉ use_tool và tham số ghi đè chi phí), game-studio/godot/tests/test_world.gd, game-studio/godot/tests/balance_world.gd, game-studio/godot/tests/test_sim.gd (chỉ use_tool) | Đạt mục tiêu A/B và hồi quy theo spec; TASKS.md cho trạng thái/bàn giao |
 | T-016 | Style bible pixel mới: bảng màu 32 màu, kích thước sprite, ánh sáng, giao diện máy tính, hoạt ảnh, kiểm tra tự động. Chờ VU xem | Claude | v2 | shared/style-bible/pixel-office-v2.md, palette-v2.json | VU duyệt style bible; quyết định có sửa CLAUDE.md mục 4 không |
 | T-017 | Content bible v2 (thế giới hư cấu Tân Lạc, công ty Lục Châu, nhân vật, 10 nguồn tin, ánh xạ 8 cú sốc) và data/news.json (41 mẫu tin, đã kiểm hợp lệ). Chờ VU xem | Claude | v2 | game-studio/godot/docs/CONTENT-BIBLE-v2.md, data/news.json | VU duyệt nội dung |
 
@@ -487,3 +488,141 @@ world.json cuối đầy đủ:
  "balance":{"seed":104,"games":2000}
 }
 ```
+
+### T-018b | Codex | 2026-11-10 | Review
+
+- Nhận trên codex/T-018b, v2 là tổ tiên HEAD (9a0657e), cây làm việc ban đầu sạch. TASKS.md chưa có dòng T-018b: đã thêm owner Codex vào In progress theo phạm vi VU giao trước khi sửa mã. Không push/merge, không dùng mạng hay dữ liệu cá nhân.
+- File đổi dưới game-studio/godot/: data/world.json; scripts/world/{report,career,verifier,world_game}.gd; scripts/sim/simulation.gd (chỉ chữ ký use_tool và chọn Budget); tests/{balance_world,test_world,test_sim}.gd (test_sim chỉ thêm trong test_use_tool). TASKS.md cho nhận việc/bàn giao. Không đổi bot propose, luật kiểm chứng, tin, câu hỏi, dữ liệu kinh tế, UI, scene, docs hay shared.
+- Công thức: acc vẫn 1 / 0,4 / 0; points = base*c khi đúng, base*c*adjacent_effect khi lệch một bậc, -base*c*wrong_factor khi ngược hướng. Với điểm dương nhân (1 + evidence_factor*ev), điểm âm nhân (1 - evidence_factor*ev), kẹp hệ số không âm, snappedf 0,1. Tin đã bác bỏ/tin cũ không còn làm mất mức phạt của báo cáo sai; bằng chứng xác nhận giảm phạt khi dự báo sai.
+- Sự nghiệp: giữ luật cảnh cáo theo lần hạ qua ngưỡng, giáng chức khi acc=0 và Tin tưởng thấp, đuổi ở 0 Tin tưởng hoặc đủ 2 giáng chức. Thay chuỗi sai của thực tập sinh bằng số ngày Tin tưởng thấp liên tiếp (low_trust_days); chỉ kích hoạt nhánh đuổi này trên báo cáo acc<1. Thăng chức dùng max(trust, reset_promotion), không lấy mất Tin tưởng vừa kiếm được. Lương/thưởng và Cash công ty vẫn tách biệt; không chọn thêm phạt tiền.
+- Chi phí: use_tool(card_id, budget_override=-1.0), mọi giá trị âm giữ giá thẻ cũ; 0 hỗ trợ công cụ miễn phí. Tầng world truyền tool_budget, tools() và cash_report hiển thị đúng giá, cache kiểm chứng không thu lại tiền. Giá mới áp dụng cả 10 và 30 ngày để cùng một công cụ không đổi giá theo kỳ; không đổi Energy/hiệu ứng/RNG của lõi.
+- Thắng: win.demo=chuyen_vien; win.full=truong_nhom. Thời gian giữ chức tối thiểu 6 ngày giúp ván dài cần cả quá trình làm việc đúng, không chỉ một chuỗi may mắn. Win bonus=8.000: với delta dương tối đa 22,4/ngày, cận điểm thua 30 ngày là 7.220; cận thắng bảo thủ 7.700 (đã trừ 2 giáng chức), vẫn tách nghiêm ngặt. Không dùng trần điểm ván thua.
+- balance_world thêm demoted %, warned %, heavy % (hợp của fired và demoted, không cộng trùng), Tin tưởng p25/p50/p75. Phân vị nội suy tại (N-1)*p; rank trung vị dùng 0..4. Chế độ --trace chỉ lấy acc/ev và mức tự tin từ báo cáo đã review, dùng overrides base=0, trust=100, Cash giả lập lớn để không mất đuôi chuỗi; không dùng kết quả này làm nghiệm thu và không đổi quyết định bot. Sàng C# tạm trong TEMP (RNG 18018) rồi kiểm tra ứng viên bằng ván thật.
+- Lưu gốc: balance_sim chạy trước sửa, TEMP/T-018b-sim-before.txt; so sau trong TEMP/T-018b-sim-after.txt khớp 47 dòng, chỉ bỏ elapsed_seconds. Bảng world gốc demo: TEMP/T-018b-baseline-10.txt; full: TEMP/T-018b-isolated-before-30.txt (git archive HEAD vào TEMP để cố định bản gốc, chỉ thêm cột thống kê cùng bot). Các lượt gốc đầu bị đổi JSON giữa chừng đã hủy, không dùng số của lượt lỗi; bản gốc chạy lại khớp toàn bộ số T-018 đã bàn giao.
+
+Bảng trước (2.000 ván/bot, seed 104..2103; đủ 5 kind 100%, 8/8 cú sốc ở cả hai kỳ):
+
+| Ngày | Bot | N | Thắng % | Fired % | Bankrupt % | Survived % | Demoted % | Warned % | Heavy % | Trust p25/p50/p75 | Rank p50 | acc TB | ev TB | Đủ 5 kind % |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|---:|---:|---:|---:|
+| 10 | random_reporter | 2000 | 7.80 | 1.60 | 0.00 | 98.40 | 0.00 | 17.95 | 1.60 | 47.77/55.50/62.90 | 0.0 | 0.5189 | 0.0000 | 100.00 |
+| 10 | rumor_follower | 2000 | 13.85 | 1.40 | 0.00 | 98.60 | 0.00 | 23.70 | 1.40 | 48.90/56.40/63.90 | 0.0 | 0.5352 | -0.3604 | 100.00 |
+| 10 | official_only | 2000 | 33.85 | 0.00 | 0.00 | 100.00 | 0.00 | 0.90 | 0.00 | 55.87/61.30/67.50 | 0.0 | 0.6985 | -0.1048 | 100.00 |
+| 10 | verifier | 2000 | 69.50 | 0.10 | 0.00 | 99.90 | 0.05 | 7.90 | 0.15 | 55.90/63.00/73.00 | 1.0 | 0.7197 | 0.3120 | 100.00 |
+| 10 | careful_hedger | 2000 | 30.50 | 0.00 | 0.00 | 100.00 | 0.00 | 0.15 | 0.00 | 57.60/62.70/67.50 | 0.0 | 0.7200 | 0.3120 | 100.00 |
+| 30 | random_reporter | 2000 | 63.95 | 3.25 | 0.65 | 96.10 | 0.10 | 22.15 | 3.35 | 55.00/62.80/72.00 | 1.0 | 0.5141 | 0.0000 | 100.00 |
+| 30 | rumor_follower | 2000 | 69.00 | 4.45 | 0.05 | 95.50 | 0.15 | 31.25 | 4.60 | 55.00/62.50/71.90 | 1.0 | 0.5345 | -0.4015 | 100.00 |
+| 30 | official_only | 2000 | 98.50 | 0.00 | 0.05 | 99.95 | 0.00 | 1.20 | 0.00 | 60.57/68.15/75.70 | 2.0 | 0.7008 | -0.0564 | 100.00 |
+| 30 | verifier | 2000 | 62.35 | 0.15 | 36.85 | 63.00 | 0.45 | 9.55 | 0.60 | 61.60/71.20/82.60 | 3.0 | 0.7006 | 0.2784 | 100.00 |
+| 30 | careful_hedger | 2000 | 41.35 | 0.00 | 58.00 | 42.00 | 0.00 | 0.35 | 0.00 | 61.00/68.80/75.40 | 2.0 | 0.7061 | 0.3007 | 100.00 |
+
+Lịch sử chỉnh số: các dòng sau là ván thật 200/bot (seed 104..303), trừ vòng 8/9 ghi rõ 2.000. Các hệ số không nêu giữ vòng trước. R/U/O/V/H = random/rumor/official/verifier/hedger. Không dùng các mẫu nhỏ thay kết quả nghiệm thu 2.000.
+
+| Vòng | Thay đổi |
+|---|---|
+| 1 | base=5, adjacent_effect=-0,3, wrong_factor=1,8, ev_factor=1; giữ Trust 42, ngưỡng thăng 70/75/80/85; thăng không giảm Trust; giá công cụ 60/80/40/100, full cần trưởng nhóm |
+| 2 | Ngưỡng thăng 62/85/100/85; demote=30; chuỗi sai thực tập tính acc<1 |
+| 3 | ev_factor=0,65; demote=25 |
+| 4 | base=6, wrong=2,2, adjacent=-0,1, ev=0,5; thap=0,7, cao=1,1; ngưỡng chuyên viên chính lên trưởng nhóm 94 |
+| 5 | demote=35, low_trust_days=3 thay chuỗi sai; thap=0,65; ngưỡng đầu 64, ngưỡng lên trưởng nhóm 100 |
+| 6 | warning/demote=40; low_days=5; thap=0,6, cao=1; full cần giám đốc, ngưỡng trưởng nhóm lên giám đốc 100 |
+| 7 | wrong=1,4, adjacent=-0,6, ev=0,7; thap=0,7, cao=1,2 |
+| Sàng 1 | 100.000 ứng viên trên chuỗi công khai 200 seed/cả hai kỳ; giữ vua=1, tốt nhất vẫn vi phạm fired official. Không sửa world.json cho từng ứng viên, không phải bảng nghiệm thu |
+| Sàng 2 | Cho vua trong [0,7;1,1], mở ev về 0..1 và minimum_days đến 7; tìm được ứng viên đạt ngưỡng trên mẫu nhỏ. Candidate: base=10, wrong=2,3, adjacent=-0,55, ev=0,2; thap/vua/cao=0,8/0,85/1,6; Trust=47, demote=16, low_days=6, minimum_days=6, promote=72/79/96/100, full=trưởng nhóm |
+| 8 | Chạy thật 2.000/bot, Trust=46 thay 47 để random có dư địa phạt; bonus thắng 8.000. Demo chỉ thiếu trần fired verifier (1,75% >1%); dừng lượt 30 ngày và quét điểm đang chạy để sửa, không lấy kết quả dở dang |
+| 9 | ev_factor=0,4, thap=0,7. Chạy thật 2.000/bot cả hai kỳ; giữ nguyên mục tiêu A/B |
+
+Kết quả từng vòng đã hoàn tất (Thắng / Fired / Heavy theo thứ tự R/U/O/V/H):
+
+| Vòng | Ngày | N/bot | Thắng % R/U/O/V/H | Fired % R/U/O/V/H | Heavy % R/U/O/V/H |
+|---|---:|---:|---|---|---|
+| 1 | 10 | 200 | 1.00 / 2.50 / 12.50 / 68.50 / 18.00 | 18.00 / 44.00 / 1.00 / 0.00 / 0.00 | chưa thêm cột |
+| 2 | 10 | 200 | 5.50 / 9.50 / 31.50 / 80.00 / 47.50 | 54.50 / 75.00 / 14.00 / 0.00 / 0.00 | 54.50 / 76.50 / 14.00 / 0.00 / 0.00 |
+| 2 | 30 | 200 | 0.00 / 0.00 / 26.00 / 92.00 / 55.00 | 80.00 / 97.00 / 18.50 / 0.00 / 0.00 | 82.00 / 98.50 / 18.50 / 0.00 / 0.00 |
+| 3 | 10 | 200 | 5.50 / 13.00 / 32.00 / 72.00 / 31.50 | 38.50 / 61.00 / 8.50 / 0.00 / 0.00 | 38.50 / 62.00 / 8.50 / 0.00 / 0.00 |
+| 3 | 30 | 200 | 0.00 / 0.50 / 27.50 / 89.00 / 25.50 | 77.00 / 92.50 / 6.00 / 0.00 / 0.00 | 78.50 / 94.50 / 6.00 / 0.00 / 0.00 |
+| 4 | 10 | 200 | 8.00 / 12.00 / 49.50 / 73.00 / 59.50 | 42.50 / 53.50 / 9.00 / 0.00 / 0.00 | 42.50 / 54.00 / 9.00 / 0.00 / 0.00 |
+| 4 | 30 | 200 | 0.50 / 1.00 / 64.00 / 88.50 / 82.50 | 73.50 / 87.50 / 8.50 / 0.50 / 0.00 | 76.00 / 91.50 / 8.50 / 0.50 / 0.00 |
+| 5 | 10 | 200 | 5.50 / 10.00 / 45.00 / 68.50 / 48.00 | 52.00 / 59.50 / 10.50 / 0.50 / 0.00 | 52.00 / 60.50 / 10.50 / 0.50 / 0.00 |
+| 5 | 30 | 200 | 0.00 / 1.00 / 54.50 / 86.50 / 70.00 | 79.00 / 88.50 / 16.50 / 1.00 / 0.00 | 81.50 / 93.00 / 17.00 / 1.00 / 0.00 |
+| 6 | 10 | 200 | 4.00 / 8.50 / 45.00 / 61.00 / 40.50 | 48.50 / 54.00 / 10.50 / 0.00 / 0.00 | 48.50 / 54.50 / 10.50 / 0.00 / 0.00 |
+| 6 | 30 | 200 | 0.00 / 0.50 / 37.00 / 65.50 / 28.00 | 81.50 / 88.50 / 13.00 / 1.50 / 0.50 | 84.00 / 93.00 / 15.00 / 1.50 / 0.50 |
+| 7 | 10 | 200 | 3.00 / 7.00 / 28.50 / 67.50 / 41.50 | 55.50 / 64.00 / 19.00 / 3.50 / 3.50 | 55.50 / 64.50 / 19.00 / 3.50 / 3.50 |
+| 7 | 30 | 200 | 0.00 / 0.00 / 17.50 / 70.50 / 31.50 | 87.50 / 95.50 / 25.00 / 5.50 / 5.50 | 90.00 / 98.00 / 26.00 / 5.50 / 5.50 |
+| 8 | 10 | 2000 | 7.10 / 10.70 / 37.65 / 63.70 / 51.35 | 53.25 / 72.55 / 2.95 / 1.75 / 0.05 | 53.50 / 72.90 / 2.95 / 1.75 / 0.05 |
+| 9 | 10 | 2000 | 7.10 / 8.25 / 35.70 / 66.20 / 52.90 | 51.40 / 76.45 / 3.45 / 0.25 / 0.00 | 51.60 / 76.95 / 3.45 / 0.25 / 0.00 |
+| 9 | 30 | 2000 | 0.55 / 0.40 / 30.55 / 66.15 / 57.10 | 90.35 / 97.60 / 10.60 / 1.05 / 0.00 | 92.30 / 98.45 / 11.75 / 1.05 / 0.00 |
+
+
+Bảng sau vòng 9 (2.000 ván/bot, seed 104..2103):
+
+| Ngày | Bot | N | Thắng % | Fired % | Bankrupt % | Survived % | Demoted % | Warned % | Heavy % | Trust p25/p50/p75 | Rank p50 | acc TB | ev TB | Đủ 5 kind % |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|---:|---:|---:|---:|
+| 10 | random_reporter | 2000 | 7.10 | 51.40 | 0.00 | 48.60 | 0.20 | 86.60 | 51.60 | 0.00/0.00/35.60 | 0.0 | 0.4774 | 0.0000 | 100.00 |
+| 10 | rumor_follower | 2000 | 8.25 | 76.45 | 0.00 | 23.55 | 0.50 | 92.75 | 76.95 | 0.00/0.00/0.00 | 0.0 | 0.4604 | -0.3538 | 100.00 |
+| 10 | official_only | 2000 | 35.70 | 3.45 | 0.00 | 96.55 | 0.00 | 43.25 | 3.45 | 39.80/58.95/76.50 | 0.0 | 0.6947 | -0.1075 | 100.00 |
+| 10 | verifier | 2000 | 66.20 | 0.25 | 0.00 | 99.75 | 0.00 | 17.85 | 0.25 | 74.40/92.80/100.00 | 1.0 | 0.7197 | 0.3120 | 100.00 |
+| 10 | careful_hedger | 2000 | 52.90 | 0.00 | 0.00 | 100.00 | 0.00 | 12.50 | 0.00 | 59.60/73.40/86.40 | 1.0 | 0.7200 | 0.3120 | 100.00 |
+| 30 | random_reporter | 2000 | 0.55 | 90.35 | 0.05 | 9.60 | 4.25 | 98.70 | 92.30 | 0.00/0.00/0.00 | 0.0 | 0.4527 | 0.0000 | 100.00 |
+| 30 | rumor_follower | 2000 | 0.40 | 97.60 | 0.00 | 2.40 | 4.50 | 99.75 | 98.45 | 0.00/0.00/0.00 | 0.0 | 0.4469 | -0.3853 | 100.00 |
+| 30 | official_only | 2000 | 30.55 | 10.60 | 0.05 | 89.35 | 1.15 | 52.35 | 11.75 | 53.70/78.45/95.30 | 2.0 | 0.6866 | -0.0630 | 100.00 |
+| 30 | verifier | 2000 | 66.15 | 1.05 | 0.50 | 98.45 | 0.00 | 17.95 | 1.05 | 90.98/96.20/100.00 | 3.0 | 0.7151 | 0.3510 | 100.00 |
+| 30 | careful_hedger | 2000 | 57.10 | 0.00 | 0.00 | 100.00 | 0.00 | 12.80 | 0.00 | 90.30/96.20/100.00 | 3.0 | 0.7172 | 0.3509 | 100.00 |
+
+- Đạt mục tiêu A: random Heavy 51,60% >=50, fired 51,40% >=15, Trust p50=0 <46, thắng 7,10% <=10. Rumor Heavy 76,95% >=35, p50=0 <=46, thắng 8,25% <=15. Official Heavy=fired 3,45% <=20/5, p50=58,95 >46, thắng 35,70% trong [30;55]. Hedger Heavy=fired 0% <=8/2, p50=73,40 >46, thắng 52,90% trong [25;60] và dưới verifier. Verifier Heavy=fired 0,25% <=5/1, p50=92,80 >=60, thắng 66,20% <=85, hơn official 30,50 điểm % >=15.
+- Đạt mục tiêu B: random thắng 0,55% <=20, Heavy 92,30% >=70; rumor thắng 0,40% <=25, Heavy 98,45% >=55. Official thắng 30,55% trong [25;55], bankrupt 0,05% <=5; hedger thắng 57,10% trong [30;60], bankrupt 0%; verifier thắng 66,15% <=85, hơn official 35,60 điểm % >=10, bankrupt 0,50% <=5. Không hạ mục tiêu; không còn mục tiêu định lượng A/B chưa đạt. Không diễn giải trần fired của demo thành trần cho full (spec B không đặt trần này); tất cả số fired full đã ghi nguyên ở bảng.
+- Kiểm thử: Godot console 4.7.2 đúng đường dẫn VU giao, --headless --path game-studio/godot --script res://tests/<tên>.gd. test_sim: 2.630/0 failures (đủ 2.623 cũ +7 mới); test_ui: 134/0; test_world: 32.419/0, gồm quét 500 seed/bot ở cả hai kỳ; chạy lại đầy đủ sau chốt 4 ví dụ hệ số cuối cũng 32.419/0, exit 0 (TEMP/T-018b-test-world-delivery.txt). Quét điểm 10 ngày: 863 thắng/1.637 thua, min_win 8.464,50 > max_loss 1.914,00; 30 ngày: 761 thắng/1.739 thua, min_win 9.538,00 > max_loss 3.776,00. balance_sim trước/sau giống 47 dòng, chỉ loại elapsed_seconds. git diff --check qua. Console vẫn báo không ghi được user://logs/godot.log và không đọc được kho chứng chỉ; không có lỗi script ở các lượt cuối.
+- Không lộ/tái lập: giữ nguyên bộ rà đệ quy truth/kind/link/state_direction/exaggerates/answer/scenario, không xóa kiểm tra; mở rộng public/replay/hash nhật ký từ 10 sang cả 30 ngày. review ngày hiện tại/tương lai vẫn bị từ chối. Mọi bot giữ nguyên propose, chỉ dùng API công khai; thống kê kind/cú sốc/acc/ev chỉ lấy từ review sau ngày. Đủ 5 kind 100% và 8/8 cú sốc ở cả hai bảng cuối. Chuỗi báo cáo đúng trên kịch bản cố định 10/30 ngày không giảm Trust, không cảnh cáo/giáng chức/đuổi việc, kể cả lúc thăng chức.
+
+Danh sách kiểm tra đổi (giữ toàn bộ kiểm tra cũ, không xóa):
+
+| Kiểm tra | Thay đổi và lý do |
+|---|---|
+| hand computed nominal correct high with evidence | Giữ 18,8 = snappedf(10*1,5*1,25); công thức thưởng đúng không đổi |
+| hand computed nominal opposite | -12,5 thành -13,5 = -10*1,8*(1-0,25); sai nhân wrong_factor, bằng chứng xác nhận giảm phạt |
+| hand computed nominal adjacent | +3,8 thành -2,2 = snappedf(-10*0,3*0,75); lệch một bậc chuyển sang bị trừ, snappedf của Godot làm tròn -2,25 lên -2,2 |
+| accuracy table / confidence grade table | Giữ đủ 27 tổ hợp hướng/đáp án/tự tin và 54 kiểm tra; acc giữ 1/0,4/0, delta thay 0,3 và -1 cũ bằng adjacent_effect và -wrong_factor |
+| evidence table / evidence delta | Giữ đủ 25 cặp truth/verification (50 kiểm tra); ev không đổi, delta nhân thêm confidence.vua vì hệ số vừa nay là 0,85, không còn mặc định bằng 1 |
+| promotion and reset | Đổi kỳ vọng Trust 55 thành 72 = max(42+15+15,55), vì thăng chức không được làm mất Trust. Cố định fixture 42/35/25, tenure=2, ngưỡng 70 để ví dụ tính tay độc lập với chỉnh cân bằng; vẫn kiểm tra thâm niên tối thiểu và 300 tiền lương/thưởng |
+| intern first wrong / intern two wrong fired | Giữ cả hai kiểm tra với fixture low_trust_days=2 và Trust 25: sau một ngày thấp chưa đuổi, ngày thấp thứ hai có báo cáo sai thì đuổi. Đây là cơ chế thấp kéo dài mới, không còn dựa riêng hai acc=0 liên tiếp |
+| warning only crossing / new crossing / demotion resets / two demotions fired / zero trust fired / adoption monotonic | Giữ nguyên mọi kỳ vọng cũ trên fixture cố định (cảnh cáo 1 rồi 2, giáng 24->40, đuổi sau 2 giáng hoặc Trust=0, chấp thuận đơn điệu). Chỉ đổi nguồn config sang fixture để không vô tình phụ thuộc ngưỡng live 16 |
+| test_public_and_replay | Giữ nguyên toàn bộ vòng 10 ngày, thêm vòng 30 ngày với cùng kiểm tra khóa ẩn/cache/bản sao/hash. Chỉ yêu cầu survived cho tích hợp demo cũ; vòng full kiểm tra kết thúc nhất quán vì báo cáo ngang cố định có thể bị đuổi theo luật mới |
+| test_score_sweep | Giữ đủ 500 ván/bot/10 ngày và cận lý thuyết 30 ngày; thêm quét thực tế 500 ván/bot/30 ngày, tách min_win/max_loss từng kỳ, không thay bằng mẫu nhỏ hơn |
+| test_overrides_and_endings | Giữ mọi fixture fired/bankrupt/survived và công thức điểm chính xác; thêm kiểm tra Trust/cảnh cáo/giáng/đuổi sau từng báo cáo đúng trong fixture thắng |
+
+Kiểm tra thêm:
+
+- Ví dụ tính tay với bộ số cuối: đúng/vừa/có xác nhận +11,9 = 10*0,85*1,4; ngược hướng -11,7 = snappedf(-10*0,85*2,3*0,6); lệch một bậc -2,8 = snappedf(-10*0,85*0,55*0,6); dẫn tin bác bỏ và ngược hướng -27,4 = snappedf(-10*0,85*2,3*1,4). Giữ thêm fixture danh định sai+bằng chứng xấu -22,5 và adjacent không bằng chứng -3, cùng kỳ vọng đoán đều âm.
+- Báo cáo đúng khi phục hồi ở Trust thấp không bị đuổi dù bộ đếm thấp đã đủ; một báo cáo adjacent sau giai đoạn thấp kéo dài mới kích hoạt nhánh đuổi. Hai chuỗi cố định 10/30 ngày kiểm tra Trust không giảm mỗi ngày, không phạt, kết thúc survived; giá tools bằng Cash bị trừ và cash_report, kiểm chứng cache không thu lại; ranh giới thắng cho cả 5 chức ở demo/full.
+- test_sim thêm 7 kiểm tra chỉ trong test_use_tool: ghi đè giá 60 khi không đủ giá gốc 500; trừ đúng 60; giữ Energy và tay; từ chối giá 80 khi Cash=0; từ chối không thay tài nguyên; ghi đè 0 hợp lệ; giá 0 không vượt được ràng buộc analysis. SQL có Energy=0 trong cards.json hiện tại, không giả định mất 1 Energy. Giữ đủ 15 kiểm tra use_tool cũ.
+- Tự quyết: mọi chỉnh số chỉ ở world.json; không đổi kinh tế v1 hoặc nguồn tin để đạt tỷ lệ. Bằng chứng nhân theo dấu điểm, ngưỡng thăng 72/79/96/100, thời gian giữ chức 6 ngày, Trust khởi điểm 46, demote 16, thấp kéo dài 6 ngày; giá công cụ dùng chung hai kỳ, full cần trưởng nhóm; bonus thắng tăng theo cận điểm. Không thêm luật đọc đáp án cho bot. Không phát hiện lỗi bắt buộc sửa trong news.json/questions.json.
+
+world.json cuối đầy đủ:
+```json
+{
+ "version":1,
+ "variables":["lai_suat","ty_gia","nguyen_lieu","suc_mua","chung_khoan","tin_dung"],
+ "directions":["tang","giam","ngang"],
+ "magnitudes":["low","mid","high"],
+ "markov_keep":0.78,
+ "shock_count":{"10":4,"30":12},
+ "shock_probability":0.85,
+ "precursors":{"competitor_discount":{"variable":"ty_gia","direction":"tang"},"price_fatigue":{"variable":"nguyen_lieu","direction":"tang"}},
+ "precursor_weight":3,
+ "news_per_day":{"10":6,"30":7},
+ "kind_weights":{"signal":45,"trap":25,"partial":5,"stale":10,"noise":10},
+ "repeat_days":3,"news_lifetime":3,"event_recent_days":2,
+ "noise_factor":0.5,
+ "macro":{"lai_suat":{"tang":{"fixed_cost":8},"giam":{"fixed_cost":-4}},"ty_gia":{"tang":{"cac":2.4},"giam":{"cac":-1.2}},"nguyen_lieu":{"tang":{"fixed_cost":6},"giam":{"fixed_cost":-3}},"suc_mua":{"tang":{"conversion":0.0003,"retention":0.003},"giam":{"conversion":-0.0003,"retention":-0.003}},"tin_dung":{"giam":{"fixed_cost":4}}},
+ "magnitude_scale":{"low":0.5,"mid":1,"high":1.5},
+ "tools":{"truy_van_lich_su":"sql_deep_dive","kiem_dinh_gia_thuyet":"ab_test","doi_chieu_nguon":"funnel_report","lam_sach_du_lieu":"clean_data"},
+ "grading":{"base":10,"adjacent":0.4,"adjacent_effect":-0.55,"wrong_factor":2.3,"evidence_factor":0.4,"confidence":{"thap":0.7,"vua":0.85,"cao":1.6},"evidence":{"xac_nhan":1,"chua_du_can_cu":0,"bac_bo":-1,"cu":-1},"unverified":{"sai":-1,"cu":-1,"dung":0.25,"mot_phan":0,"khong_lien_quan":0},"max_evidence":3},
+ "career":{"initial_trust":46,"reset_promotion":55,"reset_demotion":40,"warning":35,"demote":16,"low_trust_days":6,"minimum_days":6,"correct_streak":2,"max_demotions":2,"bonus_fraction":0.5,"adopt_min":0.4,"adopt_max":1},
+ "ranks":[{"id":"thuc_tap","actions":1,"promote":72,"salary":100},{"id":"chuyen_vien","actions":2,"promote":79,"salary":160},{"id":"chuyen_vien_chinh","actions":2,"promote":96,"salary":240},{"id":"truong_nhom","actions":3,"promote":100,"salary":340},{"id":"giam_doc","actions":3,"promote":101,"salary":460}],
+ "score":{"win_bonus":8000,"trust":5,"positive_delta":10,"demotion":150,"fired":300},
+ "tool_budget":{"truy_van_lich_su":60,"kiem_dinh_gia_thuyet":80,"doi_chieu_nguon":40,"lam_sach_du_lieu":100},
+ "win":{"demo":"chuyen_vien","full":"truong_nhom"},
+ "balance":{"seed":104,"games":2000}
+}
+```
+
+- Git: git add bị fatal: Unable to create 'D:/Dev/ai-company/.git/worktrees/ai-company-codex/index.lock': Permission denied. Không stage/commit được; giữ nguyên file chưa commit trong worktree. Không đổi quyền, không vượt sandbox, không push/merge.

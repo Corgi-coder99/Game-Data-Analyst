@@ -15,9 +15,11 @@
  "macro":{"lai_suat":{"tang":{"fixed_cost":8},"giam":{"fixed_cost":-4}},"ty_gia":{"tang":{"cac":2.4},"giam":{"cac":-1.2}},"nguyen_lieu":{"tang":{"fixed_cost":6},"giam":{"fixed_cost":-3}},"suc_mua":{"tang":{"conversion":0.0003,"retention":0.003},"giam":{"conversion":-0.0003,"retention":-0.003}},"tin_dung":{"giam":{"fixed_cost":4}}},
  "magnitude_scale":{"low":0.5,"mid":1,"high":1.5},
  "tools":{"truy_van_lich_su":"sql_deep_dive","kiem_dinh_gia_thuyet":"ab_test","doi_chieu_nguon":"funnel_report","lam_sach_du_lieu":"clean_data"},
- "grading":{"base":5,"adjacent":0.4,"partial_reward":0.3,"evidence_factor":1,"confidence":{"thap":0.6,"vua":1,"cao":1.5},"evidence":{"xac_nhan":1,"chua_du_can_cu":0,"bac_bo":-1,"cu":-1},"unverified":{"sai":-1,"cu":-1,"dung":0.25,"mot_phan":0,"khong_lien_quan":0},"max_evidence":3},
- "career":{"initial_trust":42,"reset_promotion":55,"reset_demotion":40,"warning":35,"demote":25,"minimum_days":2,"correct_streak":2,"max_demotions":2,"bonus_fraction":0.5,"adopt_min":0.4,"adopt_max":1},
- "ranks":[{"id":"thuc_tap","actions":1,"promote":70,"salary":100},{"id":"chuyen_vien","actions":2,"promote":75,"salary":160},{"id":"chuyen_vien_chinh","actions":2,"promote":80,"salary":240},{"id":"truong_nhom","actions":3,"promote":85,"salary":340},{"id":"giam_doc","actions":3,"promote":101,"salary":460}],
- "score":{"win_bonus":6000,"trust":5,"positive_delta":10,"demotion":150,"fired":300},
+ "grading":{"base":10,"adjacent":0.4,"adjacent_effect":-0.55,"wrong_factor":2.3,"evidence_factor":0.4,"confidence":{"thap":0.7,"vua":0.85,"cao":1.6},"evidence":{"xac_nhan":1,"chua_du_can_cu":0,"bac_bo":-1,"cu":-1},"unverified":{"sai":-1,"cu":-1,"dung":0.25,"mot_phan":0,"khong_lien_quan":0},"max_evidence":3},
+ "career":{"initial_trust":46,"reset_promotion":55,"reset_demotion":40,"warning":35,"demote":16,"low_trust_days":6,"minimum_days":6,"correct_streak":2,"max_demotions":2,"bonus_fraction":0.5,"adopt_min":0.4,"adopt_max":1},
+ "ranks":[{"id":"thuc_tap","actions":1,"promote":72,"salary":100},{"id":"chuyen_vien","actions":2,"promote":79,"salary":160},{"id":"chuyen_vien_chinh","actions":2,"promote":96,"salary":240},{"id":"truong_nhom","actions":3,"promote":100,"salary":340},{"id":"giam_doc","actions":3,"promote":101,"salary":460}],
+ "score":{"win_bonus":8000,"trust":5,"positive_delta":10,"demotion":150,"fired":300},
+ "tool_budget":{"truy_van_lich_su":60,"kiem_dinh_gia_thuyet":80,"doi_chieu_nguon":40,"lam_sach_du_lieu":100},
+ "win":{"demo":"chuyen_vien","full":"truong_nhom"},
  "balance":{"seed":104,"games":2000}
 }

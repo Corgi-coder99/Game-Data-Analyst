@@ -100,7 +100,7 @@ func tools() -> Array:
 	for id in _config.tools:
 		for card in _sim.cards:
 			if card.id == _config.tools[id]:
-				result.append({"id":id,"name_key":id,"energy":card.energy,"budget":card.budget})
+				result.append({"id":id,"name_key":id,"energy":card.energy,"budget":_config.tool_budget.get(id, card.budget)})
 	return result
 
 func verify(uid: String, tool_id: String) -> Dictionary:
@@ -111,7 +111,7 @@ func verify(uid: String, tool_id: String) -> Dictionary:
 	var result: Dictionary = _verifier.verify(item, tool_id, _sim)
 	if result.ok and not already_verified:
 		for card in _sim.cards:
-			if card.id == _config.tools[tool_id]: _cash_report -= float(card.budget)
+			if card.id == _config.tools[tool_id]: _cash_report -= float(_config.tool_budget.get(tool_id, card.budget))
 	return result
 
 func hand() -> Array:
@@ -156,7 +156,11 @@ func review(day: int) -> Dictionary:
 	return _reviews[day].duplicate(true)
 
 func status() -> Dictionary:
-	var won: bool = _ending == "survived" and _career.rank >= 1
+	var minimum_rank: String = _config.win.demo if _horizon == 10 else _config.win.full
+	var eligible := false
+	for index in range(_career.rank + 1):
+		if _config.ranks[index].id == minimum_rank: eligible = true
+	var won: bool = _ending == "survived" and eligible
 	var score: float = (float(_config.score.win_bonus) if won else 0.0) + _career.trust * float(_config.score.trust) + _career.positive_delta * float(_config.score.positive_delta) - _career.demotions * float(_config.score.demotion) - (float(_config.score.fired) if _ending == "fired" else 0.0)
 	return {"day":_day,"horizon":_horizon,"rank":_config.ranks[_career.rank].id,"trust":_career.trust,"warnings":_career.warnings,"demotions":_career.demotions,"personal_pay":_career.personal_pay,"cash_report":_cash_report,"finished":not _ending.is_empty(),"ending":_ending,"won":won,"score":score}
 
