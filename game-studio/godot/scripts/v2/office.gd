@@ -114,7 +114,7 @@ func _ready() -> void:
 	coffee_user = place("pat", Vector2i(1112, 388))
 	idlers.append({"node": coffee_user, "id": "pat", "offset": 0.4})
 	# People walking the corridor.
-	for entry in [["kai", 300.0, 258, 34.0], ["mei", 520.0, 266, -30.0], ["linh", 900.0, 262, -28.0]]:
+	for entry in [["kai", 300.0, 258, 34.0], ["mei", 520.0, 266, -30.0], ["linh", 900.0, 262, -28.0], ["cat", 700.0, 282, 18.0]]:
 		var walker := place(entry[0], Vector2i(int(entry[1]), entry[2]))
 		walkers.append({"node": walker, "id": entry[0], "x": entry[1], "y": entry[2], "vx": entry[3]})
 	phone_bubble = place("bubble", Vector2i(272, 376))
