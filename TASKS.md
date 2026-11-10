@@ -12,7 +12,6 @@ Trạng thái: Backlog -> In progress -> Review -> Done. Bị chặn thì chuy�
 | T-002 (ví dụ) | Cài đặt tính năng X theo spec T-001 | Codex | codex/T-002 | src/x.py, tests/test_x.py | Kiểm thử qua, đúng spec |
 | T-008 | check_web.py: ép stdout UTF-8 để không lỗi UnicodeEncodeError trên console Windows mặc định | Codex | codex/T-008 | media-marketing/web/check_web.py | Chạy `python -I check_web.py` (không cần -X utf8) qua 6 mục |
 | T-010 | Kịch bản và video quảng cáo 30 giây (làm sau T-012 để cảnh quay không hiện công ty gần hết người dùng) | Claude/Codex | chưa chốt | media-marketing/video/* | Chưa có spec |
-| T-019b | Giao diện v2 phần b: màn hình máy tính (thanh tác vụ, cửa sổ Tin tức, Công ty, Công cụ kiểm chứng). Cần spec, sau T-019a | Codex | codex/T-019b | scenes/v2/*, scripts/v2/*, data/strings_v2.json, tests/* | Chưa có spec |
 | T-019c | Giao diện v2 phần c: soạn báo cáo, họp cuối ngày, vòng chơi 10 ngày, màn tiêu đề và kết thúc. Cần spec, sau T-019b | Codex | codex/T-019c | scenes/v2/*, scripts/v2/*, data/strings_v2.json, tests/* | Chưa có spec |
 | T-019d | Giao diện v2 phần d: hiệu ứng, chỉnh theo playtest và ảnh chụp. Sau T-019c | Codex | codex/T-019d | scenes/v2/*, scripts/v2/*, assets/v2/* | Chưa có spec |
 
@@ -25,7 +24,6 @@ Trạng thái: Backlog -> In progress -> Review -> Done. Bị chặn thì chuy�
 
 | ID | Việc | Owner | Nhánh | File được sửa | Tiêu chí hoàn thành |
 |---|---|---|---|---|---|
-| T-019a | Giao diện v2 phần a: đường ống sprite bằng GDScript (ảnh chữ, sinh PNG, kiểm tra 32 màu) và cảnh văn phòng pixel. Claude tự quyết giao (VU ủy quyền) | Codex | codex/T-019a | game-studio/godot/tools/*, scripts/v2/*, scenes/v2/*, assets/v2/*, data/palette_v2.json, tests/test_v2_assets.gd | Xem game-studio/godot/docs/SPEC-T-019a.md |
 | T-016 | Style bible pixel mới: bảng màu 32 màu, kích thước sprite, ánh sáng, giao diện máy tính, hoạt ảnh, kiểm tra tự động. Chờ VU xem | Claude | v2 | shared/style-bible/pixel-office-v2.md, palette-v2.json | VU duyệt style bible; quyết định có sửa CLAUDE.md mục 4 không |
 | T-017 | Content bible v2 (thế giới hư cấu Tân Lạc, công ty Lục Châu, nhân vật, 10 nguồn tin, ánh xạ 8 cú sốc) và data/news.json (41 mẫu tin, đã kiểm hợp lệ). Chờ VU xem | Claude | v2 | game-studio/godot/docs/CONTENT-BIBLE-v2.md, data/news.json | VU duyệt nội dung |
 
@@ -48,6 +46,7 @@ Trạng thái: Backlog -> In progress -> Review -> Done. Bị chặn thì chuy�
 | T-015 | Concept GDD v2 (game-studio/godot/docs/GDD-v2-concept.md). VU duyệt hướng v2; nguồn pixel art chốt: sprite viết bằng mã; bản v1 gắn tag demo-dashboard-v1, v2 phát triển trên nhánh v2 | Claude | 2026-11-10 |
 | T-018 | Tầng thế giới v2 (scripts/world/): kịch bản ẩn, tin đúng/sai/cũ/nhiễu, kiểm chứng, báo cáo chấm điểm, sự nghiệp, bot cân bằng (Codex). Đạt 5/5 mục tiêu demo, không lộ dữ liệu ẩn (Claude quét 450 kết quả API). Còn nợ: thưởng phạt quá nhẹ, bản 30 ngày chưa dùng được (chuyển sang T-018b). Claude đã review; VU duyệt merge vào v2 | Codex | 2026-11-10 |
 | T-018b | Siết thưởng phạt và sửa ván 30 ngày (Codex). Claude chạy lại balance_world 1.000 ván/bot: mọi mục tiêu A (demo) và B (30 ngày) đạt; test_sim 2.630, test_ui 134, test_world 32.419 qua; balance_sim giống hệt; không lộ dữ liệu ẩn. Claude tự quyết merge vào v2 (VU ủy quyền) | Codex | 2026-11-10 |
+| T-019a | Giao diện v2 phần a (Codex): đường ống sprite GDScript, 26 dải PNG đúng 32 màu, cảnh văn phòng pixel. Claude chạy lại test_v2_assets (2.255), check_palette PASS, render và duyệt ảnh cảnh; tự quyết merge vào v2 (VU ủy quyền) | Codex | 2026-11-10 |
 
 ## Blocked
 
