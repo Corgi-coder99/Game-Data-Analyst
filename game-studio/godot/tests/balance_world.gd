@@ -5,15 +5,17 @@ const Loader = preload("res://scripts/data.gd")
 var _rng := RandomNumberGenerator.new()
 var _directions: Array = ["tang", "giam", "ngang"]
 
-# These are reading rules for visible Vietnamese prose, never template labels.
+# These are reading rules for the visible English prose of a headline, never template labels.
+# T-020: the keywords were ported from the Vietnamese rules so every headline is classified
+# exactly as before (the bot results must not change).
 static func interpretation(n: Dictionary, question: String) -> String:
 	var h: String = n.headline.to_lower()
-	if question == "q8": return "giam" if "trùng" in h else "tang"
-	if question == "q5": return "tang" if "đối thủ" in h and "giảm giá" in h else "ngang"
-	if question == "q9": return "giam" if "sụp" in h or "phá sản" in h else "ngang"
-	if "giữ nguyên" in h or "ổn định" in h or "đi ngang" in h: return "ngang"
-	if "phá sản" in h or "sụp" in h or "kém hút" in h or "hạ nhiệt" in h or "giảm" in h or "siết" in h or "vắng" in h or "thắt" in h: return "giam"
-	if "tăng" in h or "nâng" in h or "đông" in h or "mua nhiều" in h or "phục hồi" in h or "gấp đôi" in h: return "tang"
+	if question == "q8": return "giam" if "duplicate" in h else "tang"
+	if question == "q5": return "tang" if "rival" in h and "discount" in h else "ngang"
+	if question == "q9": return "giam" if "collapse" in h or "go bust" in h else "ngang"
+	if "holds its policy rate" in h or "steady within" in h or "flat" in h: return "ngang"
+	if "go bust" in h or "collapse" in h or "struggle" in h or "cool off" in h or "fall" in h or "fell" in h or "discount" in h or "down" in h or "tighten" in h or "empty" in h: return "giam"
+	if "rise" in h or "rose" in h or "raises" in h or "up " in h or "jump" in h or "buying more" in h or "recover" in h or "doubled" in h or "climbs" in h or "lifts" in h or "hike" in h or "cost more" in h: return "tang"
 	return "ngang"
 
 static func topic_for(question: String) -> String:
@@ -53,7 +55,7 @@ static func propose(game: RefCounted, bot: String, rng: RandomNumberGenerator, s
 			related = game.news_today().filter(func(n): return n.topic == topic_for(question.id) and n.verification == "xac_nhan")
 		elif bot == "official_only":
 			related = related.filter(func(n): return n.source_tier in ["chinh_thuc", "bao_chi"])
-			var recent: Array = related.filter(func(n): return "trước" not in n.headline)
+			var recent: Array = related.filter(func(n): return "last " not in n.headline.to_lower())
 			if not recent.is_empty(): related = recent
 		elif bot == "rumor_follower":
 			related = related.filter(func(n): return n.source_tier == "mang_xa_hoi" or n.source_id == "noi_bo_nac_danh")

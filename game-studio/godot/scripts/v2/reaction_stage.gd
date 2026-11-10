@@ -75,7 +75,7 @@ func build() -> void:
 	bubble.size = Vector2(104, 18)
 	var style := StyleBoxFlat.new()
 	style.bg_color = Palette.color(8)
-	style.border_color = Palette.color(7)
+	style.border_color = Palette.color(5)
 	style.set_border_width_all(1)
 	style.anti_aliasing = false
 	bubble.add_theme_stylebox_override("panel", style)
@@ -87,9 +87,10 @@ func build() -> void:
 	bubble_label.size = Vector2(98, 14)
 	bubble_label.clip_text = true
 	bubble_label.add_theme_font_size_override("font_size", 8)
-	bubble_label.add_theme_color_override("font_color", Palette.color(7))
+	bubble_label.add_theme_color_override("font_color", Palette.color(1))
 	bubble_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	bubble.add_child(bubble_label)
+	bubble_label.size = Vector2(98, 14)
 
 func _slab(at: Vector2, extent: Vector2) -> ColorRect:
 	var top := ColorRect.new()
@@ -152,6 +153,7 @@ func show_money(type: String, amount: int, delay: float = 0.0, column: int = 0) 
 	node.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	node.visible = delay <= 0.0
 	add_child(node)
+	node.size = Vector2(54, 15)
 	var record := {"type": type, "amount": -absi(amount) if negative else absi(amount), "text": text, "positive": not negative, "label": node, "time": 0.0, "delay": delay, "done": false, "column": column}
 	popups.append(record)
 	popup_log.append({"type": type, "amount": record.amount, "text": text, "positive": not negative})
