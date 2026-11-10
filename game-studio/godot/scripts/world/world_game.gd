@@ -23,6 +23,8 @@ var _pending: Dictionary = {}
 var _reviews: Dictionary = {}
 var _ending := ""
 var _cash_report := 0.0
+# Analysis energy is the world's own daily pool, separate from the company's Energy.
+var _analysis_energy := 0
 
 func _init(seed_value: int, horizon: int, overrides: Dictionary = {}) -> void:
 	assert(horizon in [10, 30])
@@ -68,10 +70,12 @@ func _init(seed_value: int, horizon: int, overrides: Dictionary = {}) -> void:
 	_career = Career.new(_config)
 	_adopt_rng.seed = seed_value + 3
 	_cash_report = _sim.report().cash
+	_analysis_energy = int(_config.analysis_energy)
 
 func begin_day() -> void:
 	if _open or not _ending.is_empty(): return
 	_day += 1
+	_analysis_energy = int(_config.analysis_energy)
 	_open = true
 	_submitted = false
 	_pending = {}
@@ -100,7 +104,7 @@ func tools() -> Array:
 	for id in _config.tools:
 		for card in _sim.cards:
 			if card.id == _config.tools[id]:
-				result.append({"id":id,"name_key":id,"energy":card.energy,"budget":_config.tool_budget.get(id, card.budget)})
+				result.append({"id":id,"name_key":id,"energy":int(_config.tool_energy.get(id, 1)),"budget":_config.tool_budget.get(id, card.budget)})
 	return result
 
 func verify(uid: String, tool_id: String) -> Dictionary:
@@ -108,8 +112,14 @@ func verify(uid: String, tool_id: String) -> Dictionary:
 	if not news_today().any(func(n): return n.uid == uid): return {"ok":false,"error":"invalid_uid"}
 	var item: Dictionary = _news._find(uid)
 	var already_verified: bool = item.results.has(tool_id)
+	var cost := int(_config.tool_energy.get(tool_id, 1))
+	# Repeat checks are cached and free; an unknown tool falls through to the verifier's own error.
+	if _config.tools.has(tool_id) and not already_verified and _analysis_energy < cost: return {"ok":false,"error":"no_analysis_energy"}
 	var result: Dictionary = _verifier.verify(item, tool_id, _sim)
+	if result.ok: result["energy_left"] = _analysis_energy
 	if result.ok and not already_verified:
+		_analysis_energy -= cost
+		result["energy_left"] = _analysis_energy
 		for card in _sim.cards:
 			if card.id == _config.tools[tool_id]: _cash_report -= float(_config.tool_budget.get(tool_id, card.budget))
 	return result
@@ -162,7 +172,7 @@ func status() -> Dictionary:
 		if _config.ranks[index].id == minimum_rank: eligible = true
 	var won: bool = _ending == "survived" and eligible
 	var score: float = (float(_config.score.win_bonus) if won else 0.0) + _career.trust * float(_config.score.trust) + _career.positive_delta * float(_config.score.positive_delta) - _career.demotions * float(_config.score.demotion) - (float(_config.score.fired) if _ending == "fired" else 0.0)
-	return {"energy":int(_sim.state.energy),"energy_max":int(_sim.config.energy),"day":_day,"horizon":_horizon,"rank":_config.ranks[_career.rank].id,"trust":_career.trust,"warnings":_career.warnings,"demotions":_career.demotions,"personal_pay":_career.personal_pay,"cash_report":_cash_report,"finished":not _ending.is_empty(),"ending":_ending,"won":won,"score":score}
+	return {"energy":_analysis_energy,"energy_max":int(_config.analysis_energy),"day":_day,"horizon":_horizon,"rank":_config.ranks[_career.rank].id,"trust":_career.trust,"warnings":_career.warnings,"demotions":_career.demotions,"personal_pay":_career.personal_pay,"cash_report":_cash_report,"finished":not _ending.is_empty(),"ending":_ending,"won":won,"score":score}
 
 func report_snapshot() -> Dictionary:
 	return _sim.report().duplicate(true)

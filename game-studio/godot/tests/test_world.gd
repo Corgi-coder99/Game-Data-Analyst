@@ -234,7 +234,9 @@ func test_verification() -> void:
 	var item := {"truth":"dung","verify_with":["lam_sach_du_lieu"],"verified_by":[],"results":{},"verification":"chua_kiem_chung"}
 	var before := item.duplicate(true)
 	var verifier := Verify.new(42, config)
-	check(not verifier.verify(item, "lam_sach_du_lieu", sim).ok and item == before, "energy refusal atomic")
+	# T-018c: the verifier no longer checks or spends company Energy; the world's analysis energy lives in WorldGame.
+	check(verifier.verify(item, "lam_sach_du_lieu", sim).ok and sim.state.energy == 0, "verifier ignores company energy")
+	item = before.duplicate(true)
 	sim.state.energy = 3
 	sim.state.base.cash = 0
 	check(not verifier.verify(item, "truy_van_lich_su", sim).ok and item == before, "budget refusal atomic")
@@ -325,6 +327,7 @@ func test_score_sweep() -> void:
 
 func _init() -> void:
 	test_status_energy()
+	test_analysis_energy()
 	config = Loader.load_json("res://data/world.json")
 	test_public_and_replay()
 	test_public_and_replay(30)
@@ -444,22 +447,101 @@ func test_world_cost_and_correct_chain() -> void:
 			game._career.rank = index
 			check(game.status().won == expected_wins[index], "demo/full victory boundary for each rank")
 
+func test_analysis_energy() -> void:
+	var world: Dictionary = Loader.load_json("res://data/world.json")
+	check(int(world.analysis_energy) == 3, "analysis energy default is 3 per day")
+	var game := Game.new(104, 10)
+	for tool in game.tools():
+		check(tool.energy is int and tool.energy == int(world.tool_energy[tool.id]) and tool.energy >= 1, "tools() advertises world tool_energy")
+		check(float(tool.budget) == float(world.tool_budget[tool.id]), "tools() budget is the world budget")
+	check(game.tools().size() == world.tool_energy.size() and world.tool_energy.size() == world.tools.size(), "tool_energy covers every tool")
+	game.begin_day()
+	var items: Array = game.news_today()
+	var ids: Array = game.tools().map(func(t): return t.id)
+	var spent := 0
+	var used: Array = []
+	var index := 0
+	# Spend the whole pool with distinct (news, tool) pairs.
+	while true:
+		var tool: Dictionary = game.tools()[index % ids.size()]
+		if game.status().energy < int(tool.energy): break
+		var uid: String = items[index].uid
+		var left: int = game.status().energy
+		var result: Dictionary = game.verify(uid, tool.id)
+		check(result.ok and game.status().energy == left - int(tool.energy), "paid verification costs advertised tool energy")
+		spent += int(tool.energy)
+		used.append([uid, tool.id, result])
+		index += 1
+	check(spent <= game.status().energy_max and index >= 1 and game.status().energy == game.status().energy_max - spent, "pool spent from the shared limit")
+	# Afterwards a tool that costs more than what is left is refused; drain fully with the cheapest tool when possible.
+	var cheapest: Dictionary = game.tools()[0]
+	for t in game.tools():
+		if int(t.energy) < int(cheapest.energy): cheapest = t
+	var fresh: Array = items.filter(func(n): return not used.any(func(u): return u[0] == n.uid))
+	var drained := 0
+	while game.status().energy >= int(cheapest.energy) and drained < fresh.size():
+		check(game.verify(fresh[drained].uid, cheapest.id).ok, "cheapest tool drains remaining pool")
+		drained += 1
+	var target: String = fresh[drained].uid
+	var blocked_tool := ""
+	for t in game.tools():
+		if int(t.energy) > game.status().energy: blocked_tool = t.id
+	var snapshot_status: Dictionary = game.status()
+	var snapshot_news: Array = game.news_today()
+	if blocked_tool.is_empty(): blocked_tool = cheapest.id
+	check(game.status().energy < int(game.tools().filter(func(t): return t.id == blocked_tool)[0].energy), "pool short of the blocked tool")
+	check(game.verify(target, blocked_tool) == {"ok":false,"error":"no_analysis_energy"}, "empty or short pool refuses with no_analysis_energy")
+	check(game.status() == snapshot_status and game.news_today() == snapshot_news, "refusal changes no state and no budget (status incl. cash_report)")
+	check(game.verify(target, "khong_co").error == "invalid_tool", "invalid tool wins over energy error")
+	check(game.verify("khong-co-tin", blocked_tool).error == "invalid_uid", "invalid uid wins over energy error")
+	# Cached repeats stay free even with an empty pool.
+	for u in used:
+		var again: Dictionary = game.verify(u[0], u[1])
+		check(again.ok and again.result == u[2].result and game.status() == snapshot_status, "repeat verification free after exhaustion")
+	check(public_only(game.verify(used[0][0], used[0][1])), "verify result has no secret keys")
+	# Company energy is never spent, so proposed actions still run after the pool is empty.
+	var executed_any := false
+	for round in 8:
+		if game.status().finished: break
+		if round > 0:
+			game.begin_day()
+			check(game.status().energy == game.status().energy_max, "pool refilled for the day")
+		var company_energy: int = game._sim.state.energy
+		var today: Array = game.news_today()
+		var t0: Dictionary = game.tools()[0]
+		for n in today:
+			if game.status().energy < int(t0.energy): break
+			game.verify(n.uid, t0.id)
+		check(game._sim.state.energy == company_energy, "verification never spends company energy")
+		var input := submission(game)
+		var hand: Array = game.hand()
+		if not hand.is_empty(): input.actions = [hand[0].id]
+		check(game.submit_report(input).ok, "report accepted with empty analysis pool")
+		var ended: Dictionary = game.end_day()
+		check(ended.ok, "day ends with empty analysis pool")
+		for action in ended.actions:
+			check(action.executed == action.adopted, "adopted action executes despite empty analysis pool")
+			executed_any = executed_any or action.executed
+	check(executed_any, "at least one proposed action was executed")
+
 func test_status_energy() -> void:
 	var game := Game.new(104, 10)
 	check(game.status().energy is int and game.status().energy_max is int, "public energy integers")
-	check(game.status().energy == game._sim.state.energy and game.status().energy_max == int(game._sim.config.energy), "public energy values before day")
+	check(game.status().energy == int(game._config.analysis_energy) and game.status().energy_max == int(game._config.analysis_energy), "public energy values before day are the analysis pool")
 	game.begin_day()
 	check(game.status().energy == game.status().energy_max and game.status().energy_max == 3, "energy full at start")
+	var company_energy: int = game._sim.state.energy
 	var tool: Dictionary = game.tools().filter(func(t): return int(t.energy) > 0)[0]
 	for i in 3:
 		var before: int = game.status().energy
 		var uid: String = game.news_today()[i].uid
 		check(game.verify(uid, tool.id).ok, "energy consuming verify succeeds")
 		check(game.status().energy == before - int(tool.energy), "public energy decreases by advertised cost")
-		check(game.status().energy == game._sim.state.energy, "public energy matches company")
+		check(game._sim.state.energy == company_energy, "company energy untouched by verification")
 		check(game.verify(uid, tool.id).ok and game.status().energy == before - int(tool.energy), "cached verify preserves energy")
 	var before: Dictionary = game.status()
 	check(not game.verify(game.news_today()[3].uid, tool.id).ok and game.status() == before, "failed verify preserves energy")
+	check(game.verify(game.news_today()[3].uid, tool.id) == {"ok":false,"error":"no_analysis_energy"}, "exhausted pool error code")
 	check(public_only(game.status()), "status energy adds no secret keys")
 	check(game.submit_report(submission(game)).ok and game.end_day().ok, "energy test closes day")
 	game.begin_day()

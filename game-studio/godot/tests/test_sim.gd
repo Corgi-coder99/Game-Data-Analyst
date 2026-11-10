@@ -460,3 +460,11 @@ func test_use_tool() -> void:
 	check(discounted.state.energy == original_energy and discounted.state.base.cash == 0, "override refusal atomic")
 	check(discounted.use_tool("ab_test", 0), "zero override supported")
 	check(not discounted.use_tool("onboarding_redesign", 0), "override cannot bypass category")
+	var free_energy := Sim.new(42)
+	free_energy.begin_week(false)
+	free_energy.state.energy = 0
+	var free_cash: float = free_energy.state.base.cash
+	check(not free_energy.use_tool("clean_data") and free_energy.state.base.cash == free_cash, "default still requires and spends energy")
+	check(free_energy.use_tool("clean_data", -1.0, false) and free_energy.state.energy == 0, "spend_energy=false neither requires nor spends energy")
+	near(free_energy.state.base.cash, free_cash - 300, "spend_energy=false still charges the card budget")
+	check(not free_energy.use_tool("onboarding_redesign", 0, false), "spend_energy=false cannot bypass category")

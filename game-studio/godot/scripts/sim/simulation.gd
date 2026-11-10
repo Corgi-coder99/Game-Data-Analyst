@@ -105,7 +105,7 @@ func play(card_id: String) -> bool:
 		return true
 	return false
 
-func use_tool(card_id: String, budget_override: float = -1.0) -> bool:
+func use_tool(card_id: String, budget_override: float = -1.0, spend_energy: bool = true) -> bool:
 	if state.lost or state.won or not week_open:
 		return false
 	for i in cards.size():
@@ -113,9 +113,10 @@ func use_tool(card_id: String, budget_override: float = -1.0) -> bool:
 		if card.id != card_id or card.category != "analysis":
 			continue
 		var budget := float(card.budget) if budget_override < 0 else budget_override
-		if state.energy < card.energy or state.base.cash < budget:
+		if (spend_energy and state.energy < card.energy) or state.base.cash < budget:
 			return false
-		state.energy -= int(card.energy)
+		if spend_energy:
+			state.energy -= int(card.energy)
 		state.base.cash -= budget
 		for event in active_events.duplicate():
 			if card_id in event.definition.revealed_by:

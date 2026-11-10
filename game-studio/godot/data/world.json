@@ -19,6 +19,8 @@
  "career":{"initial_trust":46,"reset_promotion":55,"reset_demotion":40,"warning":35,"demote":16,"low_trust_days":6,"minimum_days":6,"correct_streak":2,"max_demotions":2,"bonus_fraction":0.5,"adopt_min":0.4,"adopt_max":1},
  "ranks":[{"id":"thuc_tap","actions":1,"promote":72,"salary":100},{"id":"chuyen_vien","actions":2,"promote":79,"salary":160},{"id":"chuyen_vien_chinh","actions":2,"promote":96,"salary":240},{"id":"truong_nhom","actions":3,"promote":100,"salary":340},{"id":"giam_doc","actions":3,"promote":101,"salary":460}],
  "score":{"win_bonus":8000,"trust":5,"positive_delta":10,"demotion":150,"fired":300},
+ "analysis_energy":3,
+ "tool_energy":{"truy_van_lich_su":1,"kiem_dinh_gia_thuyet":1,"doi_chieu_nguon":1,"lam_sach_du_lieu":1},
  "tool_budget":{"truy_van_lich_su":60,"kiem_dinh_gia_thuyet":80,"doi_chieu_nguon":40,"lam_sach_du_lieu":100},
  "win":{"demo":"chuyen_vien","full":"truong_nhom"},
  "balance":{"seed":104,"games":2000}
