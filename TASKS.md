@@ -16,8 +16,7 @@ Trạng thái: Backlog -> In progress -> Review -> Done. Bị chặn thì chuy�
 
 ## In progress
 
-| ID | Việc | Owner | Nhánh | File được sửa | Tiêu chí hoàn thành |
-|---|---|---|---|---|---|
+(chưa có)
 
 ## Review
 
@@ -25,7 +24,6 @@ Trạng thái: Backlog -> In progress -> Review -> Done. Bị chặn thì chuy�
 |---|---|---|---|---|---|
 | T-016 | Style bible pixel mới: bảng màu 32 màu, kích thước sprite, ánh sáng, giao diện máy tính, hoạt ảnh, kiểm tra tự động. Chờ VU xem | Claude | v2 | shared/style-bible/pixel-office-v2.md, palette-v2.json | VU duyệt style bible; quyết định có sửa CLAUDE.md mục 4 không |
 | T-017 | Content bible v2 (thế giới hư cấu Tân Lạc, công ty Lục Châu, nhân vật, 10 nguồn tin, ánh xạ 8 cú sốc) và data/news.json (41 mẫu tin, đã kiểm hợp lệ). Chờ VU xem | Claude | v2 | game-studio/godot/docs/CONTENT-BIBLE-v2.md, data/news.json | VU duyệt nội dung |
-| T-019c | Giao diện v2 phần c: cửa sổ Báo cáo, họp cuối ngày, vòng chơi 10 ngày, màn tiêu đề và kết thúc. Codex hết hạn mức đến 15/11/2026 nên Claude subagent làm thay (VU ủy quyền toàn quyền); Claude điều phối tự review và merge | Claude subagent (thay Codex) | codex/T-019c | game-studio/godot/scenes/v2/*, scripts/v2/*, data/strings_v2.json, tools/sprites/* và assets/v2/* (nếu thêm biểu tượng), scripts/world/world_game.gd (chỉ status: max_actions), tests/test_world.gd (chỉ max_actions), tests/test_v2_flow.gd, tests/test_v2_screens_render.gd, tests/test_v2_desktop.gd | Xem game-studio/godot/docs/SPEC-T-019c.md. Bàn giao ở mục ghi chú T-019c bên dưới |
 
 ## Done
 
@@ -49,6 +47,7 @@ Trạng thái: Backlog -> In progress -> Review -> Done. Bị chặn thì chuy�
 | T-019a | Giao diện v2 phần a (Codex): đường ống sprite GDScript, 26 dải PNG đúng 32 màu, cảnh văn phòng pixel. Claude chạy lại test_v2_assets (2.255), check_palette PASS, render và duyệt ảnh cảnh; tự quyết merge vào v2 (VU ủy quyền) | Codex | 2026-11-10 |
 | T-019b | Giao diện v2 phần b (Codex): màn hình máy tính với cửa sổ Tin tức, Công ty, Công cụ kiểm chứng, ghim bằng chứng, thanh tác vụ. Claude chạy lại kiểm thử (v2_desktop 2.332, layout_render 2.614 không headless, assets 2.255, sim 2.630, ui 134, world 32.438), đo thanh tác vụ trong render thật (108x14), balance_sim giống hệt; qua 2 vòng trả lại vì bố cục tràn; tự quyết merge vào v2 (VU ủy quyền) | Codex | 2026-11-10 |
 | T-018c | Kho Energy phân tích riêng (3 mỗi ngày), tool_energy, lỗi no_analysis_energy, bot chịu cùng giới hạn (Claude subagent làm thay Codex hết hạn mức). Claude chạy lại: test_sim 2.634, ui 134, world 32.502, v2_assets 2.255, v2_desktop 2.336, layout_render 2.614 (không headless), balance_sim giống hệt, không lộ dữ liệu ẩn; balance_world 10 ngày: verifier 65,2% vs official_only 36,4%. Lưu ý: bot chỉ dùng khoảng 1 lần kiểm chứng mỗi ngày nên khan hiếm chưa cắn bot, người chơi thật thấy 6 đến 7 tin sẽ chịu áp lực nhiều hơn. Tự quyết merge vào v2 (VU ủy quyền) | Claude subagent (thay Codex) | 2026-11-10 |
+| T-019c | Vòng chơi v2 trọn vẹn: cửa sổ Báo cáo, họp cuối ngày 6 bước, màn tiêu đề, 3 kiểu kết thúc, bộ điều phối game_flow, chạy bằng scenes/v2/main_v2.tscn (Claude subagent làm thay Codex). Claude chạy lại: sim 2.634, ui 134, world 32.511, v2_assets 2.257, v2_desktop 2.448, v2_flow (đủ 3 kết cục, 12 loại lời sếp), layout_render 2.662 và screens_render 7.488 (36 màn, không headless), check_palette PASS, balance_sim giống hệt; xem ảnh tiêu đề, soạn báo cáo, họp cuối ngày, kết thúc. Tự quyết merge vào v2 (VU ủy quyền) | Claude subagent (thay Codex) | 2026-11-10 |
 
 ## Blocked
 
