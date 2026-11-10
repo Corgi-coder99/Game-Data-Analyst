@@ -10,6 +10,9 @@ const FLOAT_TIME := 0.6
 const SWEEP_TIME := 0.4
 const SWEEP_WIDTH := 48
 const BODY_WIDTH := 608
+const SWEEP_AREA := 396
+const STAGE_AT := Vector2(400, 0)
+const ReactionStage = preload("res://scripts/v2/reaction_stage.gd")
 signal finished
 signal line_shown(category: String, text: String)
 var strings: Dictionary
@@ -34,6 +37,8 @@ var sweep_outer: ColorRect
 var sweep_inner: ColorRect
 var sweep_time := -1.0
 var title_label: Label
+var stage: Control
+var skipped := false
 var built := false
 
 func _ready() -> void:
@@ -64,6 +69,11 @@ func _build() -> void:
 	body.size = Vector2(BODY_WIDTH, 214)
 	body.clip_contents = true
 	panel.add_child(body)
+	stage = ReactionStage.new()
+	stage.name = "Stage"
+	stage.position = STAGE_AT
+	body.add_child(stage)
+	stage.hide()
 	var dialog := Panel.new()
 	dialog.position = Vector2(24, 272)
 	dialog.size = Vector2(592, 80)
@@ -149,7 +159,11 @@ func _say(category: String, text: String) -> void:
 		line_shown.emit(category, text)
 
 func _render_step() -> void:
+	body.remove_child(stage)
 	empty(body)
+	body.add_child(stage)
+	stage.clear()
+	stage.hide()
 	float_label = null
 	float_time = -1.0
 	sweep_time = -1.0
@@ -186,7 +200,8 @@ func _step_reaction() -> void:
 	_apply_float()
 	var acc := float(data.result.acc)
 	icon(body, "check" if acc >= 1.0 else ("question" if acc > 0.0 else "cross"), Vector2(0, 50))
-	_text(body, strings.review.accuracy % _accuracy_text(), Rect2(12, 46, 590, 17), 22, 12)
+	_text(body, strings.review.accuracy % _accuracy_text(), Rect2(12, 46, 380, 17), 22, 12)
+	_show_stage(category)
 
 func _accuracy_text() -> String:
 	var acc := float(data.result.acc)
@@ -229,7 +244,7 @@ func _step_shocks() -> void:
 	for shock in data.shocks:
 		icon(body, "question", Vector2(0, y + 2))
 		_text(body, strings.shocks.get(shock.id, shock.id), Rect2(12, y, 590, 12), 28)
-		_wrapped(body, strings.review.cause % shock.root_cause, Rect2(12, y + 13, 590, 12), 7, 1)
+		_wrapped(body, strings.review.cause % strings.root_causes.get(shock.id, strings.shocks.get(shock.id, shock.id)), Rect2(12, y + 13, 590, 12), 7, 1)
 		y += 28
 	_text(body, strings.review.world, Rect2(0, 112, 608, 12), 8)
 	var index := 0
@@ -264,27 +279,75 @@ func _step_career() -> void:
 	if category != "": _say(category, strings.boss_lines[category])
 	else: _say("", strings.review.say[5])
 	var y := 0
-	_text(body, strings.review.rank % strings.ranks[status.rank], Rect2(0, y, 608, 17), 22, 12)
+	_text(body, strings.review.rank % strings.ranks[status.rank], Rect2(0, y, 392, 17), 22, 12)
 	y += 22
-	_text(body, strings.review.trust % [float(before.get("trust", status.trust)), float(status.trust)], Rect2(0, y, 608, 12), 7)
+	_text(body, strings.review.trust % [float(before.get("trust", status.trust)), float(status.trust)], Rect2(0, y, 392, 12), 7)
 	y += 16
+	var events := money_events()
+	var shown := {}
+	for event in events: shown[event.type] = int(event.amount)
+	if shown.has("pay"):
+		_text(body, strings.review.pay % shown.pay, Rect2(0, y, 392, 12), 24)
+		y += 14
 	var bonus := float(data.career.bonus)
-	_text(body, strings.review.bonus % bonus if bonus > 0 else strings.review.no_bonus, Rect2(0, y, 608, 12), 24 if bonus > 0 else 7)
-	y += 20
+	_text(body, strings.review.bonus % roundi(bonus) if bonus > 0 else strings.review.no_bonus, Rect2(0, y, 392, 12), 24 if bonus > 0 else 7)
+	y += 14
+	if shown.has("fine"):
+		_text(body, strings.review.fine % absi(int(shown.fine)), Rect2(0, y, 392, 12), 26)
+		y += 14
+	y += 6
 	match category:
 		"promotion":
-			_text(body, strings.review.promoted % strings.ranks[status.rank], Rect2(0, y, 608, 17), 24, 12)
+			_text(body, strings.review.promoted % strings.ranks[status.rank], Rect2(0, y, 392, 17), 24, 12)
 			_start_sweep()
-		"demotion": _text(body, strings.review.demoted % strings.ranks[status.rank], Rect2(0, y, 608, 17), 26, 12)
-		"warning": _text(body, strings.review.warned, Rect2(0, y, 608, 17), 28, 12)
-		"fired": _text(body, strings.review.fired, Rect2(0, y, 608, 17), 26, 12)
-		"bankrupt": _text(body, strings.review.bankrupt, Rect2(0, y, 608, 17), 26, 12)
-		_: _text(body, strings.review.steady, Rect2(0, y, 608, 12), 7)
+		"demotion": _text(body, strings.review.demoted % strings.ranks[status.rank], Rect2(0, y, 392, 17), 26, 12)
+		"warning": _text(body, strings.review.warned, Rect2(0, y, 392, 17), 28, 12)
+		"fired": _text(body, strings.review.fired, Rect2(0, y, 392, 17), 26, 12)
+		"bankrupt": _text(body, strings.review.bankrupt, Rect2(0, y, 392, 17), 26, 12)
+		_: _text(body, strings.review.steady, Rect2(0, y, 392, 12), 7)
+	_show_stage(category if category != "" else "steady")
+	var delay := 0.0
+	for event in events:
+		stage.show_money(event.type, int(event.amount), delay, 1 if event.type == "bonus" else 0)
+		delay += 0.5
+	if skipped: stage.skip()
+
+# Pay, bonus and fine from values the review already shows: the public personal_pay change
+# and the bonus in the career record. Nothing hidden is read.
+func money_events() -> Array:
+	var out: Array = []
+	var total := float(status.personal_pay) - float(before.get("personal_pay", status.personal_pay))
+	var bonus := float(data.career.bonus)
+	var pay := total - bonus
+	if pay > 0.5: out.append({"type": "pay", "amount": roundi(pay)})
+	if bonus > 0.5: out.append({"type": "bonus", "amount": roundi(bonus)})
+	if pay < -0.5: out.append({"type": "fine", "amount": -roundi(-pay)})
+	return out
+
+# Emote for the player and the coworker's reaction for one boss/career category.
+func emote_for(category: String) -> String:
+	match category:
+		"right", "promotion": return "happy"
+		"partial", "steady": return "neutral"
+		"wrong_high", "fired": return "angry"
+	return "sad"
+
+func coworker_mood_for(category: String) -> String:
+	match category:
+		"right", "promotion": return "happy"
+		"wrong_low", "wrong_mid", "wrong_high", "demotion", "fired", "bankrupt": return "angry"
+	return ""
+
+func _show_stage(category: String) -> void:
+	stage.show()
+	stage.set_emote(emote_for(category))
+	stage.react(coworker_mood_for(category), day * 3 + step)
+	if skipped: stage.skip()
 
 func _start_sweep() -> void:
 	sweep_root = Control.new()
 	sweep_root.position = Vector2(0, 100)
-	sweep_root.size = Vector2(BODY_WIDTH, 24)
+	sweep_root.size = Vector2(SWEEP_AREA, 24)
 	sweep_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	body.add_child(sweep_root)
 	sweep_outer = ColorRect.new()
@@ -302,14 +365,14 @@ func _start_sweep() -> void:
 func _apply_sweep() -> void:
 	if sweep_root == null: return
 	var progress := clampf(sweep_time / SWEEP_TIME, 0.0, 1.0)
-	var left := roundi(lerpf(-SWEEP_WIDTH, BODY_WIDTH, progress))
+	var left := roundi(lerpf(-SWEEP_WIDTH, SWEEP_AREA, progress))
 	_place_band(sweep_outer, left, SWEEP_WIDTH)
 	_place_band(sweep_inner, left + 14, SWEEP_WIDTH - 28)
 	sweep_root.visible = sweep_time < SWEEP_TIME
 
 func _place_band(node: ColorRect, left: int, width: int) -> void:
 	var from := maxi(0, left)
-	var to := mini(BODY_WIDTH, left + width)
+	var to := mini(SWEEP_AREA, left + width)
 	node.visible = to > from
 	node.position = Vector2(from, 0)
 	node.size = Vector2(maxi(0, to - from), sweep_root.size.y)
@@ -336,6 +399,12 @@ func _process(delta: float) -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if not is_visible_in_tree(): return
+	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_ESCAPE:
+		# Esc finishes the popups and the coworker animation at once; it never blocks the flow.
+		skipped = true
+		if stage != null: stage.skip()
+		get_viewport().set_input_as_handled()
+		return
 	if event is InputEventKey and event.pressed and not event.echo and event.keycode in [KEY_SPACE, KEY_ENTER, KEY_KP_ENTER]:
 		next_step()
 		get_viewport().set_input_as_handled()

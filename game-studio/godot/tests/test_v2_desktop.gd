@@ -278,9 +278,9 @@ class LongTextGame extends RefCounted:
 	func news_today() -> Array:
 		var out: Array = []
 		for i in 6:
-			out.append({"uid":str(i),"day":i + 1,"source_id":"fiction","source_tier":["chinh_thuc","bao_chi","mang_xa_hoi","noi_bo"][i % 4],"source_name":"Nguồn mô phỏng ".repeat(14),"headline":("Bản tin mô phỏng dài %d " % i).repeat(12).left(200),"topic":"suc_mua","verification":["chua_kiem_chung","xac_nhan","bac_bo","chua_du_can_cu","cu"][i % 5],"verified_by":[]})
+			out.append({"uid":str(i),"day":i + 1,"source_id":"fiction","source_tier":["chinh_thuc","bao_chi","mang_xa_hoi","noi_bo"][i % 4],"source_name":"Simulated source ".repeat(14),"headline":("Simulated long bulletin %d " % i).repeat(12).left(200),"topic":"suc_mua","verification":["chua_kiem_chung","xac_nhan","bac_bo","chua_du_can_cu","cu"][i % 5],"verified_by":[]})
 		return out
-	func question_today() -> Dictionary: return {"text":"Câu hỏi mô phỏng ".repeat(20)}
+	func question_today() -> Dictionary: return {"text":"Simulated question ".repeat(20)}
 	func status() -> Dictionary: return {"day":6,"horizon":10,"rank":"giam_doc","trust":100,"energy":3,"energy_max":3,"cash_report":0,"finished":false}
 	func report_snapshot() -> Dictionary: return {"cash":123456789,"users":1234567,"retention":0.5,"conversion":0.08,"cac":99,"arpu":88,"integrity":45}
 	func tools() -> Array: return [{"id":"truy_van_lich_su","energy":1,"budget":60},{"id":"kiem_dinh_gia_thuyet","energy":1,"budget":80},{"id":"doi_chieu_nguon","energy":1,"budget":40},{"id":"lam_sach_du_lieu","energy":1,"budget":100}]

@@ -119,7 +119,7 @@ func fixture(world_patch: Dictionary = {}, extra: Dictionary = {}) -> Dictionary
 		for variable in config.variables: values[variable] = {"direction":"tang", "magnitude":"low"}
 		states.append(values)
 	var questions: Array = []
-	for i in 7: questions.append({"id":"fixture%d" % i, "text":"Câu hỏi thử %d" % i, "variable":"lai_suat", "window_days":0, "answer_rule":"state"})
+	for i in 7: questions.append({"id":"fixture%d" % i, "text":"Test question %d" % i, "variable":"lai_suat", "window_days":0, "answer_rule":"state"})
 	var result := {"world":config, "questions":questions, "scenario":{"days":states, "shocks":[]}}
 	for key in extra: result[key] = extra[key]
 	return result
