@@ -1,57 +1,57 @@
-# Quy ước phối hợp giữa Claude Code và Codex
+# Collaboration conventions between Claude Code and Codex
 
-Áp dụng cho mọi việc trong D:\Dev\ai-company. Cả hai bên đọc file này và TASKS.md trước khi bắt đầu.
+Applies to every task in this repository. Both sides read this file and TASKS.md before starting.
 
-## 1. Vai trò
+## 1. Roles
 
-- Claude Code: điều phối, viết spec, thiết kế, tài liệu, phân tích dữ liệu, review mã của Codex.
-- Codex: viết mã theo spec đã giao (scripts, mã game, web), kèm kiểm thử cơ bản.
-- VU: duyệt việc lớn, quyết định khi hai bên bất đồng hoặc bị chặn.
+- Claude Code: coordination, writing specs, design, documentation, data analysis, reviewing Codex's code.
+- Codex: writes code to the assigned spec (scripts, game code, web), with basic tests.
+- The owner: approves large tasks and decides when the two sides disagree or are blocked.
 
-## 2. Năm nguyên tắc để không trùng lặp
+## 2. Five rules to avoid duplicated work
 
-1. Một việc chỉ có một chủ (owner).
-2. Một file chỉ có một người ghi tại một thời điểm.
-3. Nhận việc trước khi làm: ghi owner và đổi trạng thái thành In progress trong TASKS.md.
-4. Mỗi bên làm trên nhánh git riêng. Codex làm trong worktree riêng (xem mục 5).
-5. Bàn giao bằng ghi chú rõ ràng: đã làm gì, file nào đổi, cách kiểm tra.
+1. A task has exactly one owner.
+2. A file has exactly one writer at a time.
+3. Claim a task before working: record the owner and set the status to In progress in TASKS.md.
+4. Each side works on its own git branch. Codex works in its own worktree (see section 5).
+5. Hand off with a clear note: what was done, which files changed, how to verify.
 
-## 3. Quy trình một việc
+## 3. Task workflow
 
-1. Claude (hoặc VU) tạo việc trong TASKS.md: mô tả, owner, file được sửa, tiêu chí hoàn thành.
-2. Owner đổi trạng thái thành In progress và bắt đầu trên nhánh claude/<id> hoặc codex/<id>.
-3. Làm xong: commit nhỏ, viết ghi chú bàn giao dưới việc đó, đổi trạng thái thành Review.
-4. Bên còn lại review. Không đạt thì ghi nhận xét và trả về In progress.
-5. Review đạt thì merge vào main và đổi trạng thái thành Done. Việc lớn cần VU duyệt trước khi merge.
+1. Claude (or the owner) creates the task in TASKS.md: description, owner, files that may be edited, completion criteria.
+2. The owner sets the status to In progress and starts on the branch claude/<id> or codex/<id>.
+3. When finished: make small commits, write a handoff note under the task, and set the status to Review.
+4. The other side reviews. If it does not pass, they write comments and return it to In progress.
+5. If the review passes, merge into main and set the status to Done. Large tasks need the owner's approval before merging.
 
-## 4. Quyền sở hữu thư mục mặc định
+## 4. Default folder ownership
 
-| Thư mục hoặc file | Bên được ghi |
+| Folder or file | Who may write |
 |---|---|
 | docs/, design/, shared/, CLAUDE.md, TASKS.md | Claude |
 | src/, scripts/, tools/, tests/ | Codex |
-| data-analytics/ (báo cáo, notebook phân tích) | Claude |
-| data-analytics/ (mã xử lý dữ liệu) | Codex |
-| deliverables/ | Bên tạo ra sản phẩm, bên kia chỉ đọc |
+| data-analytics/ (reports, analysis notebooks) | Claude |
+| data-analytics/ (data-processing code) | Codex |
+| deliverables/ | The side that produces the deliverable; the other side reads only |
 
-Muốn thay đổi file thuộc bên kia: tạo việc mới trong TASKS.md đề xuất thay đổi, không sửa trực tiếp.
+To change a file owned by the other side: create a new task in TASKS.md proposing the change; do not edit it directly.
 
-## 5. Git và worktree
+## 5. Git and worktrees
 
-- Claude làm trong thư mục chính D:\Dev\ai-company.
-- Codex làm trong worktree riêng, tạo một lần bằng:
-  git worktree add D:\Dev\ai-company-codex -b codex/work
-- Trước khi bắt đầu một việc: lấy bản mới nhất của main. Commit nhỏ, thông điệp rõ ràng.
-- Không push lên GitHub nếu VU chưa đồng ý.
+- Claude works in the main checkout.
+- Codex works in its own worktree, created once with:
+  `git worktree add <path-to-codex-worktree> -b codex/work`
+- Before starting a task: get the latest main. Make small commits with clear messages.
+- Do not push to GitHub without the owner's approval.
 
-## 6. Khi có xung đột hoặc bị chặn
+## 6. Conflicts and blockers
 
-- Thấy file ngoài quyền sở hữu có thay đổi chưa commit: dừng, ghi vào mục Blocked trong TASKS.md, hỏi VU.
-- Không tự gọi nhau quá 3 vòng cho cùng một việc. Sau 3 vòng chưa xong thì báo VU.
+- If you see uncommitted changes in a file outside your ownership: stop, record it in the Blocked section of TASKS.md, and ask the owner.
+- Do not call each other more than 3 rounds for the same task. If it is not done after 3 rounds, tell the owner.
 
-## 7. Điều không được làm
+## 7. What not to do
 
-- Sửa dòng việc của bên kia (trừ khi đổi trạng thái lúc review).
-- Chạy lệnh xóa file hoặc thư mục ngoài phạm vi việc được giao.
-- Commit mật khẩu, khóa API hoặc dữ liệu cá nhân.
-- Làm việc với dữ liệu người dùng thô. Chỉ dùng dữ liệu đã ẩn danh hoặc tổng hợp, theo quy tắc trong CLAUDE.md.
+- Edit the other side's task line (except to change the status during review).
+- Run commands that delete files or folders outside the scope of the assigned task.
+- Commit passwords, API keys or personal data.
+- Work with raw user data. Only use anonymized or aggregated data, following the rules in CLAUDE.md.
