@@ -26,6 +26,7 @@ const SHOPS := [
 	{"x": 336, "variety": "news", "wall": [87, 85, 88], "trim": 88, "awn": [93, 102], "plate": 103, "ink": 86, "mode": "clap"},
 	{"x": 420, "variety": "books", "wall": [80, 81, 79], "trim": 79, "awn": [74, 102], "plate": 103, "ink": 89, "mode": "brick"}]
 const FLOWERS := [85, 89, 93, 87, 97, 86]
+const MAX_CACHED := 3
 static var cache := {}
 
 static func _h(x: int, y: int) -> int:
@@ -67,6 +68,9 @@ static func build(day: int, crisis: int, names: Array, headlines: Array) -> Dict
 	out.bulbs = bulbs
 	out.puddles = puddles
 	cache[key] = out
+	# Keep memory bounded: only the most recent days stay cached (each entry is a few MB of textures).
+	while cache.size() > MAX_CACHED:
+		cache.erase(cache.keys()[0])
 	return out
 
 # ---- sky and skyline ------------------------------------------------------------------------
