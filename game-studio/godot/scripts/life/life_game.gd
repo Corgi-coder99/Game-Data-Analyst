@@ -4,6 +4,7 @@ extends RefCounted
 # dollars. Every change of net worth is written to `ledger`, so net_worth() == sum of the ledger.
 # Every random draw comes from a generator seeded by (seed, day), so a series is reproducible.
 const CONFIG_PATH := "res://data/life.json"
+const Vitals = preload("res://scripts/life/vitals.gd")
 var config: Dictionary
 var seed_value := 0
 var wallet := 0
@@ -26,6 +27,9 @@ var food_factor := 1.0
 var event_id := ""
 var ledger: Array = []
 var last_weakness := 0.0
+# T-026: the daily-life bars (null until enable_daily(), so T-024 behavior is unchanged).
+var vitals: RefCounted
+var last_night: Dictionary = {}
 
 func _init(seed_number: int = 0, overrides: Dictionary = {}) -> void:
 	seed_value = seed_number
@@ -210,6 +214,40 @@ func settle_for_ending(public: Dictionary) -> void:
 	_settle_pay(public)
 	if float(public.get("cash_report", -INF)) > ref_cash: ref_cash = float(public.cash_report)
 
+# T-026: turns on the daily-life rules: start stats, start cash (a ledger entry), the vitals module.
+func enable_daily() -> void:
+	if vitals != null: return
+	vitals = Vitals.new(self, seed_value)
+	mood = int(config.vitals.start.mood)
+	earn(int(config.vitals.start.wallet), "start", "start cash")
+
+# The wage of the day that just ended arrives (idempotent through synced_pay). Returns the amount.
+func deposit_wage(public: Dictionary) -> int:
+	day = int(public.get("day", day))
+	return _settle_pay(public)
+
+# Evening over, then the night: bills, sleep, sick-day check.
+func night() -> Dictionary:
+	end_evening()
+	if vitals != null: last_night = vitals.night()
+	return last_night
+
+func spend_checked(price: int, kind: String, note: String = "") -> bool:
+	if price < 0 or wallet < price: return false
+	if price > 0: _spend(price, kind, note)
+	return true
+
+func earn(amount: int, kind: String, note: String = "") -> void:
+	if amount <= 0: return
+	wallet += amount
+	_record(kind, amount, note)
+
+# Pays what the wallet can cover (never below zero). Returns the amount paid.
+func charge_up_to(price: int, kind: String, note: String = "") -> int:
+	var paid := mini(wallet, maxi(price, 0))
+	if paid > 0: _spend(paid, kind, note)
+	return paid
+
 func end_evening() -> void:
 	if not evening_open: return
 	evening_open = false
@@ -236,7 +274,9 @@ func buy_food(id: String) -> Dictionary:
 	var price := food_price(id)
 	if wallet < price: return _fail("funds")
 	_spend(price, "food", id)
-	return {"ok": true, "cost": price, "mood": _add_mood(int(entry.mood))}
+	var gained := _add_mood(int(entry.mood))
+	if vitals != null: vitals.on_treat(gained)
+	return {"ok": true, "cost": price, "mood": gained}
 
 func splurge(id: String) -> Dictionary:
 	var entry := item("splurge", id)
@@ -244,7 +284,9 @@ func splurge(id: String) -> Dictionary:
 	var price := int(entry.price)
 	if wallet < price: return _fail("funds")
 	_spend(price, "splurge", id)
-	return {"ok": true, "cost": price, "mood": _add_mood(int(entry.mood))}
+	var gained := _add_mood(int(entry.mood))
+	if vitals != null: vitals.on_treat(gained)
+	return {"ok": true, "cost": price, "mood": gained}
 
 func buy_gold(units: int = 1) -> Dictionary:
 	if units <= 0: return _fail("amount")
