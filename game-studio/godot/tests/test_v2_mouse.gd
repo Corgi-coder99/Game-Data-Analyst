@@ -32,6 +32,15 @@ func shot(name: String) -> void:
 	DirAccess.make_dir_recursive_absolute(folder)
 	root.get_texture().get_image().save_png(folder.path_join("T-021-" + name + ".png"))
 
+# T-024 captures go to their own folder.
+func shot_life(name: String) -> void:
+	if not capture: return
+	await settle(4)
+	await RenderingServer.frame_post_draw
+	var folder := ProjectSettings.globalize_path("res://docs/screenshots-T-024")
+	DirAccess.make_dir_recursive_absolute(folder)
+	root.get_texture().get_image().save_png(folder.path_join("T-024-mouse-" + name + ".png"))
+
 func send_mouse(position: Vector2, pressed: bool, moving: bool = false) -> void:
 	var window_position := position * scale_factor
 	if moving:
@@ -190,7 +199,36 @@ func run() -> void:
 		await settle(1)
 		await click(flow.review_view.continue_button, "review Continue")
 		guard += 1
-	check(flow.state == "DAY_START" and int(game.status().day) == 2, "a whole day finished by mouse, day 2 begins: " + flow.state)
+	# 7b. T-024: the Evening scene, driven by real clicks.
+	check(flow.state == "EVENING", "the review leads to the Evening scene: " + flow.state)
+	var evening: Control = flow.evening_view
+	var life: RefCounted = flow.life
+	check(evening.is_visible_in_tree() and life.wallet >= 100, "the evening shows the wallet with the day's pay")
+	await shot_life("evening-start")
+	var wallet_before: int = life.wallet
+	var mood_before: int = life.mood
+	await click(evening.action_buttons.food_noodle_cart, "Buy noodles")
+	check(life.wallet == wallet_before - life.food_price("noodle_cart") and life.mood > mood_before and evening.mood_float.visible and evening.stage.emote == "happy", "clicking a street food button spends money and lifts mood")
+	await shot_life("food-bought")
+	await click(evening.tab_buttons.gold, "Gold tab")
+	check(evening.tab == "gold" and evening.action_buttons.has("gold_buy1"), "the Gold tab opens by mouse")
+	var units_before: int = life.gold_units
+	await click(evening.action_buttons.gold_buy1, "Buy 1 gold")
+	check(life.gold_units == units_before + 1, "Buy 1 gold works by mouse")
+	await click(evening.action_buttons.gold_sell1, "Sell 1 gold")
+	check(life.gold_units == units_before, "Sell 1 gold works by mouse (choices stay editable)")
+	await shot_life("gold-tab")
+	await click(evening.tab_buttons.savings, "Savings tab")
+	await click(evening.action_buttons.deposit_all, "Deposit all")
+	check(life.wallet == 0 and life.savings > 0, "Deposit all moves the wallet into savings")
+	await click(evening.action_buttons.withdraw_all, "Withdraw all")
+	check(life.savings == 0 and life.wallet > 0, "Withdraw all moves it back")
+	await click(evening.tab_buttons.property, "Land/House tab")
+	check(evening.action_buttons.land_buy.disabled, "land is disabled while the wallet is too small")
+	await shot_life("property-tab")
+	check(life.net_worth() == life.ledger_total(), "net worth stays consistent after the clicks")
+	await click(evening.go_button, "Go home")
+	check(flow.state == "DAY_START" and int(game.status().day) == 2, "Go home by mouse starts day 2: " + flow.state)
 	await pump_office()
 	if flow.office.dialog.visible: await click(flow.office.dialog, "dialog day 2")
 	if flow.state == "DAY_START":

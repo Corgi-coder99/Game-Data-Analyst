@@ -61,42 +61,43 @@ func _build() -> void:
 	title_label = _text(self, "", Rect2(8, 4, 400, 17), 22, 12)
 	var stats := Panel.new()
 	stats.position = Vector2(8, 24)
-	stats.size = Vector2(208, 78)
+	stats.size = Vector2(208, 84)
 	stats.add_theme_stylebox_override("panel", WindowTheme.box(2))
 	add_child(stats)
-	wallet_label = _text(stats, "", Rect2(6, 3, 196, 15), 24, 12)
-	net_label = _text(stats, "", Rect2(6, 18, 196, 15), 22, 12)
-	_text(stats, strings.life.mood, Rect2(6, 35, 34, 12), 7)
+	wallet_label = _text(stats, "", Rect2(6, 3, 196, 17), 24, 12)
+	net_label = _text(stats, "", Rect2(6, 21, 196, 17), 22, 12)
+	_text(stats, strings.life.mood, Rect2(6, 41, 34, 12), 7)
 	mood_bar = ProgressBar.new()
 	mood_bar.theme = theme
 	mood_bar.show_percentage = false
 	mood_bar.custom_minimum_size = Vector2(110, 7)
-	mood_bar.position = Vector2(40, 38)
+	mood_bar.position = Vector2(40, 44)
 	mood_bar.size = Vector2(110, 7)
 	mood_bar.max_value = 100
 	stats.add_child(mood_bar)
 	mood_bar.size = Vector2(110, 7)
-	mood_label = _text(stats, "", Rect2(154, 35, 48, 12), 22)
-	holdings_a = _text(stats, "", Rect2(6, 50, 196, 12), 7)
-	holdings_b = _text(stats, "", Rect2(6, 63, 196, 12), 7)
+	mood_label = _text(stats, "", Rect2(154, 41, 48, 12), 22)
+	holdings_a = _text(stats, "", Rect2(6, 55, 196, 12), 7)
+	holdings_b = _text(stats, "", Rect2(6, 68, 196, 12), 7)
 	stage = ReactionStage.new()
 	stage.name = "Stage"
-	stage.position = Vector2(8, 104)
+	stage.position = Vector2(8, 110)
 	add_child(stage)
 	stage.build()
 	for node in stage.get_children():
 		if node is ColorRect: node.hide()
 	stage.neighbor_node.hide()
-	mood_float = _text(self, "", Rect2(150, 60, 60, 12), 24)
+	mood_float = _text(self, "", Rect2(84, 170, 60, 12), 24)
+	mood_float.set_meta("overlay", true)
 	mood_float.hide()
 	var chat := Panel.new()
-	chat.position = Vector2(8, 228)
-	chat.size = Vector2(208, 58)
+	chat.position = Vector2(8, 234)
+	chat.size = Vector2(208, 64)
 	chat.add_theme_stylebox_override("panel", WindowTheme.box(2))
 	add_child(chat)
-	message_label = _text(chat, "", Rect2(6, 4, 196, 50), 22)
+	message_label = _text(chat, "", Rect2(6, 3, 196, 58), 22)
 	message_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	message_label.max_lines_visible = 5
+	message_label.max_lines_visible = 4
 	var menu := Panel.new()
 	menu.position = Vector2(224, 24)
 	menu.size = Vector2(408, 240)
@@ -114,6 +115,7 @@ func _build() -> void:
 	menu_body.size = Vector2(396, 206)
 	menu_body.clip_contents = true
 	menu.add_child(menu_body)
+	_rect(self, 2, Rect2(224, 268, 408, 28))
 	var hint := _text(self, strings.life.hint, Rect2(224, 270, 408, 24), 7)
 	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	hint.max_lines_visible = 2
@@ -272,7 +274,7 @@ func _tab_property() -> void:
 func _property_row(id: String, y: int, name: String, owned: bool, bought: bool, value: int, price: int, fee_rate: float) -> void:
 	_text(menu_body, name, Rect2(0, y, 250, 14), 22, 12)
 	var status_text: String = strings.life.owned_value % value if owned else (strings.life.sold_once if bought else strings.life.not_owned)
-	_text(menu_body, status_text, Rect2(0, y + 18, 290, 12), 24 if owned else 7)
+	_text(menu_body, status_text, Rect2(0, y + 18, 266, 12), 24 if owned else 7)
 	if owned:
 		var fee := ceili(float(value) * fee_rate)
 		_row_button(id + "_sell", strings.life.sell_with_fee % fee, Rect2(272, y + 2, 120, 22), true, sell_property.bind(id))
@@ -293,7 +295,7 @@ func _after(kind: String, result: Dictionary, success_text: String) -> Dictionar
 func _gain_mood(amount: int) -> void:
 	if amount <= 0: return
 	mood_float.text = strings.life.mood_gain % amount
-	mood_float.position = Vector2(150, 60)
+	mood_float.position = Vector2(84, 170)
 	mood_float.modulate.a = 1.0
 	mood_float.show()
 	mood_float_time = 0.0
@@ -353,7 +355,7 @@ func advance(delta: float) -> void:
 	if mood_float_time >= 0.0:
 		mood_float_time += delta
 		var progress := clampf(mood_float_time / MOOD_FLOAT_TIME, 0.0, 1.0)
-		mood_float.position.y = 60 - floorf(progress * 10.0)
+		mood_float.position.y = 170 - floorf(progress * 10.0)
 		mood_float.modulate.a = maxf(1.0 - floorf(progress * 4.0) * 0.25, 0.25)
 		if progress >= 1.0:
 			mood_float.hide()

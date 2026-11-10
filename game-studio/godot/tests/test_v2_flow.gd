@@ -291,7 +291,8 @@ func test_scripted_lines() -> void:
 	flow.start_with_game(Game.new(77, 10, fixture({}, {"simulation":{"config":company}})))
 	scripted_day("tang", "cao")
 	finish_ending("bankrupt")
-	check(flow.ending_view.summary_lines.size() == 6, "ending summary lines")
+	# T-024: three life lines (net worth, mood, flavor) follow the five world lines and precede the verdict.
+	check(flow.ending_view.summary_lines.size() == 6 + flow.ending_view.life_lines.size() and flow.ending_view.life_lines.size() == 3, "ending summary lines")
 	# Survives without reaching the winning rank.
 	flow.start_with_game(Game.new(77, 10, fixture({"grading":{"base":1}})))
 	for i in 10: scripted_day("tang", "thap")
