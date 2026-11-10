@@ -106,7 +106,7 @@ Giữ nguyên `scripts/sim/` (kinh tế công ty, thẻ, sự kiện, điểm) l
 
 ## 13. Câu hỏi mở
 
-1. **Nguồn mỹ thuật pixel:** chưa có công cụ tạo ảnh. Lựa chọn: (a) tạo sprite đơn giản bằng mã (nhanh, chất lượng cơ bản), (b) dùng gói asset có giấy phép rõ (ví dụ CC0), cần VU đồng ý tải và duyệt giấy phép, (c) VU hoặc họa sĩ vẽ.
-2. **Bản v2 thay thế hay cùng tồn tại với bản dashboard hiện tại?** Đề xuất: giữ bản hiện tại trên `master` như một mốc, phát triển v2 trên nhánh riêng và chỉ thay khi đạt bản demo.
-3. **Tên game:** có giữ "Data Corp" hay đổi cho hợp bối cảnh văn phòng khủng hoảng (cần kiểm tra trùng tên).
-4. **Bối cảnh vĩ mô hư cấu:** dùng một "cuộc khủng hoảng tín dụng" chung chung hay đặt tên một thế giới hư cấu riêng.
+1. **Nguồn mỹ thuật pixel: ĐÃ CHỐT (VU, 2026-11-10): sprite viết bằng mã.** Sprite đơn giản tạo bằng mã (script sinh ảnh hoặc vẽ trong Godot) với bảng màu giới hạn, bản quyền thuộc dự án. Có thể thay bằng bản vẽ đẹp hơn sau. Style bible (T-016) phải mô tả sprite ở mức đơn giản khả thi bằng mã (nhân vật khoảng 16x24, bàn, máy tính, cửa sổ UI).
+2. **Bản v2 thay thế hay cùng tồn tại với bản dashboard hiện tại?** Mặc định đề xuất: giữ bản hiện tại trên `master` như một mốc (gắn tag), phát triển v2 trên nhánh riêng, chỉ thay khi đạt bản demo. Chưa được VU xác nhận.
+3. **Tên game:** mặc định giữ "Data Corp (tên tạm)", kiểm tra trùng tên trước khi phát hành. Chưa được VU xác nhận.
+4. **Bối cảnh vĩ mô hư cấu:** mặc định dùng một "cuộc khủng hoảng tín dụng" chung chung trong thế giới hư cấu không gắn quốc gia hay sự kiện thật. Chưa được VU xác nhận.
