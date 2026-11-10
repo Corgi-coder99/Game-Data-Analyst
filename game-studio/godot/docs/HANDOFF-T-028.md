@@ -15,7 +15,11 @@ Worktree `D:\Dev\ai-company-t028`. No push, no merge. Spec: `docs/SPEC-T-028.md`
 - `tools/shots_t028.gd`: screenshot set generator (non-headless). Screenshots: `docs/screenshots-T-028/before` and `/after` (title, home, 9 rooms, desktop-home, browser, mail, review, evening, ending, plus extras).
 
 ## Tests
-RESULTS_PLACEHOLDER
+Verified by the reviewer on the merged tree (T-028 + v2 with T-027), all 0 failures:
+headless: test_sim 2634, test_ui 134, test_world 32511, test_life 136, test_vitals 918, test_daily_flow 144, test_t027 276, test_v2_t023 91, test_v2_flow 1426, test_v2_commute 735, test_v2_assets 479, test_v2_popups 230, test_v2_t021 311, test_v2_desktop 4588; check_palette PASS (64 PNG, 112 colors v4).
+non-headless: test_v2_layout_render 5520, test_v2_screens_render 21129 (85 screens), test_t026_render 3646 (24 screens), test_v2_mouse 171, test_t026_mouse 34, test_t027_mouse 30.
+balance_sim and balance_world were not re-run (no sim/world files changed; test_world identical).
+Final after-screenshots regenerated with tools/shots_t028.gd into docs/screenshots-T-028/after.
 
 ## Changed existing checks (none relaxed)
 - `test_v2_commute.test_palette`: now asserts v4 (112 colors, superset of v3 and v2, unique symbols, shared copy identical). Why: the palette changed.
