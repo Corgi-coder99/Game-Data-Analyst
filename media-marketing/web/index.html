@@ -1,72 +1,144 @@
 <!doctype html>
-<html lang="vi">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Data Corp (tên tạm)</title>
-  <meta name="description" content="Đọc dữ liệu. Tìm nguyên nhân. Cứu startup.">
-  <meta property="og:title" content="Data Corp (tên tạm)">
-  <meta property="og:description" content="Đang phát triển. Chưa phát hành.">
+  <title>Data Corp (working title) - a pixel-art data analyst game</title>
+  <meta name="description" content="Data Corp (working title) is an early-demo pixel-art office game. Read a simulated internet, verify the rumors, report to your boss, and keep your job.">
+  <meta property="og:title" content="Data Corp (working title)">
+  <meta property="og:description" content="Early demo. You are a data analyst during a financial crisis: read the news, verify it, report to the boss.">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <a class="skip" href="#main">Skip to content</a>
   <header id="top" class="shell topbar">
-    <a class="brand" href="#top">Data Corp (tên tạm)</a>
-    <nav aria-label="Các mục">
-      <a href="#loop">Vòng chơi mỗi tuần</a>
-      <a href="#gameplay">Gameplay</a>
-      <a href="#status">Tình trạng dự án</a>
-      <a href="#follow">Theo dõi dự án</a>
+    <a class="brand" href="#top">Data Corp <small>(working title)</small></a>
+    <nav aria-label="Page sections">
+      <a href="#how">How it works</a>
+      <a href="#day">A day in the life</a>
+      <a href="#features">Features</a>
+      <a href="#gallery">Gallery</a>
+      <a href="#faq">FAQ</a>
     </nav>
   </header>
-  <main class="shell">
-    <section id="hero" class="hero">
-      <p class="status-label">Đang phát triển. Chưa phát hành.</p>
-      <h1>Đọc dữ liệu.<br>Tìm nguyên nhân.<br><span>Cứu startup.</span></h1>
-      <p class="intro">Data Corp là game chiến thuật nhẹ: bạn là Lead Data Analyst của một startup sắp cạn tiền. Mỗi tuần, bạn đọc dashboard, tìm nguyên nhân gốc của vấn đề và chọn thẻ hành động. Nhưng số liệu bạn thấy không phải lúc nào cũng đúng.</p>
-      <a class="button" href="#gameplay">Xem gameplay <span aria-hidden="true">↓</span></a>
-    </section>
-    <section id="loop">
-      <h2>Vòng chơi mỗi tuần</h2>
-      <ol class="steps">
-        <li>Đọc báo cáo tuần: Users, Retention, Conversion, CAC, ARPU, LTV/CAC, Data Integrity.</li>
-        <li>Xem sự kiện: bạn thấy triệu chứng, chưa chắc thấy nguyên nhân.</li>
-        <li>Chơi thẻ: mỗi tuần có 3 Energy và tay 4 thẻ, mỗi thẻ tốn Budget.</li>
-        <li>Kết thúc tuần: xem kết quả, rồi đối chiếu số thật ở cuối ván.</li>
-      </ol>
-    </section>
-    <section id="gameplay">
-      <h2>Gameplay</h2>
-      <figure>
-        <img src="assets/gameplay-dashboard.png" alt="Dashboard tuần 3/10: sự kiện Retention giảm đã lộ nguyên nhân (đối thủ giảm giá) kèm thẻ xử lý được gợi ý, một sự kiện khác (CAC tăng) chưa lộ nguyên nhân, và biểu đồ Users.">
-        <figcaption>Ảnh chụp từ bản demo đang phát triển</figcaption>
+
+  <main id="main">
+    <section id="hero" class="hero shell">
+      <div class="hero-text">
+        <p class="badge">Early demo - working title - not yet released</p>
+        <h1>Trust the data. <span>Not the rumor.</span></h1>
+        <p class="intro">You are a data analyst at a small company in the middle of a credit crisis. Read a simulated internet, work out which news is true, and tell your boss what comes next. Be right and earn a bonus. Be wrong and you may be looking for a new job.</p>
+        <p class="cta">
+          <span class="button disabled" role="note">Demo coming soon</span>
+          <a class="textlink" href="#faq">How can I try it?</a>
+        </p>
+      </div>
+      <figure class="hero-shot">
+        <img src="assets/hero-desk.png" width="640" height="360" alt="The in-game office desktop at night with a city skyline behind it. A message from the boss asks whether imported materials prices will rise, fall or stay flat this week, with icons for Browser, Mail, Insight BI and Code Pad on the left.">
+        <figcaption>Your desktop on day 1: the boss asks a question, and you have until the end of the day to answer it. Screenshot from the current build.</figcaption>
       </figure>
     </section>
-    <section id="difference">
-      <h2>Điểm khác biệt</h2>
+
+    <section id="how" class="shell">
+      <h2>How it works</h2>
+      <ol class="steps">
+        <li>
+          <h3>Read</h3>
+          <p>Open the in-game Browser and scan the day's news. Stories come from official bodies, the press, social media and insider tips. Each source has a different track record.</p>
+        </li>
+        <li>
+          <h3>Verify</h3>
+          <p>Spend limited Energy on verification tools. Pin the evidence you trust. Any kind of source can be right or wrong, so there is no fixed rule to lean on.</p>
+        </li>
+        <li>
+          <h3>Report</h3>
+          <p>Write a forecast for your boss with a confidence level. At the end of the day you see which news was true, false, partly true, stale or irrelevant, and how your report scored.</p>
+        </li>
+      </ol>
+      <figure class="wide">
+        <img src="assets/news-browser.png" width="640" height="360" alt="The in-game Browser window listing news cards. Each card shows a source tier label such as Official, Social media or Insider, a headline, and Pin and Read more buttons.">
+        <figcaption>News cards carry a source tier. Official, social media and insider items all appear, and none of them is always right.</figcaption>
+      </figure>
+    </section>
+
+    <section id="day" class="shell">
+      <h2>A day in the life</h2>
+      <p class="lead">The job is only part of the game. Each day also has a cozy loop around it.</p>
       <div class="columns">
-        <article><h3>Dữ liệu có thể sai</h3><p>Khi Data Integrity giảm, các chỉ số trên dashboard bị nhiễu. Có lúc một chỉ số trông rất xấu chỉ vì dữ liệu lỗi, không phải vì công ty có vấn đề.</p></article>
-        <article><h3>Triệu chứng không phải nguyên nhân</h3><p>Retention tụt có thể do lỗi ứng dụng, đối thủ giảm giá hoặc log trùng. Thẻ phân tích giúp lộ nguyên nhân, và mỗi nguyên nhân cần một cách xử lý khác nhau.</p></article>
+        <figure>
+          <img src="assets/commute-bus.png" width="640" height="360" alt="A busy pixel-art street in the morning with a cafe, a noodle shop, a corner mart, a bank, a news stand, a bookshop and the company building, plus buses, taxis and people walking.">
+          <figcaption>Commute: head to work past the shops. The street, shops and people are all fictional.</figcaption>
+        </figure>
+        <figure>
+          <img src="assets/evening.png" width="640" height="360" alt="The evening screen. A wallet panel shows money and mood, and a street food menu lists cheap treats that raise mood, each with a Buy button.">
+          <figcaption>Evening: spend your wallet on small treats or save it. Mood and stamina shape your day, so a good meal is not a waste.</figcaption>
+        </figure>
+      </div>
+      <figure class="wide">
+        <img src="assets/report-review.png" width="640" height="360" alt="The end-of-day review. Six news items are each marked True, False, Partly true, Stale or Irrelevant, and the boss says: here is today's news and the truth behind it.">
+        <figcaption>End of day: the boss shows the truth behind every story you read.</figcaption>
+      </figure>
+    </section>
+
+    <section id="features" class="shell">
+      <h2>Features in the current demo</h2>
+      <ul class="cards">
+        <li><h3>Simulated internet</h3><p>News from sources of different reliability, generated from a seed so scenarios can be replayed.</p></li>
+        <li><h3>Real consequences</h3><p>A career ladder with boss trust, bonuses, warnings, demotion and dismissal. The company can also go bankrupt.</p></li>
+        <li><h3>Transparent scoring</h3><p>Reports are scored on forecast accuracy, how well your confidence matches reality, and the quality of your evidence. Some days the market simply surprises you.</p></li>
+        <li><h3>Cozy daily life</h3><p>Commute, shops, treats, mood and stamina, all drawn in a warm pixel-art style.</p></li>
+        <li><h3>Wall of Fame</h3><p>Employee of the Month cards, all-time awards and achievements, kept locally on your own computer.</p></li>
+        <li><h3>Pixel-perfect art</h3><p>640x360 art at integer scale, drawn with a locked color palette.</p></li>
+      </ul>
+      <p class="note">Planned, not built yet: an online leaderboard. There is no multiplayer.</p>
+    </section>
+
+    <section id="gallery" class="shell">
+      <h2>Screenshot gallery</h2>
+      <p class="lead">All images are captured from the current build. Select a picture to open it at full size.</p>
+      <div class="gallery">
+        <a href="assets/title.png"><img src="assets/title.png" width="640" height="360" alt="The title screen with a night skyline and a menu with Play, Daily Shift, Wall of Fame, Request leave, Settings and Quit."></a>
+        <a href="assets/wall-of-fame.png"><img src="assets/wall-of-fame.png" width="640" height="360" alt="The Wall of Fame screen with Employee of the Month cards, all-time awards and a list of achievements."></a>
+        <a href="assets/news-browser.png"><img src="assets/news-browser.png" width="640" height="360" alt="The in-game Browser with news cards and source tier labels."></a>
+        <a href="assets/hero-desk.png"><img src="assets/hero-desk.png" width="640" height="360" alt="The office desktop with the boss's question of the day and a goals checklist."></a>
       </div>
     </section>
-    <section id="numbers">
-      <h2>Con số của bản demo</h2>
-      <div class="numbers">
-        <div><p><strong data-stat="weeks">10</strong> tuần</p><small>theo bản demo hiện tại</small></div>
-        <div><p><strong data-stat="cards">12</strong> thẻ</p><small>theo bản demo hiện tại</small></div>
-        <div><p><strong data-stat="events">8</strong> sự kiện</p><small>theo bản demo hiện tại</small></div>
-        <div><p><strong data-stat="metrics">7</strong> chỉ số</p><small>theo bản demo hiện tại</small></div>
-      </div>
+
+    <section id="faq" class="shell">
+      <h2>FAQ</h2>
+      <details>
+        <summary>Can I play it now?</summary>
+        <p>Not as a download yet. This is an early demo of a Godot 4.7 PC game that has not been published, so the "Demo coming soon" button is intentionally inactive. To run it from source you would open the project in Godot 4.7 and run the scene <code>scenes/v2/main_v2.tscn</code>, as described in the project README under "Run the game".</p>
+      </details>
+      <details>
+        <summary>Is the name final?</summary>
+        <p>No. "Data Corp" is a working title and may change.</p>
+      </details>
+      <details>
+        <summary>Which platforms?</summary>
+        <p>The current build is a PC game made with Godot 4.7. No other platform is confirmed.</p>
+      </details>
+      <details>
+        <summary>Is there multiplayer or an online leaderboard?</summary>
+        <p>No multiplayer. An online leaderboard is planned but does not exist yet. The Wall of Fame is local.</p>
+      </details>
+      <details>
+        <summary>Is the data real? Is it investment advice?</summary>
+        <p>No. Every company, person, ticker and figure in the game is fictional and generated by simulation. It is not real market data and not investment advice.</p>
+      </details>
+      <details>
+        <summary>Was AI used?</summary>
+        <p>Yes. Part of the content and code was created with AI assistance.</p>
+      </details>
+      <details>
+        <summary>Does this site collect data?</summary>
+        <p>No. It has no forms, cookies, trackers, external fonts or scripts.</p>
+      </details>
     </section>
-    <section id="status">
-      <h2>Tình trạng dự án</h2>
-      <div class="columns">
-        <article><h3>Đã có</h3><ul><li>vòng chơi 10 tuần</li><li>dashboard</li><li>sự kiện và thẻ</li><li>màn kết thúc</li></ul></article>
-        <article id="not-yet"><h3>Chưa có</h3><ul><li>bản chơi trên web</li><li>bảng xếp hạng</li><li>nhiều công ty</li><li>phát hành</li></ul></article>
-      </div>
-    </section>
-    <section id="follow"><h2>Theo dõi dự án</h2><p>Chưa mở đăng ký. Liên kết trang phát hành sẽ đặt ở đây khi có.</p></section>
   </main>
-  <footer id="footer" class="shell"><p>Dự án đang phát triển. Một phần nội dung và mã được tạo với hỗ trợ của AI.</p></footer>
+
+  <footer class="shell">
+    <p>Data Corp (working title) - early demo. All data, names and companies in the game are fictional. Not real market data and not investment advice. Part of the content and code was created with AI assistance.</p>
+  </footer>
 </body>
 </html>
