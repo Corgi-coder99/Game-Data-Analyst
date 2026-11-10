@@ -10,18 +10,18 @@ const ICONS := {
 const COLORS := {"stamina": 28, "mood": 36, "health": 26, "stress": 30}
 const ORDER := ["stamina", "mood", "health", "stress"]
 const SEGMENT := 50
-const STRIP := Rect2(388, 0, 252, 12)
+const STRIP := Rect2(372, 0, 268, 12)
 var life: RefCounted
 var focus_text := ""
 var show_focus := false
 
 func _ready() -> void:
-	size = Vector2(640, 26)
+	size = Vector2(640, 360)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 func bind(life_game: RefCounted) -> void:
 	life = life_game
-	size = Vector2(640, 26)
+	size = Vector2(640, 360)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	queue_redraw()
 
@@ -60,14 +60,10 @@ func _draw() -> void:
 		if id == "stress" and value > 80 or id != "stress" and value < 30: color = 51
 		draw_rect(Rect2(x + 11, 5, fill, 3), Palette.color(color))
 		draw_string(font, Vector2(x + 36, 9.5), str(value), HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Palette.color(22))
-		x += SEGMENT - 8
-	draw_string(font, Vector2(x + 6, 9.5), "$%d" % v.wallet, HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Palette.color(52))
+		x += SEGMENT
+	draw_string(font, Vector2(x + 2, 9.5), "$%d" % v.wallet, HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Palette.color(52))
 	if show_focus and focus_text != "":
-		var width := font.get_string_size(focus_text, HORIZONTAL_ALIGNMENT_LEFT, -1, 8).x
-		draw_rect(Rect2(640 - width - 10, 12, width + 10, 12), Palette.color(1))
-		draw_rect(Rect2(640 - width - 10, 23, width + 10, 1), Palette.color(5))
-		draw_rect(Rect2(640 - width - 10, 12, 1, 12), Palette.color(5))
-		draw_string(font, Vector2(640 - width - 5, 21.5), focus_text, HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Palette.color(48))
+		draw_string(font, Vector2(344, 354), focus_text, HORIZONTAL_ALIGNMENT_LEFT, 200, 8, Palette.color(48))
 
 func _icon(id: String, at: Vector2) -> void:
 	var rows: Array = ICONS[id]

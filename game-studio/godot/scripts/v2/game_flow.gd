@@ -96,7 +96,7 @@ func _update_hud() -> void:
 	var on: bool = life != null and life.vitals != null and state in HUD_STATES
 	hud_layer.visible = on
 	if on:
-		hud.set_focus(strings.daily.focus_label % strings.daily.focus[focus_info.reason], state in ["DAY_START", "WORK"])
+		hud.set_focus(strings.daily.focus_label % strings.daily.focus[focus_info.reason], state == "WORK")
 
 # ---- transitions -------------------------------------------------------
 

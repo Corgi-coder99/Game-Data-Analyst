@@ -51,7 +51,7 @@ func _build() -> void:
 	_sprite(self, "player", 0, Vector2(30, 126), 3)
 	stage = ReactionStage.new()
 	stage.name = "Stage"
-	stage.position = Vector2(8, 236)
+	stage.position = Vector2(8, 222)
 	add_child(stage)
 	stage.build()
 	for node in stage.get_children():

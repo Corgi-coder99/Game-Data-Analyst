@@ -31,12 +31,16 @@ func _build() -> void:
 	if built: return
 	built = true
 	_prepare()
+	var floor_fill := _rect(self, 3, Rect2(0, 0, 640, 360))
+	floor_fill.mouse_filter = Control.MOUSE_FILTER_STOP
 	backdrop = Control.new()
 	backdrop.size = Vector2(640, 360)
 	backdrop.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	backdrop.set_meta("overlay", true)
 	add_child(backdrop)
 	stage = ReactionStage.new()
 	stage.name = "Stage"
+	stage.set_meta("overlay", true)
 	stage.position = Vector2(8, 100)
 	add_child(stage)
 	stage.build()
@@ -125,8 +129,8 @@ func _render_items() -> void:
 		var id: String = entry.id
 		var price := int(entry.price)
 		_text(menu, daily.items[id], Rect2(0, y, 190, 12), 22, 8)
-		_text(menu, change_text(0, entry) + ("  Skill +%d" % int(entry.skill) if entry.has("skill") else ""), Rect2(0, y + 12, 250, 11), 24)
-		var tip_label := _text(menu, daily.item_tip[id], Rect2(0, y + 23, 290, 11), 7)
+		_text(menu, change_text(0, entry) + ("  Skill +%d" % int(entry.skill) if entry.has("skill") else ""), Rect2(0, y + 13, 250, 12), 24)
+		var tip_label := _text(menu, daily.item_tip[id], Rect2(0, y + 26, 290, 12), 7)
 		tip_label.tooltip_text = daily.item_tip[id]
 		_text(menu, "$%d" % price, Rect2(296, y + 4, 34, 12), 52 if life.wallet >= price else 51)
 		var node := button(menu, daily.buy, Rect2(334, y, 48, 22))
@@ -136,7 +140,7 @@ func _render_items() -> void:
 		node.tooltip_text = daily.tip_funds if not enough else daily.item_tip[id]
 		node.pressed.connect(buy.bind(id))
 		rows[id] = node
-		y += 44
+		y += 48
 
 func _render_bank() -> void:
 	_text(menu, daily.bank_line % life.savings, Rect2(0, 0, 384, 14), 24, 12)

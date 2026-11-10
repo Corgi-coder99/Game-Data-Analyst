@@ -140,8 +140,8 @@ func _render_transport(v: RefCounted) -> void:
 		node.tooltip_text = daily.transport_tip[id] if enough else daily.no_money
 		node.pressed.connect(choose_transport.bind(id))
 		buttons[id] = node
-		_text(body, daily.transport_line % [int(t.minutes), price, int(t.stress), int(t.stamina)], Rect2(4, y + 22, 296, 11), 24)
-		_text(body, daily.transport_tip[id] if enough else daily.no_money, Rect2(4, y + 33, 296, 11), 7 if enough else 51)
+		_text(body, daily.transport_line % [int(t.minutes), price, int(t.stress), int(t.stamina)], Rect2(4, y + 22, 296, 12), 24)
+		_text(body, daily.transport_tip[id] if enough else daily.no_money, Rect2(4, y + 35, 296, 12), 7 if enough else 51)
 		y += 56
 
 func _render_sick() -> void:

@@ -65,6 +65,7 @@ func run() -> void:
 	test_overtime_and_sleep()
 	test_focus_flow()
 	test_sick_day_flow()
+	test_score_unchanged()
 	test_legacy_flags()
 	test_source_scan()
 	print("test_daily_flow: %d checks, %d failures" % [checks, failures])
@@ -331,3 +332,24 @@ func test_source_scan() -> void:
 		check(not commute.contains(word), "commute_scene does not touch hidden state (" + word + ")")
 	var flow := FileAccess.get_file_as_string("res://scripts/v2/game_flow.gd")
 	check(not flow.contains("_answers") and not flow.contains("root_cause"), "flow does not read hidden labels")
+
+# The life loop never decides the score: the same seed and the same reports score the same with it on or off.
+func test_score_unchanged() -> void:
+	for seed_number in [21, 22, 23]:
+		var scores := []
+		for daily in [false, true]:
+			var flow := new_flow(seed_number, daily)
+			var guard := 0
+			while flow.state != "END_SCREEN" and guard < 500:
+				guard += 1
+				match flow.state:
+					"EVENING": flow.evening_view.go_home()
+					"WORK": submit(flow, "tang", "vua")
+					"REVIEW", "SUBMITTED": flow.continue_review()
+					"DAY_START": flow.skip_intro()
+					"COMMUTE": drain(flow)
+					"MORNING", "TRANSPORT", "SHOP", "OVERTIME": flow.quick_advance()
+					_: flow.skip_commute()
+			scores.append([flow.game.status().score, flow.game.status().day, flow.game.status().trust])
+			flow.queue_free()
+		check(scores[0] == scores[1], "seed %d: score, days and trust identical with the life loop on and off: %s" % [seed_number, str(scores)])

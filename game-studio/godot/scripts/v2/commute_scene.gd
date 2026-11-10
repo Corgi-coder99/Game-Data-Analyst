@@ -84,6 +84,8 @@ var toast_panel: Panel
 var toast_label: Label
 var player_vehicle: Dictionary = {}
 var results: Array = []
+var emote_name := ""
+var emote_time := 0.0
 
 func setup(day_number: int, trust_value: int = 50) -> void:
 	day = clampi(day_number, 1, 30)
@@ -141,12 +143,15 @@ func _build_prompt() -> void:
 	prompt_secondary = _prompt_button(prompt_panel, Rect2(92, 26, 78, 20))
 	toast_panel = Panel.new()
 	toast_panel.position = Vector2(120, 22)
-	toast_panel.size = Vector2(400, 20)
+	toast_panel.size = Vector2(400, 30)
 	toast_panel.add_theme_stylebox_override("panel", WindowTheme.box(2))
 	toast_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	toast_panel.hide()
 	ui.add_child(toast_panel)
-	toast_label = _prompt_text(toast_panel, Rect2(6, 4, 388, 12))
+	toast_label = _prompt_text(toast_panel, Rect2(6, 4, 388, 24))
+	toast_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	toast_label.clip_text = false
+	toast_label.max_lines_visible = 2
 
 func _prompt_text(parent: Node, area: Rect2) -> Label:
 	var node := Label.new()
@@ -157,6 +162,7 @@ func _prompt_text(parent: Node, area: Rect2) -> Label:
 	node.clip_text = true
 	node.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	parent.add_child(node)
+	node.size = area.size
 	return node
 
 func _prompt_button(parent: Node, area: Rect2) -> Button:
@@ -185,6 +191,7 @@ func _open_stop(stop: Dictionary) -> void:
 		prompt_secondary.text = daily_strings.run
 		prompt_primary.pressed.connect(answer_prompt.bind("wait"))
 		prompt_secondary.pressed.connect(answer_prompt.bind("run"))
+	prompt_label.size = Vector2(164, 14)
 	prompt_panel.position = Vector2(clampf(player_x - 60.0, 4.0, 456.0), 90)
 	prompt_panel.show()
 	prompt_opened.emit(paused)
@@ -212,6 +219,9 @@ func answer_prompt(choice: String) -> void:
 			"fined": text = text % int(result.fine)
 			"accident": text = text % [int(vitals.cfg.light.accident_health), int(result.minutes)]
 		show_toast(text, 2.4)
+		if result.outcome in ["fined", "accident"]:
+			emote_name = "emote_sad"
+			emote_time = 2.4
 		prompt_panel.hide()
 		if choice == "run":
 			_close_prompt()
@@ -253,6 +263,7 @@ func clock_minutes() -> int:
 	return total
 
 func _advance_interactive(delta: float) -> void:
+	if emote_time > 0.0: emote_time -= delta
 	if toast_time >= 0.0:
 		toast_time -= delta
 		if toast_time < 0.0: toast_panel.hide()
@@ -1041,6 +1052,10 @@ func _draw_vehicle(p: Pen, v: Dictionary) -> void:
 			p.r(x + 4, y - 19, 4, 2, 9)
 
 func _draw_overlay(p: Pen) -> void:
+	if interactive and emote_time > 0.0 and emote_name != "":
+		var vehicle_len: int = VEHICLE_LEN.get(mode, 0)
+		var ey := FEET_Y - 46 if vehicle_len == 0 else LANE_DOWN - 52
+		draw_texture(lib.frame(emote_name), Vector2(roundi(player_x) + vehicle_len / 2 - 4, ey))
 	for s in signs:
 		p.text(s.text, s.x, s.y, s.ink, s.size)
 	# Header chip with day and the morning clock.
