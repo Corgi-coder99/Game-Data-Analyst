@@ -747,7 +747,7 @@ Kết quả chạy thật (worktree, Godot 4.7.2 console):
 ### T-024 | Claude subagent | 2026-11-10 | In progress
 - Cuộc sống sau giờ làm: tiêu tiền (đồ ăn vặt, vàng, tiết kiệm, đất, nhà). Spec docs/SPEC-T-024.md, worktree ai-company-t024, nhánh codex/T-024. Handoff: docs/HANDOFF-T-024.md.
 
-### T-025 | Claude subagent | 2026-11-10 | In progress
+### T-025 | Claude subagent | 2026-11-10 | Done
 - Tài liệu tiếng Anh, README, .gitignore, chuẩn bị GitHub (không push). Spec docs/SPEC-T-025.md, worktree ai-company-t025, nhánh codex/T-025. Handoff: docs/GITHUB-READINESS.md.
 
 ### T-022 handoff | Claude subagent (thay Codex) | 2026-11-10 | Review
