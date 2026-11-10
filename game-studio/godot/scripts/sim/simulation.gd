@@ -80,8 +80,6 @@ func play(card_id: String) -> bool:
 		if card.id != card_id:
 			continue
 		var budget := float(card.budget)
-		if state.week > int(config.weeks.demo):
-			budget *= float(config.economy.get("full_card_cost_multiplier", 1.0))
 		if state.energy < card.energy or state.base.cash < budget:
 			return false
 		state.energy -= int(card.energy)
@@ -137,8 +135,6 @@ func finish_week() -> Dictionary:
 	state.base.users = maxf(0, state.base.users - churned + new_users)
 	var revenue: float = state.base.users * state.value("conversion", config) * state.value("arpu", config)
 	var fixed_cost: float = state.value("fixed_cost", config) + config.economy.cost_per_user * state.base.users
-	if state.week > int(config.weeks.demo):
-		fixed_cost *= float(config.economy.get("full_cost_multiplier", 1.0))
 	# Campaign budgets were debited by play(); do not charge ad spend twice.
 	state.base.cash += revenue - fixed_cost
 	state.bad_ratio_weeks = state.bad_ratio_weeks + 1 if state.ratio(config) < config.loss.ratio else 0

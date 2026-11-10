@@ -26,12 +26,17 @@ func _init() -> void:
 			var retention: Array = []
 			var conversion: Array = []
 			var ratios: Array = []
+			var winner_users: Array = []
+			var trajectories: Array = []
 			for game in count:
 				var sim := Sim.new(int(template.config.balance.seed) + game, {"config":template.config,"cards":template.cards,"events":template.events}, weeks)
+				var trajectory := {}
 				while not sim.state.lost and not sim.state.won:
 					sim.begin_week()
 					if strategy == "analyst":
 						play_analyst(sim)
+					elif strategy == "balanced":
+						play_revealed_remedies(sim)
 					var choices: Array = []
 					if strategy == "random":
 						var pool := sim.hand.duplicate()
@@ -42,15 +47,19 @@ func _init() -> void:
 					else:
 						choices = template.config.balance.priorities["balanced" if strategy == "analyst" else strategy]
 					for id in choices:
+						if strategy == "balanced" and id in ["sql_deep_dive", "funnel_report", "ab_test"] and not has_hidden_symptom(sim):
+							continue
 						if strategy == "analyst" and id in ["sql_deep_dive", "funnel_report", "ab_test"]:
 							continue
-						if strategy in ["balanced", "analyst"] and id == "influencer_campaign" and sim.report().retention < 0.7:
+						if strategy in ["balanced", "analyst"] and id == "influencer_campaign" and (sim.upgrade_plays.get("onboarding_redesign", 0) == 0 or sim.report().retention < 0.85):
 							continue
 						if strategy == "random" or useful_upgrade(sim, id):
 							sim.play(id)
 					sim.finish_week()
+					trajectory[sim.state.week] = sim.state.base.users
 				if sim.state.won:
 					wins += 1
+					winner_users.append(sim.state.base.users)
 					retention.append(100 * sim.state.value("retention", sim.config))
 					conversion.append(100 * sim.state.value("conversion", sim.config))
 					ratios.append(sim.state.ratio(sim.config))
@@ -59,6 +68,7 @@ func _init() -> void:
 					if sim.state.week < 15:
 						early += 1
 				cash.append(sim.state.base.cash)
+				trajectories.append({"won":sim.state.won,"values":trajectory})
 				if count == 1:
 					print("sample users=%.2f ratio=%.2f" % [sim.state.base.users, sim.state.ratio(sim.config)])
 
@@ -67,6 +77,16 @@ func _init() -> void:
 			for q in template.config.balance.quantiles:
 				quantiles.append(snappedf(cash[int(round(q * (count - 1)))], 0.01))
 			print("%d | %s | %d | %.2f | %s | %.2f | %s | %s / %s / %s" % [weeks,strategy,count,100.0*wins/count,median_of(losses),100.0*early/count,str(quantiles),median_of(retention),median_of(conversion),median_of(ratios)])
+			print("  winner Users p10/p50/p90: %s / %s / %s" % [quantile_of(winner_users, 0.1), median_of(winner_users), quantile_of(winner_users, 0.9)])
+			for group in ["all", "losses"]:
+				var path := []
+				for week in ([1, 3, 5, 10] if weeks == 10 else [1, 3, 5, 10, 20, 30]):
+					var values: Array = []
+					for trajectory in trajectories:
+						if (group == "all" or not trajectory.won) and trajectory.values.has(week):
+							values.append(trajectory.values[week])
+					path.append("%d:%s(n=%d)" % [week, median_of(values), values.size()])
+				print("  Users median %s, observed weeks only: %s" % [group, str(path)])
 	print("elapsed_seconds=%.3f" % ((Time.get_ticks_msec()-started)/1000.0))
 	quit(0)
 
@@ -80,6 +100,9 @@ func play_analyst(sim: RefCounted) -> void:
 			if definition.symptom == visible.symptom:
 				for id in definition.revealed_by:
 					sim.play(id)
+	play_revealed_remedies(sim)
+
+func play_revealed_remedies(sim: RefCounted) -> void:
 	for visible in sim.event_reports():
 		if not visible.has("root_cause"):
 			continue
@@ -89,7 +112,14 @@ func play_analyst(sim: RefCounted) -> void:
 					if sim.play(id):
 						break
 
-# Counts are public action history; remedies bypass this filter in play_analyst.
+# Balanced diagnoses broadly, after its actions, only if some cause remains hidden.
+func has_hidden_symptom(sim: RefCounted) -> bool:
+	for visible in sim.event_reports():
+		if not visible.has("root_cause"):
+			return true
+	return false
+
+# Counts are public action history; revealed remedies bypass this filter.
 func useful_upgrade(sim: RefCounted, id: String) -> bool:
 	for card in sim.cards:
 		if card.id == id and card.get("diminishing", false):
@@ -103,3 +133,9 @@ func median_of(values: Array) -> String:
 	var middle := values.size() / 2
 	var value := float(values[middle]) if values.size() % 2 else (float(values[middle - 1]) + float(values[middle])) / 2.0
 	return "%.2f" % value
+
+func quantile_of(values: Array, q: float) -> String:
+	if values.is_empty():
+		return "n/a"
+	values.sort()
+	return "%.2f" % values[int(round(q * (values.size() - 1)))]
