@@ -23,6 +23,8 @@ static func topic_for(question: String) -> String:
 
 static func propose(game: RefCounted, bot: String, rng: RandomNumberGenerator, stats: Dictionary = {}) -> Dictionary:
 	var question: Dictionary = game.question_today()
+	# late_verifier plays exactly like verifier, then submits late (see run_game).
+	if bot == "late_verifier": bot = "verifier"
 	var related: Array = game.news_today().filter(func(n): return n.topic == topic_for(question.id))
 	var forecast := "ngang"
 	var confidence := "vua"
@@ -92,7 +94,11 @@ static func run_game(seed_value: int, days: int, bot: String) -> Dictionary:
 	var shocks := {}
 	while not game.status().finished:
 		game.begin_day()
-		var submission: Dictionary = game.submit_report(propose(game, bot, rng, vstats))
+		var report := propose(game, bot, rng, vstats)
+		# T-023: a late bot lets the clock pass the on-time limit by waiting for more data.
+		if bot == "late_verifier":
+			while game.status().band == "on_time": assert(game.wait_for_data().ok)
+		var submission: Dictionary = game.submit_report(report)
 		assert(submission.ok)
 		game.end_day()
 		var review: Dictionary = game.review(game.status().day)
@@ -136,7 +142,7 @@ func _init() -> void:
 		return
 	print("days | bot | games | win % | fired % | bankrupt % | survived % | demoted % | warned % | heavy % | trust p25/p50/p75 | rank median | accuracy | ev | all kinds % | verifies per day | related checked %")
 	var all_shocks := {}
-	var bots := ["random_reporter", "rumor_follower", "official_only", "verifier", "careful_hedger"]
+	var bots := ["random_reporter", "rumor_follower", "official_only", "verifier", "careful_hedger", "late_verifier"]
 	var stats := {}
 	for bot in bots:
 		stats[bot] = {"wins":0,"fired":0,"bankrupt":0,"survived":0,"demoted":0,"warned":0,"heavy":0,"trusts":[],"ranks":[],"accuracy":0.0,"ev":0.0,"covered":0,"verifications":0,"days":0,"related":0,"related_checked":0}

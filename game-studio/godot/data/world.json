@@ -23,5 +23,20 @@
  "tool_energy":{"truy_van_lich_su":1,"kiem_dinh_gia_thuyet":1,"doi_chieu_nguon":1,"lam_sach_du_lieu":1},
  "tool_budget":{"truy_van_lich_su":60,"kiem_dinh_gia_thuyet":80,"doi_chieu_nguon":40,"lam_sach_du_lieu":100},
  "win":{"demo":"chuyen_vien","full":"truong_nhom"},
+ "clock":{"start":510,"on_time":900,"late":1020,"wait_minutes":60},
+ "tool_minutes":{"truy_van_lich_su":30,"kiem_dinh_gia_thuyet":45,"doi_chieu_nguon":20,"lam_sach_du_lieu":35},
+ "late":{
+  "volatile_probability":0.5,"flip_probability":0.6,"update_reliability":0.7,"reward_factor":0.6,"missed_penalty":6,
+  "mixed":"signals are mixed this afternoon; nothing conclusive yet",
+  "updates":{
+   "q1":{"source":"so_giao_dich","topic":"nguyen_lieu","tang":"Market update: imported materials prices rise again in afternoon trading","giam":"Market update: imported materials prices fall in afternoon trading","ngang":"Market update: imported materials prices hold steady within a narrow band"},
+   "q3":{"source":"ngan_hang_tw","topic":"lai_suat","tang":"Market update: the central bank signals a rate hike in an afternoon statement","giam":"Market update: the central bank signals loan rates will fall","ngang":"Market update: the central bank holds its policy rate in an afternoon statement"},
+   "q4":{"source":"cuc_thong_ke","topic":"suc_mua","tang":"Market update: flash estimate shows household spending recovers","giam":"Market update: flash estimate shows household spending keeps falling","ngang":"Market update: flash estimate shows household spending flat"},
+   "q5":{"source":"nhat_bao","topic":"suc_mua","tang":"Market update: rival confirms a deep discount on imported stock","giam":"Market update: rival confirms a deep discount on imported stock","ngang":"Market update: rival price cut turns out to be a one-day ad stunt"},
+   "q6":{"source":"ngan_hang_tw","topic":"tin_dung","tang":"Market update: partner bank credit conditions improve and lending rises","giam":"Market update: partner bank credit conditions tighten","ngang":"Market update: partner bank credit conditions steady within the normal range"},
+   "q8":{"source":"dong_nghiep","topic":"noi_bo","tang":"Market update: the data team confirms the weekly report table is clean","giam":"Market update: the data team confirms duplicate rows in the weekly report table","ngang":"Market update: the data team confirms the weekly report table is clean"},
+   "q9":{"source":"ngan_hang_tw","topic":"tin_dung","tang":"Market update: the central bank says the bank rumor is baseless and deposits are stable","giam":"Market update: the rumor is confirmed and the lender is set to collapse","ngang":"Market update: the central bank says the bank rumor is baseless and deposits are stable"}
+  }
+ },
  "balance":{"seed":104,"games":2000}
 }
