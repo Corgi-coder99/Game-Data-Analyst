@@ -19,7 +19,7 @@ static func interpretation(n: Dictionary, question: String) -> String:
 static func topic_for(question: String) -> String:
 	return {"q1":"nguyen_lieu","q3":"lai_suat","q4":"suc_mua","q5":"suc_mua","q6":"tin_dung","q8":"noi_bo","q9":"tin_dung"}.get(question, "")
 
-static func propose(game: RefCounted, bot: String, rng: RandomNumberGenerator) -> Dictionary:
+static func propose(game: RefCounted, bot: String, rng: RandomNumberGenerator, stats: Dictionary = {}) -> Dictionary:
 	var question: Dictionary = game.question_today()
 	var related: Array = game.news_today().filter(func(n): return n.topic == topic_for(question.id))
 	var forecast := "ngang"
@@ -34,11 +34,22 @@ static func propose(game: RefCounted, bot: String, rng: RandomNumberGenerator) -
 			var order: Array = ["doi_chieu_nguon", "truy_van_lich_su", "kiem_dinh_gia_thuyet", "lam_sach_du_lieu"]
 			if question.id in ["q1", "q4", "q5"]: order = ["truy_van_lich_su", "kiem_dinh_gia_thuyet"]
 			if question.id == "q8": order = ["lam_sach_du_lieu", "truy_van_lich_su", "doi_chieu_nguon", "kiem_dinh_gia_thuyet"]
-			for n in related:
-				if n.day != game.status().day: continue
+			# Analysis energy is scarce: spend it on today's related news only, newest first, using only the public headline/topic/day fields.
+			var today: Array = related.filter(func(n): return n.day == game.status().day)
+			var out_of_energy := false
+			for n in today:
+				if out_of_energy: break
 				for tool in order:
+					var before: int = game.status().energy
 					var result: Dictionary = game.verify(n.uid, tool)
-					if not result.ok or result.result != "chua_du_can_cu": break
+					if not result.ok:
+						out_of_energy = result.error == "no_analysis_energy"
+						break
+					if game.status().energy < before: stats["verifications"] = int(stats.get("verifications", 0)) + 1
+					if result.result != "chua_du_can_cu": break
+			var checked: Array = game.news_today().filter(func(n): return n.topic == topic_for(question.id) and n.day == game.status().day)
+			stats["related"] = int(stats.get("related", 0)) + checked.size()
+			stats["related_checked"] = int(stats.get("related_checked", 0)) + checked.filter(func(n): return n.verification != "chua_kiem_chung").size()
 			related = game.news_today().filter(func(n): return n.topic == topic_for(question.id) and n.verification == "xac_nhan")
 		elif bot == "official_only":
 			related = related.filter(func(n): return n.source_tier in ["chinh_thuc", "bao_chi"])
@@ -71,6 +82,7 @@ static func run_game(seed_value: int, days: int, bot: String) -> Dictionary:
 	var game := Game.new(seed_value, days)
 	var rng := RandomNumberGenerator.new()
 	rng.seed = seed_value + 10000
+	var vstats := {}
 	var acc := 0.0
 	var ev := 0.0
 	var count := 0
@@ -78,7 +90,7 @@ static func run_game(seed_value: int, days: int, bot: String) -> Dictionary:
 	var shocks := {}
 	while not game.status().finished:
 		game.begin_day()
-		var submission: Dictionary = game.submit_report(propose(game, bot, rng))
+		var submission: Dictionary = game.submit_report(propose(game, bot, rng, vstats))
 		assert(submission.ok)
 		game.end_day()
 		var review: Dictionary = game.review(game.status().day)
@@ -92,6 +104,10 @@ static func run_game(seed_value: int, days: int, bot: String) -> Dictionary:
 	result["ev"] = ev / count
 	result["kinds_count"] = kinds.size()
 	result["shocks_seen"] = shocks.keys()
+	result["verifications"] = int(vstats.get("verifications", 0))
+	result["related"] = int(vstats.get("related", 0))
+	result["related_checked"] = int(vstats.get("related_checked", 0))
+	result["days_played"] = count
 	return result
 
 static func median(values: Array) -> float:
@@ -116,12 +132,12 @@ func _init() -> void:
 		trace_reports(config, games)
 		quit()
 		return
-	print("days | bot | games | win % | fired % | bankrupt % | survived % | demoted % | warned % | heavy % | trust p25/p50/p75 | rank median | accuracy | ev | all kinds %")
+	print("days | bot | games | win % | fired % | bankrupt % | survived % | demoted % | warned % | heavy % | trust p25/p50/p75 | rank median | accuracy | ev | all kinds % | verifies per day | related checked %")
 	var all_shocks := {}
 	var bots := ["random_reporter", "rumor_follower", "official_only", "verifier", "careful_hedger"]
 	var stats := {}
 	for bot in bots:
-		stats[bot] = {"wins":0,"fired":0,"bankrupt":0,"survived":0,"demoted":0,"warned":0,"heavy":0,"trusts":[],"ranks":[],"accuracy":0.0,"ev":0.0,"covered":0}
+		stats[bot] = {"wins":0,"fired":0,"bankrupt":0,"survived":0,"demoted":0,"warned":0,"heavy":0,"trusts":[],"ranks":[],"accuracy":0.0,"ev":0.0,"covered":0,"verifications":0,"days":0,"related":0,"related_checked":0}
 	for i in games:
 		for bot in bots:
 			var result := run_game(int(config.balance.seed) + i, days, bot)
@@ -137,10 +153,14 @@ func _init() -> void:
 			row.accuracy += float(result.accuracy)
 			row.ev += float(result.ev)
 			row.covered += int(result.kinds_count == 5)
+			row.verifications += int(result.verifications)
+			row.days += int(result.days_played)
+			row.related += int(result.related)
+			row.related_checked += int(result.related_checked)
 			for shock in result.shocks_seen: all_shocks[shock] = true
 	for bot in bots:
 		var row: Dictionary = stats[bot]
-		print("%d | %s | %d | %.2f | %.2f | %.2f | %.2f | %.2f | %.2f | %.2f | %.2f/%.2f/%.2f | %.1f | %.4f | %.4f | %.2f" % [days, bot, games, row.wins * 100.0 / games, row.fired * 100.0 / games, row.bankrupt * 100.0 / games, row.survived * 100.0 / games, row.demoted * 100.0 / games, row.warned * 100.0 / games, row.heavy * 100.0 / games, percentile(row.trusts, 0.25), median(row.trusts), percentile(row.trusts, 0.75), median(row.ranks), row.accuracy / games, row.ev / games, row.covered * 100.0 / games])
+		print("%d | %s | %d | %.2f | %.2f | %.2f | %.2f | %.2f | %.2f | %.2f | %.2f/%.2f/%.2f | %.1f | %.4f | %.4f | %.2f | %.3f | %.2f" % [days, bot, games, row.wins * 100.0 / games, row.fired * 100.0 / games, row.bankrupt * 100.0 / games, row.survived * 100.0 / games, row.demoted * 100.0 / games, row.warned * 100.0 / games, row.heavy * 100.0 / games, percentile(row.trusts, 0.25), median(row.trusts), percentile(row.trusts, 0.75), median(row.ranks), row.accuracy / games, row.ev / games, row.covered * 100.0 / games, float(row.verifications) / maxf(1.0, row.days), row.related_checked * 100.0 / maxf(1.0, row.related)])
 	print("shock coverage: %d/8" % all_shocks.size())
 	quit()
 
