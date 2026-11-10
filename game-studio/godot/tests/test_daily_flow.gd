@@ -158,25 +158,24 @@ func test_choices() -> void:
 	broke.queue_free()
 
 func test_shop_and_light() -> void:
+	# T-027: the street is free choice. Click (visit) a shop, buy, leave, go to work.
 	var flow := new_flow(8)
 	flow.quick_advance()
 	flow.morning_view.choose_transport("walk")
 	var commute: Node2D = flow.commute
+	check(commute.phase == "street" and not commute.prompt_panel.visible, "the street opens idle: no sequential stops")
 	check(flow.life.vitals.light_red == (flow.life.vitals.rng_for(1, 1).randf() < 0.65), "the light plan is seeded")
-	# Walk to the first shop (cafe) and go in.
-	var guard := 0
-	while commute.paused == "" and guard < 2000:
-		guard += 1
-		commute.advance(0.05)
-	check(commute.paused == "shop" and commute.current_stop.id == "cafe", "the commute pauses at the first shop door")
-	check(commute.prompt_panel.visible, "the prompt is visible")
 	var moving: float = commute.player_x
 	commute.advance(1.0)
-	check(commute.player_x == moving, "the player does not move while the prompt is open")
+	check(commute.player_x == moving, "the player stands still until a choice is made")
 	var wallet: int = flow.life.wallet
-	commute.answer_prompt("enter")
-	check(flow.state == "SHOP" and flow.shop_view != null, "Enter opens the shop interior")
-	check(flow.life.vitals.extra_minutes == 10, "a shop stop costs 10 minutes")
+	check(commute.visit_shop("cafe"), "visit_shop starts the walk to the cafe door")
+	var guard := 0
+	while commute.phase == "to_shop" and guard < 2000:
+		guard += 1
+		commute.advance(0.05)
+	check(flow.state == "SHOP" and flow.shop_view != null, "arriving at the door opens the shop interior")
+	check(flow.life.vitals.extra_minutes == 5, "a shop visit costs 5 minutes")
 	var shop: Control = flow.shop_view
 	var stamina: int = flow.life.vitals.stamina
 	var result: Dictionary = shop.buy("coffee")
@@ -187,31 +186,21 @@ func test_shop_and_light() -> void:
 	check(shop.rows.pastry.disabled and shop.rows.pastry.tooltip_text == "Not enough money", "with no money buying is disabled with a tooltip")
 	check(not shop.buy("pastry").ok, "cannot overspend")
 	shop.leave_shop()
-	check(flow.state == "COMMUTE" and commute.paused == "", "leaving the shop resumes the walk")
-	# Skip the noodle stall with Enter.
-	guard = 0
-	while commute.paused == "" and guard < 2000:
-		guard += 1
-		commute.advance(0.05)
-	check(commute.current_stop.id == "noodle", "next stop is the noodle stall")
-	commute.default_answer()
-	check(commute.paused == "" and flow.life.vitals.extra_minutes == 10, "skipping costs nothing")
-	# Walk on to the mart, skip, then a red light (if the seed has one).
-	var seen_light := false
+	check(flow.state == "COMMUTE" and commute.phase == "street" and commute.paused == "", "leaving the shop returns to the street")
+	# Go to work; a red light (if the seed has one) appears once, at this moment.
+	commute.go_to_work()
+	var seen_light: bool = commute.phase == "light"
+	check(seen_light == flow.life.vitals.light_red, "a red light appears exactly when the seeded plan says so")
+	if seen_light:
+		check(commute.light_state() == "red", "the light is red while the player decides")
+		var before: int = flow.life.vitals.extra_minutes
+		commute.answer_prompt("wait")
+		check(flow.life.vitals.extra_minutes == before + 4, "waiting costs 4 minutes")
 	guard = 0
 	while flow.state == "COMMUTE" and guard < 6000:
 		guard += 1
 		commute.advance(0.05)
-		if commute.paused == "light":
-			seen_light = true
-			check(commute.light_state() == "red", "the light is red while the player waits")
-			var before: int = flow.life.vitals.extra_minutes
-			commute.answer_prompt("wait")
-			check(flow.life.vitals.extra_minutes == before + 4, "waiting costs 4 minutes")
-		elif commute.paused != "":
-			commute.default_answer()
-	check(seen_light == flow.life.vitals.light_red, "a red light stop appears exactly when the seeded plan says so")
-	check(flow.state == "DAY_START" and flow.late_minutes == 10 + (4 if seen_light else 0), "arrival: walk 40 + one shop stop (+ light wait) is late by %d" % flow.late_minutes)
+	check(flow.state == "DAY_START" and flow.late_minutes == 5 + (4 if seen_light else 0), "arrival: walk 40 + one visit (+ light wait) is late by %d" % flow.late_minutes)
 	check(int(flow.game.status().minutes) == 510 + flow.late_minutes, "the work clock starts %d minutes late" % flow.late_minutes)
 	flow.queue_free()
 	# Running the red.
@@ -223,14 +212,10 @@ func test_shop_and_light() -> void:
 		run.quick_advance()
 		run.morning_view.choose_transport("moto")
 		var c: Node2D = run.commute
-		var guard2 := 0
-		while c.paused != "light" and guard2 < 4000:
-			guard2 += 1
-			c.advance(0.05)
-			if c.paused == "shop": c.default_answer()
-		check(c.paused == "light", "moto reaches the light (seed %d)" % seed_number)
+		c.go_to_work()
+		check(c.phase == "light", "Go to work meets the light (seed %d)" % seed_number)
 		c.answer_prompt("run")
-		check(c.paused == "" and c.results.size() == 1 and c.results[0].choice == "run", "running the red resolves at once")
+		check(c.phase == "to_work" and c.results.size() == 1 and c.results[0].choice == "run", "running the red resolves at once")
 		run.queue_free()
 		break
 

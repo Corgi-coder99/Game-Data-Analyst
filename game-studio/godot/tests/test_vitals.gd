@@ -130,7 +130,7 @@ func test_arrival() -> void:
 	v.choose_transport("walk")
 	v.enter_shop()
 	var r: Dictionary = v.finish_commute()
-	check(r.late == 25 and v.arrival_minutes == 535, "sleep in + walk + one shop stop = 25 minutes late")
+	check(r.late == 20 and v.arrival_minutes == 530, "sleep in + walk + one shop visit (5 min) = 20 minutes late")
 	v.begin_morning(4)
 	v.choose_transport("walk")
 	for i in 20: v.enter_shop()
