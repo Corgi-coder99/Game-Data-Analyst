@@ -784,5 +784,5 @@ Kết quả chạy thật (worktree, Godot 4.7.2 console):
 ### T-031 | Claude subagent | 2026-11-10 | In progress
 - Dịch dữ liệu và test v1 sang tiếng Anh (events/cards/strings, test_ui), thêm test cấm dấu tiếng Việt. Spec docs/SPEC-T-031.md, worktree ai-company-t031, nhánh codex/T-031. Handoff: docs/HANDOFF-T-031.md.
 
-### T-032 | Claude subagent | 2026-11-10 | In progress
+### T-032 | Claude subagent | 2026-11-10 | Done
 - Landing page tiếng Anh cho game v2, trung thực, không bịa số liệu, cập nhật check_web.py (sửa T-008). Spec docs/SPEC-T-032.md, worktree ai-company-t032, nhánh codex/T-032. Handoff: media-marketing/web/HANDOFF-T-032.md. Không deploy.
