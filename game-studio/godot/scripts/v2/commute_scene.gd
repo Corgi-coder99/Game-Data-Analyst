@@ -7,7 +7,10 @@ signal shop_requested(shop_ids: Array, storefront: String)
 signal prompt_opened(stop_type: String)
 const WindowTheme = preload("res://scripts/v2/theme_v2.gd")
 const Pen = preload("res://scripts/v2/pen.gd")
+const Palette = preload("res://scripts/v2/palette.gd")
 const Library = preload("res://scripts/v2/sprite_lib.gd")
+const StreetArt = preload("res://scripts/v2/street_art.gd")
+const Actors = preload("res://scripts/v2/street_actors.gd")
 const W := 640
 const H := 360
 const DURATION := 7.0
@@ -26,10 +29,10 @@ const SKY_BANDS := {
 	"clear": [33, 33, 34, 34, 35, 35, 35],
 	"overcast": [40, 40, 41, 41, 6, 6, 7],
 	"gloom": [4, 4, 5, 5, 40, 40, 41]}
-const SHIRTS := [51, 53, 52, 54, 56, 55, 7, 47, 38, 36]
-const PANTS := [3, 4, 17, 58, 10, 2, 9]
-const HAIRS := [1, 9, 10, 27, 1, 2]
-const SKINS := [32, 31, 50, 49, 32]
+const SHIRTS := [85, 91, 89, 93, 94, 97, 102, 75, 87, 90]
+const PANTS := [83, 4, 84, 79, 108, 3, 80]
+const HAIRS := [103, 108, 109, 110, 103, 107]
+const SKINS := [106, 104, 32, 50, 31, 107]
 const SHOP_NAMES := ["MOONBEAN CAFE", "SIZZLE NOODLES", "CORNER MART", "HARBOR BANK", "DAILY NEWS", "MOTH BOOKS"]
 const HEADLINES := ["FRESH START", "FRESH START", "MARKETS EDGY", "MARKETS EDGY", "SHOPS CLOSING", "QUEUES GROW", "QUEUES GROW", "CRISIS DEEPENS", "CRISIS DEEPENS", "CRISIS DEEPENS"]
 var lib := Library.new()
@@ -57,11 +60,14 @@ var player_visible := true
 var door_open := false
 var enter_time := -1.0
 var lit_shop_windows: Array = []
+var bulbs: Array = []
+var puddles: Array = []
 # T-026: interactive daily commute. The player moves with the chosen transport, pauses at shop doors
 # and at a red light. Without `interactive` the scene behaves exactly as in T-022.
 const STOREFRONTS := ["cafe", "noodle", "mart", "bank", "news", "books"]
 const SHOP_STOPS := {"cafe": 30, "noodle": 110, "mart": 190, "bank": 282, "news": 366, "books": 450}
 const SHOP_TOP := 114
+const TOOLTIP_Y := 44
 const WALK_SPEED := 150.0
 const START_X := 6.0
 const WALK_LIGHT_X := 232
@@ -137,7 +143,7 @@ func _build_prompt() -> void:
 	add_child(ui)
 	prompt_panel = Panel.new()
 	prompt_panel.size = Vector2(176, 52)
-	prompt_panel.add_theme_stylebox_override("panel", WindowTheme.box(2))
+	prompt_panel.add_theme_stylebox_override("panel", WindowTheme.pastel(102, 82))
 	prompt_panel.hide()
 	ui.add_child(prompt_panel)
 	prompt_label = _prompt_text(prompt_panel, Rect2(6, 4, 164, 14))
@@ -146,7 +152,7 @@ func _build_prompt() -> void:
 	toast_panel = Panel.new()
 	toast_panel.position = Vector2(120, 22)
 	toast_panel.size = Vector2(400, 30)
-	toast_panel.add_theme_stylebox_override("panel", WindowTheme.box(2))
+	toast_panel.add_theme_stylebox_override("panel", WindowTheme.pastel(102, 82))
 	toast_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	toast_panel.hide()
 	ui.add_child(toast_panel)
@@ -156,7 +162,7 @@ func _build_prompt() -> void:
 	toast_label.max_lines_visible = 2
 	tooltip_panel = Panel.new()
 	tooltip_panel.size = Vector2(176, 52)
-	tooltip_panel.add_theme_stylebox_override("panel", WindowTheme.box(2))
+	tooltip_panel.add_theme_stylebox_override("panel", WindowTheme.pastel(102, 82))
 	tooltip_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	tooltip_panel.hide()
 	ui.add_child(tooltip_panel)
@@ -165,13 +171,14 @@ func _build_prompt() -> void:
 	tooltip_label.clip_text = false
 	tooltip_label.max_lines_visible = 4
 	go_button = _prompt_button(ui, Rect2(200, 334, 140, 20))
+	WindowTheme.pastel_button(go_button)
 	go_button.text = str(daily_strings.go_to_work)
 	go_button.pressed.connect(go_to_work)
 
 func _prompt_text(parent: Node, area: Rect2) -> Label:
 	var node := Label.new()
 	node.add_theme_font_size_override("font_size", 8)
-	node.add_theme_color_override("font_color", Color("#d4f0fb"))
+	node.add_theme_color_override("font_color", Palette.color(66))
 	node.position = area.position
 	node.size = area.size
 	node.clip_text = true
@@ -186,6 +193,7 @@ func _prompt_button(parent: Node, area: Rect2) -> Button:
 	node.position = area.position
 	node.size = area.size
 	node.focus_mode = Control.FOCUS_NONE
+	WindowTheme.pastel_button(node)
 	parent.add_child(node)
 	return node
 
@@ -217,7 +225,7 @@ func _update_tooltip() -> void:
 		return
 	tooltip_label.text = shop_label(index)
 	var rect := shop_rect(index)
-	tooltip_panel.position = Vector2(clampf(rect.position.x + 4.0, 4.0, W - 180.0), 62)
+	tooltip_panel.position = Vector2(clampf(rect.position.x + 4.0, 4.0, W - 180.0), TOOLTIP_Y)
 	tooltip_panel.show()
 
 # Click a storefront (or confirm a keyboard selection): walk to its door, then open the shop panel.
@@ -276,7 +284,7 @@ func _start_to_work() -> void:
 	paused = ""
 	var length: int = VEHICLE_LEN.get(mode, 0)
 	if length > 0:
-		var look: Array = {"bus": [56, 17, 33], "moto": [55, 43, 36], "taxi": [52, 27, 64]}[mode]
+		var look: Array = {"bus": [91, 78, 90], "moto": [97, 98, 96], "taxi": [110, 27, 95]}[mode]
 		player_vehicle = {"variety": "bus" if mode == "bus" else ("moto" if mode == "moto" else "car"), "dir": 1, "x": player_x, "len": length, "speed": 0.0, "max": 0.0, "color": look[0], "shade": look[1], "light": look[2], "rider": 3, "bottom": LANE_DOWN, "player": true}
 		vehicles.append(player_vehicle)
 		player_visible = false
@@ -399,346 +407,16 @@ func sky_key() -> String:
 	return "clear_dawn" if day <= 2 else "clear"
 
 func _build_art() -> void:
-	var sky_image := Pen.canvas(W, SIDEWALK_Y)
-	var sky := Pen.new(sky_image)
-	var bands: Array = SKY_BANDS[sky_key()]
-	var count := bands.size()
-	var band_height := float(SIDEWALK_Y) / float(count)
-	for y in range(SIDEWALK_Y):
-		var position := float(y) / band_height
-		var index := mini(int(position), count - 1)
-		var fraction := position - float(index)
-		if fraction > 0.78 and index + 1 < count:
-			var near_edge := fraction > 0.9
-			for x in range(0, W, 2):
-				var first := (y % 2 == 0)
-				var use_next := (not first) or (not near_edge and x % 4 == 0)
-				if near_edge:
-					use_next = not (first and x % 4 == 0)
-				sky.r(x, y, 1, 1, bands[index + 1] if use_next else bands[index])
-				sky.r(x + 1, y, 1, 1, bands[index + 1] if (not first or near_edge) else bands[index])
-		else:
-			sky.r(0, y, W, 1, bands[index])
-	if crisis == 0:
-		sky.disc(502, 64, 17, 36 if day <= 2 else 35)
-		sky.disc(502, 64, 12, 52)
-		sky.disc(500, 62, 5, 64)
-	else:
-		sky.disc(502, 64, 9, 41 if crisis == 1 else 5)
-	sky_tex = Pen.texture(sky_image)
-	# Clouds: a wide strip that drifts slowly.
-	var cloud_image := Pen.canvas(1280, 90)
-	var cloud := Pen.new(cloud_image)
-	var cloud_light := 64 if crisis == 0 else (6 if crisis == 1 else 4)
-	var cloud_shade := 35 if crisis == 0 else (5 if crisis == 1 else 3)
-	var cloud_count := 7 if crisis == 0 else 12
-	var cloud_rng := RandomNumberGenerator.new()
-	cloud_rng.seed = 31 * day
-	for i in range(cloud_count):
-		var cx := cloud_rng.randi_range(20, 1240)
-		var cy := cloud_rng.randi_range(14, 60)
-		var puffs := cloud_rng.randi_range(3, 5)
-		for p in range(puffs):
-			cloud.disc(cx + p * 10 - 12, cy + 3 + (p % 2) * -3, 6 + (p % 3) * 2, cloud_shade)
-		for p in range(puffs):
-			cloud.disc(cx + p * 10 - 12, cy + (p % 2) * -3, 6 + (p % 3) * 2, cloud_light)
-		cloud.r(cx - 14, cy + 7, puffs * 10 + 8, 3, cloud_shade)
-	cloud_tex = Pen.texture(cloud_image)
-	layer_tex.clear()
-	var palettes: Array
-	if crisis == 0:
-		palettes = [[6, 7, 5], [5, 6, 4], [18, 19, 17]]
-	elif crisis == 1:
-		palettes = [[41, 7, 40], [40, 41, 5], [4, 5, 3]]
-	else:
-		palettes = [[5, 6, 4], [4, 5, 3], [2, 3, 1]]
-	var specs := [[190, 100, 150, 21], [205, 105, 145, 22], [218, 104, 128, 23]]
-	for i in range(3):
-		layer_tex.append(_skyline(palettes[i], specs[i][0], specs[i][1], specs[i][2], specs[i][3], i))
-	var street_image := Pen.canvas(W, H)
-	var street := Pen.new(street_image)
-	_build_street(street)
-	street_tex = Pen.texture(street_image)
-	var front_image := Pen.canvas(W, H - FRONT_Y)
-	var front := Pen.new(front_image)
-	_build_front(front)
-	front_tex = Pen.texture(front_image)
-
-func _skyline(colors: Array, baseline: int, min_h: int, max_h: int, seed_value: int, layer: int) -> ImageTexture:
-	var image := Pen.canvas(760, baseline)
-	var pen := Pen.new(image)
-	var local := RandomNumberGenerator.new()
-	local.seed = seed_value * 101 + day * 3
-	var x := -6
-	while x < 760:
-		var bw := local.randi_range(22, 46)
-		var bh := local.randi_range(min_h, max_h)
-		var top := baseline - bh
-		pen.box(x, top, bw, bh, colors[0], colors[1], colors[2])
-		if local.randf() < 0.3:
-			pen.r(x + bw / 2, top - 9, 1, 9, colors[2])
-			pen.px(x + bw / 2, top - 10, 51 if layer == 2 else colors[1])
-		if local.randf() < 0.35:
-			pen.r(x + 3, top - 3, 8, 3, colors[2])
-		var lit_chance := 0.28 if crisis == 0 else 0.4
-		for wy in range(top + 6, baseline - 6, 7):
-			for wx in range(x + 4, x + bw - 5, 6):
-				if local.randf() < lit_chance:
-					pen.r(wx, wy, 3, 4, 52 if layer == 2 else (20 if layer == 1 else colors[1]))
-				elif layer > 0:
-					pen.r(wx, wy, 3, 4, colors[2])
-		x += bw + local.randi_range(0, 4)
-	return Pen.texture(image)
-
-# Sidewalk, road and the shop row. Signs are collected as text overlays.
-func _build_street(p: Pen) -> void:
-	signs.clear()
+	var art: Dictionary = StreetArt.build(day, crisis, SHOP_NAMES, HEADLINES)
+	sky_tex = art.sky
+	cloud_tex = art.cloud
+	layer_tex = art.layers.duplicate()
+	street_tex = art.street
+	front_tex = art.front
+	signs = art.signs.duplicate()
+	bulbs = art.bulbs
+	puddles = art.puddles
 	lit_shop_windows.clear()
-	# Sidewalk and shadow under the facades.
-	p.r(0, SIDEWALK_Y, W, 30, 61)
-	for x in range(0, W, 16):
-		p.r(x, SIDEWALK_Y + 2, 1, 28, 7)
-	p.r(0, SIDEWALK_Y + 14, W, 1, 7)
-	p.r(0, SIDEWALK_Y, W, 3, 6)
-	p.r(0, 262, W, 1, 64)
-	p.r(0, 263, W, 3, 5)
-	# Road.
-	p.r(0, ROAD_Y, W, 62, 62)
-	for i in range(40):
-		var rx := (i * 97 + day * 13) % W
-		var ry := ROAD_Y + 3 + (i * 53) % 56
-		p.r(rx, ry, 5 + i % 7, 1, 63)
-	for x in range(8, W, 30):
-		p.r(x, 296, 16, 2, 52)
-	for y in range(ROAD_Y, 328, 6):
-		p.r(250, y, 28, 3, 64)
-	p.r(0, 328, W, 2, 5)
-	p.r(0, 330, W, 2, 61)
-	# Shops.
-	var shops := [
-		{"x": 0, "wall": [43, 44, 42], "awn": [53, 64], "plate": 9, "ink": 45, "variety": "cafe"},
-		{"x": 84, "wall": [23, 24, 46], "awn": [51, 52], "plate": 46, "ink": 52, "variety": "noodle"},
-		{"x": 168, "wall": [56, 33, 17], "awn": [52, 64], "plate": 7, "ink": 56, "variety": "mart"},
-		{"x": 252, "wall": [13, 64, 12], "awn": [17, 28], "plate": 17, "ink": 28, "variety": "bank"},
-		{"x": 336, "wall": [59, 54, 38], "awn": [54, 64], "plate": 2, "ink": 52, "variety": "news"},
-		{"x": 420, "wall": [38, 30, 29], "awn": [55, 64], "plate": 10, "ink": 45, "variety": "books"}]
-	for i in range(shops.size()):
-		_shop(p, shops[i], i)
-	_tower(p)
-	# Street furniture on the sidewalk: lamp posts and hydrant.
-	for x in [78, 166, 334, 418]:
-		_lamp(p, x)
-	p.r(236, 250, 5, 8, 51)
-	p.r(235, 249, 7, 2, 25)
-
-func _lamp(p: Pen, x: int) -> void:
-	p.r(x, 196, 2, 62, 3)
-	p.r(x - 1, 258, 4, 3, 2)
-	p.r(x - 4, 194, 10, 3, 3)
-	p.box(x - 5, 190, 6, 5, 52 if crisis > 0 else 27, 64, 26)
-
-func _shop(p: Pen, s: Dictionary, index: int) -> void:
-	var x: int = s.x
-	var w := 84
-	var wall: Array = s.wall
-	var top := 114
-	var bottom := SIDEWALK_Y
-	p.box(x, top, w, bottom - top, wall[0], wall[1], wall[2])
-	# Cornice, upper windows with sills and planters.
-	p.r(x, top, w, 5, wall[2])
-	p.r(x, top, w, 1, wall[1])
-	var closed := crisis >= 2 and index in [0, 5]
-	var window_xs: Array = [x + 10, x + 54]
-	if s.variety == "news":
-		window_xs = []
-		p.box(x + 4, top + 10, 76, 22, 1, 2, 1)
-		p.r(x + 6, top + 12, 72, 1, 51)
-		var headline: String = HEADLINES[clampi(day - 1, 0, HEADLINES.size() - 1)]
-		signs.append({"text": headline, "x": x + 4 + (76 - Pen.text_width(headline, 8)) / 2, "y": top + 17, "ink": 52, "size": 8})
-		signs.append({"text": "NEWS FLASH", "x": x + 4 + (76 - Pen.text_width("NEWS FLASH", 8)) / 2, "y": top + 6, "ink": 64, "size": 8})
-	for wx in window_xs:
-		p.box(wx, top + 12, 20, 18, 6, 7, 5)
-		p.r(wx + 2, top + 14, 16, 14, 18 if closed else 34)
-		p.r(wx + 2, top + 14, 16, 2, 20 if not closed else 17)
-		p.r(wx + 9, top + 14, 2, 14, 6)
-		if not closed and crisis == 0:
-			p.r(wx + 3, top + 17, 5, 8, 36)
-		p.r(wx - 2, top + 30, 24, 3, wall[2])
-		if index % 2 == 0:
-			p.r(wx + 2, top + 27, 4, 3, 47)
-			p.r(wx + 4, top + 25, 2, 2, 51)
-	# Sign plate.
-	var plate: int = s.plate
-	var name: String = SHOP_NAMES[index]
-	var sign_y := top + 38
-	p.box(x + 4, sign_y, w - 8, 15, plate, mini(plate + 1, 64) if plate != 7 else 64, 1)
-	signs.append({"text": name, "x": x + 4 + (w - 8 - Pen.text_width(name, 8)) / 2, "y": sign_y + 3, "ink": s.ink, "size": 8})
-	# Awning with scalloped edge.
-	var awn: Array = s.awn
-	var awning_y := sign_y + 17
-	if s.variety != "bank":
-		for sx in range(0, w, 8):
-			p.r(x + sx, awning_y, 8, 8, awn[(sx / 8) % 2])
-			p.r(x + sx, awning_y, 8, 1, 64 if awn[(sx / 8) % 2] != 64 else 6)
-			p.r(x + sx + 1, awning_y + 8, 6, 2, awn[(sx / 8) % 2])
-			p.r(x + sx + 2, awning_y + 10, 4, 1, awn[(sx / 8) % 2])
-		p.r(x, awning_y + 8, w, 1, 1)
-	else:
-		# Columns and pediment.
-		p.r(x + 2, awning_y, w - 4, 3, 64)
-		p.r(x + 2, awning_y + 3, w - 4, 1, 12)
-		for cx in [x + 6, x + 26, x + 50, x + 70]:
-			p.box(cx, awning_y + 4, 8, 36, 64, 7, 12)
-	var win_top := awning_y + 12
-	var win_h := bottom - win_top - 2
-	match s.variety:
-		"cafe":
-			p.box(x + 6, win_top, 44, win_h, 34, 35, 5)
-			p.r(x + 6, win_top + win_h - 12, 44, 12, 10)
-			for tx in [x + 14, x + 34]:
-				p.r(tx, win_top + 10, 8, 2, 11)
-				p.r(tx + 3, win_top + 12, 2, 8, 9)
-				p.r(tx + 5, win_top + 6, 3, 4, 7)
-				p.r(tx + 5, win_top + 6, 3, 1, 51)
-			for lx in [x + 12, x + 26, x + 40]:
-				p.r(lx, win_top + 1, 1, 4, 1)
-				p.disc(lx, win_top + 6, 2, 52)
-			p.r(x + 6, win_top, 44, 2, 35)
-			p.r(x + 10, win_top + 3, 1, 12, 35)
-			_door(p, x + 56, awning_y + 12, 22, bottom, 9)
-			if crisis >= 2:
-				p.box(x + 58, awning_y + 20, 18, 8, 7, 64, 6)
-				signs.append({"text": "CLOSED", "x": x + 60, "y": awning_y + 20, "ink": 51, "size": 8})
-		"noodle":
-			p.r(x + 6, win_top, 72, win_h, 2)
-			p.r(x + 6, win_top, 72, 2, 1)
-			p.box(x + 8, win_top + win_h - 14, 68, 14, 10, 11, 9)
-			p.box(x + 14, win_top + win_h - 24, 14, 10, 5, 6, 4)
-			p.r(x + 12, win_top + win_h - 26, 18, 3, 6)
-			p.box(x + 36, win_top + win_h - 20, 12, 6, 7, 64, 6)
-			p.box(x + 54, win_top + win_h - 20, 12, 6, 52, 64, 26)
-			for lx in [x + 10, x + 36, x + 62]:
-				p.r(lx + 4, awning_y + 11, 1, 5, 1)
-				p.box(lx, awning_y + 16, 9, 8, 51, 25, 24)
-				p.r(lx + 3, awning_y + 24, 3, 2, 52)
-			p.box(x + 56, win_top + 4, 18, 12, 1, 2, 1)
-			signs.append({"text": "MENU", "x": x + 59, "y": win_top + 6, "ink": 52, "size": 8})
-		"mart":
-			p.box(x + 6, win_top, 44, win_h, 34, 35, 5)
-			var shelf_rng := RandomNumberGenerator.new()
-			shelf_rng.seed = 77
-			for row in range(3):
-				var sy := win_top + 4 + row * 11
-				p.r(x + 8, sy + 8, 40, 2, 6)
-				for bx in range(x + 9, x + 47, 5):
-					p.r(bx, sy + 1, 4, 7, [51, 52, 53, 54, 56, 55, 47][shelf_rng.randi_range(0, 6)])
-			_door(p, x + 56, awning_y + 12, 22, bottom, 7)
-		"bank":
-			p.box(x + 14, awning_y + 6, 56, 3, 17, 18, 1)
-			_door(p, x + 34, awning_y + 12, 22, bottom, 27)
-			p.box(x + 10, awning_y + 20, 16, 22, 34, 35, 5)
-			p.box(x + 58, awning_y + 20, 16, 22, 34, 35, 5)
-			for bx in [x + 14, x + 18, x + 22, x + 62, x + 66, x + 70]:
-				p.r(bx, awning_y + 21, 1, 20, 27)
-		"news":
-			p.box(x + 6, win_top, 44, win_h, 34, 35, 5)
-			for row in range(2):
-				for col in range(5):
-					p.r(x + 9 + col * 8, win_top + 4 + row * 12, 6, 9, [51, 52, 53, 54, 56, 55, 47, 7, 36, 38][row * 5 + col])
-					p.r(x + 10 + col * 8, win_top + 6 + row * 12, 4, 2, 64)
-			_door(p, x + 56, awning_y + 12, 22, bottom, 9)
-		"books":
-			p.box(x + 6, win_top, 44, win_h, 34, 35, 5)
-			var book_rng := RandomNumberGenerator.new()
-			book_rng.seed = 91
-			for row in range(3):
-				var by := win_top + 3 + row * 11
-				p.r(x + 8, by + 9, 40, 2, 9)
-				var bx := x + 9
-				while bx < x + 46:
-					var bwid := book_rng.randi_range(2, 4)
-					var bh := book_rng.randi_range(6, 9)
-					p.r(bx, by + 9 - bh, bwid, bh, [51, 53, 54, 56, 52, 47, 38, 55][book_rng.randi_range(0, 7)])
-					bx += bwid + 1
-			_door(p, x + 56, awning_y + 12, 22, bottom, 9)
-	# Crisis banners are drawn here so they stay on the facade.
-	if s.variety == "books" and day >= 4:
-		p.box(x + 4, 120, 76, 10, 51, 26, 25)
-		signs.append({"text": "CLOSING SALE", "x": x + 6, "y": 121, "ink": 64, "size": 8})
-		for tx in [x + 12, x + 34, x + 58]:
-			p.r(tx, win_top + 12, 8, 10, 64)
-			p.r(tx + 1, win_top + 14, 6, 1, 51)
-			p.r(tx + 1, win_top + 17, 6, 1, 51)
-
-func _door(p: Pen, x: int, top: int, w: int, bottom: int, frame_color: int) -> void:
-	p.box(x, top, w, bottom - top, frame_color, mini(frame_color + 1, 64), 1)
-	p.r(x + 2, top + 2, w - 4, bottom - top - 2, 34)
-	p.r(x + 2, top + 2, w - 4, 2, 35)
-	p.r(x + w / 2, top + 2, 1, bottom - top - 2, frame_color)
-	p.r(x + w / 2 - 3, top + (bottom - top) / 2, 2, 3, 52)
-	p.r(x + w / 2 + 2, top + (bottom - top) / 2, 2, 3, 52)
-
-func _tower(p: Pen) -> void:
-	var x := 504
-	var w := 136
-	var top := 36
-	p.box(x, top, w, SIDEWALK_Y - top, 17, 18, 1)
-	# Glass grid with day/dusk sky reflection.
-	for gy in range(top + 24, SIDEWALK_Y - 52, 12):
-		for gx in range(x + 8, x + w - 10, 14):
-			var on := ((gx / 14 + gy / 12 + day) % 5) < 2
-			p.r(gx, gy, 12, 10, 52 if (on and crisis == 0 and gy > 100) else 34)
-			p.r(gx, gy, 12, 2, 35)
-			p.r(gx, gy + 9, 12, 1, 5)
-	p.r(x + 4, top - 8, w - 8, 8, 18)
-	p.r(x + 12, top - 14, w - 24, 6, 17)
-	p.r(x + w / 2 - 1, top - 30, 2, 16, 6)
-	p.px(x + w / 2 - 1, top - 31, 51)
-	# Sign plate on the tower.
-	p.box(x + 14, top + 6, w - 28, 14, 1, 4, 1)
-	var name := "LUC CHAU DATA CORP"
-	signs.append({"text": name, "x": x + 14 + (w - 28 - Pen.text_width(name, 8)) / 2, "y": top + 9, "ink": 52, "size": 8})
-	# Entrance with canopy, glass doors, planters.
-	p.box(x + 36, SIDEWALK_Y - 52, 62, 6, 1, 3, 1)
-	p.box(x + 38, SIDEWALK_Y - 46, 58, 46, 5, 6, 4)
-	p.r(x + 42, SIDEWALK_Y - 42, 22, 42, 34)
-	p.r(x + 68, SIDEWALK_Y - 42, 22, 42, 34)
-	p.r(x + 42, SIDEWALK_Y - 42, 22, 3, 35)
-	p.r(x + 68, SIDEWALK_Y - 42, 22, 3, 35)
-	p.r(x + 62, SIDEWALK_Y - 22, 2, 5, 52)
-	p.r(x + 68, SIDEWALK_Y - 22, 2, 5, 52)
-	for px_ in [x + 12, x + 108]:
-		p.box(px_, SIDEWALK_Y - 14, 14, 14, 9, 10, 8)
-		p.disc(px_ + 7, SIDEWALK_Y - 20, 7, 46)
-		p.disc(px_ + 5, SIDEWALK_Y - 22, 4, 47)
-		p.disc(px_ + 4, SIDEWALK_Y - 23, 2, 48)
-
-func _build_front(p: Pen) -> void:
-	# Foreground sidewalk below the road with trees and lamp posts (drawn over the traffic).
-	var top := 328 - FRONT_Y
-	var rows := H - FRONT_Y - top
-	p.r(0, top, W, 2, 5)
-	p.r(0, top + 2, W, rows, 61)
-	for x in range(0, W, 16):
-		p.r(x, top + 4, 1, rows, 7)
-	p.r(0, top + 4, W, 2, 6)
-	for tx in [36, 150, 300, 446, 590]:
-		p.box(tx - 8, top + 22, 16, 8, 9, 10, 8)
-		p.r(tx - 1, top + 12, 3, 12, 9)
-		p.disc(tx, top + 8, 10, 46)
-		p.disc(tx - 3, top + 5, 7, 47)
-		p.disc(tx - 5, top + 3, 3, 48 if crisis == 0 else 47)
-	for lx in [96, 360, 520]:
-		p.r(lx, top - 12, 2, 40, 3)
-		p.box(lx - 5, top - 16, 7, 5, 52 if crisis > 0 else 27, 64, 26)
-	# A bench and a bicycle rack in the foreground.
-	p.r(214, top + 18, 26, 3, 10)
-	p.r(214, top + 15, 26, 2, 11)
-	p.r(216, top + 21, 2, 5, 3)
-	p.r(236, top + 21, 2, 5, 3)
-	p.r(398, top + 18, 3, 8, 6)
-	p.r(412, top + 18, 3, 8, 6)
-	p.r(398, top + 16, 17, 2, 6)
 
 # ---- actors -----------------------------------------------------------
 
@@ -759,9 +437,9 @@ func _build_actors() -> void:
 	# Traffic: fewer vehicles on crisis days.
 	var kinds_down := ["car", "bus", "moto", "car", "bike", "car"] if crisis < 2 else ["car", "moto", "car"]
 	var kinds_up := ["car", "moto", "car", "bus", "bike"] if crisis < 2 else ["bus", "car"]
-	var colors := [51, 56, 52, 53, 54, 55, 7]
-	var shades := {51: 25, 56: 17, 52: 27, 53: 58, 54: 38, 55: 43, 7: 6}
-	var lights := {51: 26, 56: 33, 52: 64, 53: 34, 54: 37, 55: 36, 7: 64}
+	var colors := [87, 97, 91, 93, 94, 89, 112]
+	var shades := {87: 88, 97: 98, 91: 78, 93: 80, 94: 84, 89: 97, 112: 67}
+	var lights := {87: 85, 97: 96, 91: 90, 93: 82, 94: 35, 89: 95, 112: 26}
 	for lane in range(2):
 		var kinds: Array = kinds_down if lane == 0 else kinds_up
 		var dir := 1 if lane == 0 else -1
@@ -975,21 +653,28 @@ func _draw() -> void:
 	_draw_overlay(p)
 
 func _draw_dynamic(p: Pen) -> void:
-	# Steam from the noodle stall.
+	# Steam from the food cart.
 	for i in range(4):
 		var rise := fposmod(elapsed * 14.0 + i * 6.0, 24.0)
-		p.r(104 + i * 3 + int(sin(elapsed * 2.0 + i) * 2.0), 208 - int(rise), 2, 2, 7 if rise < 16.0 else 41)
+		p.r(144 + i * 3 + int(sin(elapsed * 2.0 + i) * 2.0), 232 - int(rise), 2, 2, 102 if rise < 14.0 else (101 if rise < 20.0 else 100))
 	# Neon OPEN sign on the mart.
 	if int(elapsed * 2.0) % 2 == 0 or crisis == 0:
-		p.box(222, 198, 26, 10, 1, 2, 1)
-		p.text("OPEN", 226, 199, 53 if crisis == 0 else 51)
+		p.rr(212, 198, 26, 11, 65)
+		p.r(213, 199, 24, 9, 103)
+		p.text("OPEN", 216, 199, 91 if crisis == 0 else 85)
+	# String lights twinkle: a bright pixel travels along the wire.
+	for i in range(bulbs.size()):
+		var b: Vector3 = bulbs[i]
+		if (int(elapsed * 2.0) + i) % 3 == 0:
+			p.px(int(b.x) - 1, int(b.y), 102)
+			p.px(int(b.x) + 2, int(b.y) + 1, 95)
 	# Doors: tower door opens when the player enters.
 	if door_open:
-		p.r(504 + 42, SIDEWALK_Y - 42, 22, 42, 2)
-		p.r(504 + 42, SIDEWALK_Y - 42, 22, 3, 1)
-		p.r(504 + 68, SIDEWALK_Y - 42, 22, 42, 2)
-		p.r(504 + 68, SIDEWALK_Y - 42, 22, 3, 1)
-		p.r(504 + 56, SIDEWALK_Y - 30, 20, 30, 52)
+		p.r(504 + 42, SIDEWALK_Y - 42, 22, 42, 66)
+		p.r(504 + 42, SIDEWALK_Y - 42, 22, 3, 65)
+		p.r(504 + 68, SIDEWALK_Y - 42, 22, 42, 66)
+		p.r(504 + 68, SIDEWALK_Y - 42, 22, 3, 65)
+		p.r(504 + 56, SIDEWALK_Y - 30, 20, 30, 95)
 	# Sidewalk actors sorted by feet position.
 	var drawables: Array = []
 	for w in walkers:
@@ -1001,13 +686,14 @@ func _draw_dynamic(p: Pen) -> void:
 		if d.has("player"):
 			var frame_index := 2 + _walk_frame(elapsed)
 			var pos := Vector2(roundi(player_x), FEET_Y - 22)
+			p.ellipse(roundi(player_x) + 8, FEET_Y, 7, 1, 99)
 			draw_texture(lib.frame("player", frame_index), pos)
 			var bob := int(elapsed * 4.0) % 2
-			p.r(roundi(player_x) + 4, FEET_Y - 32 + bob, 9, 1, 1)
-			p.r(roundi(player_x) + 5, FEET_Y - 31 + bob, 7, 1, 52)
-			p.r(roundi(player_x) + 6, FEET_Y - 30 + bob, 5, 1, 52)
-			p.r(roundi(player_x) + 7, FEET_Y - 29 + bob, 3, 1, 52)
-			p.r(roundi(player_x) + 8, FEET_Y - 28 + bob, 1, 1, 52)
+			p.r(roundi(player_x) + 4, FEET_Y - 32 + bob, 9, 1, 65)
+			p.r(roundi(player_x) + 5, FEET_Y - 31 + bob, 7, 1, 89)
+			p.r(roundi(player_x) + 6, FEET_Y - 30 + bob, 5, 1, 89)
+			p.r(roundi(player_x) + 7, FEET_Y - 29 + bob, 3, 1, 97)
+			p.r(roundi(player_x) + 8, FEET_Y - 28 + bob, 1, 1, 97)
 		else:
 			_draw_walker(p, d.w)
 	# Vehicles and crossing pedestrians, far lane first.
@@ -1025,17 +711,43 @@ func _draw_dynamic(p: Pen) -> void:
 	# Traffic lights on the sidewalk.
 	var state := light_state()
 	for lx in [244, 280]:
-		p.r(lx, 214, 2, 46, 3)
-		p.box(lx - 3, 204, 8, 18, 1, 2, 1)
-		p.r(lx - 1, 206, 4, 4, 51 if state == "red" else 25)
-		p.r(lx - 1, 211, 4, 4, 52 if state == "yellow" else 27)
-		p.r(lx - 1, 216, 4, 4, 48 if state == "green" else 46)
-	# Rain on the gloomiest days.
+		p.r(lx, 214, 2, 46, 99)
+		p.r(lx, 214, 1, 46, 100)
+		p.rr(lx - 3, 203, 8, 20, 65)
+		p.r(lx - 2, 204, 6, 18, 103)
+		p.r(lx - 1, 206, 4, 4, 112 if state == "red" else 4)
+		p.r(lx - 1, 211, 4, 4, 89 if state == "yellow" else 4)
+		p.r(lx - 1, 216, 4, 4, 76 if state == "green" else 4)
+		if state == "red": p.px(lx - 1, 206, 85)
+		if state == "yellow": p.px(lx - 1, 211, 102)
+		if state == "green": p.px(lx - 1, 216, 77)
+	# Wet streets: puddle sparkle, rain streaks and splash rings on the gloomy days.
+	if crisis >= 1:
+		for i in range(puddles.size()):
+			var pd: Vector3 = puddles[i]
+			if (int(elapsed * 2.0) + i) % 4 == 0:
+				p.px(int(pd.x) + 2 + i, int(pd.y) - 1, 102)
 	if crisis >= 2:
 		for i in range(70):
 			var rx := (i * 53 + int(elapsed * 40.0)) % W
 			var ry := (i * 37 + int(elapsed * 260.0)) % 300
-			p.r(rx, ry, 1, 5, 6)
+			p.r(rx, ry, 1, 5, 82 if i % 3 == 0 else 6)
+		for i in range(10):
+			var phase_t := fposmod(elapsed * 2.2 + float(i) * 0.37, 1.0)
+			var sx := (i * 97 + 31) % (W - 20) + 6
+			var sy := 270 + (i * 43) % 52
+			var radius := 1 + int(phase_t * 3.0)
+			if phase_t < 0.8:
+				p.r(sx - radius, sy, radius * 2 + 1, 1, 101 if phase_t < 0.4 else 100)
+				p.px(sx - radius, sy - 1, 101)
+				p.px(sx + radius, sy - 1, 101)
+	# Fallen leaves drift past on calm days.
+	if crisis == 0:
+		for i in range(6):
+			var fx := (i * 113 + int(elapsed * 14.0 + float(i) * 40.0)) % W
+			var fy := int(fposmod(elapsed * 22.0 + float(i) * 51.0, 260.0)) + 20
+			p.px(fx, fy, 97 if i % 2 == 0 else 98)
+			p.px(fx + 1, fy + 1, 70)
 
 func _walk_frame(time: float) -> int:
 	var total := 0.0
@@ -1049,114 +761,10 @@ func _walk_frame(time: float) -> int:
 	return 0
 
 func _draw_walker(p: Pen, w: Dictionary) -> void:
-	var x := roundi(w.x)
-	var y := roundi(w.y)
-	var moving: bool = absf(w.vx) > 0.0 or w.variety == "cross"
-	var step := (int((elapsed + w.phase) * 4.0) % 2) if moving else 0
-	var skin: int = w.skin
-	p.r(x - 1, y - 1, 10, 2, 63 if y > 262 else 5)
-	# Legs and shoes.
-	p.r(x + 1, y - 7, 3, 6 - step, w.pants)
-	p.r(x + 4, y - 7, 3, 5 + step, w.pants)
-	p.r(x + 1, y - 1 - step, 3, 1, 1)
-	p.r(x + 4, y - 2 + step, 3, 1, 1)
-	# Torso with a lit left edge and shaded bottom.
-	p.r(x, y - 14, 8, 7, w.shirt)
-	p.r(x, y - 14, 1, 7, 64 if w.shirt in [7] else 7)
-	p.r(x, y - 8, 8, 1, 2)
-	p.r(x - 1, y - 13, 1, 5, w.shirt)
-	p.r(x + 8, y - 13, 1, 5, w.shirt)
-	p.r(x - 1, y - 8, 1, 1, skin)
-	p.r(x + 8, y - 8, 1, 1, skin)
-	# Head and hair.
-	p.r(x + 1, y - 19, 6, 5, skin)
-	p.r(x + 1, y - 20, 6, 2, w.hair)
-	p.r(x + 1, y - 18, 1, 3, w.hair)
-	p.px(x + 3, y - 17, 1)
-	p.px(x + 5, y - 17, 1)
-	match w.variety:
-		"umbrella":
-			var col: int = [54, 56, 51, 52][roundi(w.phase) % 4]
-			p.r(x - 4, y - 26, 16, 2, col)
-			p.r(x - 2, y - 28, 12, 2, col)
-			p.r(x + 1, y - 29, 6, 1, col)
-			p.r(x + 4, y - 24, 1, 6, 5)
-		"cup":
-			p.r(x + 8, y - 11, 3, 3, 7)
-			p.r(x + 8, y - 11, 3, 1, 51)
-		"phone":
-			p.r(x + 7, y - 20, 2, 4, 1)
-			p.px(x + 7, y - 20, 53)
-		"read":
-			p.r(x + 7, y - 12, 7, 5, 64)
-			p.r(x + 7, y - 12, 7, 1, 51)
-		"queue":
-			p.r(x - 3, y - 7, 3, 4, 10)
-		"cross":
-			p.r(x + 8, y - 11, 3, 6, 10)
+	Actors.walker(p, w, elapsed)
 
 func _draw_vehicle(p: Pen, v: Dictionary) -> void:
-	var x := roundi(v.x)
-	var y: int = v.bottom
-	var dir: int = v.dir
-	var base: int = v.color
-	var shade: int = v.shade
-	var light: int = v.light
-	var length: int = v.len
-	p.r(x + 1, y - 1, length - 2, 2, 1)
-	match v.variety:
-		"car":
-			p.r(x, y - 9, length, 6, base)
-			p.r(x, y - 9, length, 1, light)
-			p.r(x, y - 4, length, 2, shade)
-			p.r(x + 7, y - 15, 16, 6, base)
-			p.r(x + 7, y - 15, 16, 1, light)
-			p.r(x + 9, y - 14, 5, 4, 34)
-			p.r(x + 16, y - 14, 5, 4, 34)
-			p.r(x + 9, y - 14, 5, 1, 35)
-			p.r(x + (length - 2 if dir > 0 else 0), y - 7, 2, 2, 52)
-			p.r(x + (0 if dir > 0 else length - 2), y - 7, 2, 2, 51)
-			for wx in [x + 4, x + length - 10]:
-				p.r(wx, y - 5, 6, 5, 1)
-				p.r(wx + 2, y - 3, 2, 2, 6)
-		"bus":
-			p.r(x, y - 17, length, 14, 53)
-			p.r(x, y - 17, length, 2, 33)
-			p.r(x, y - 7, length, 3, 64)
-			p.r(x, y - 4, length, 2, 58)
-			for wx in range(x + 4, x + length - 12, 9):
-				p.r(wx, y - 15, 7, 6, 34)
-				p.r(wx, y - 15, 7, 1, 35)
-			var front_x := x + (length - 10 if dir > 0 else 1)
-			p.r(front_x, y - 15, 9, 8, 34)
-			p.r(x + (length - 3 if dir > 0 else 0), y - 6, 3, 2, 52)
-			p.r(x + (0 if dir > 0 else length - 3), y - 6, 3, 2, 51)
-			p.r(x + length / 2 - 6, y - 18, 12, 1, 52)
-			for wx in [x + 6, x + length - 14]:
-				p.r(wx, y - 5, 8, 5, 1)
-				p.r(wx + 3, y - 3, 2, 2, 6)
-		"moto":
-			p.disc(x + 3, y - 3, 3, 1)
-			p.disc(x + 11, y - 3, 3, 1)
-			p.px(x + 3, y - 3, 6)
-			p.px(x + 11, y - 3, 6)
-			p.r(x + 3, y - 8, 9, 3, base)
-			p.r(x + 3, y - 8, 9, 1, light)
-			p.r(x + (10 if dir > 0 else 2), y - 10, 2, 3, 6)
-			var shirt: int = SHIRTS[v.rider]
-			p.r(x + 5, y - 15, 5, 7, shirt)
-			p.r(x + 6, y - 20, 4, 5, 32)
-			p.r(x + 6, y - 21, 4, 3, 1 if v.rider % 2 == 0 else 51)
-		"bike":
-			for wx in [x + 2, x + 9]:
-				p.disc(wx, y - 3, 3, 1)
-				p.disc(wx, y - 3, 1, 62)
-			p.r(x + 3, y - 7, 7, 1, 6)
-			p.r(x + 6, y - 7, 1, 4, 6)
-			var shirt2: int = SHIRTS[v.rider]
-			p.r(x + 4, y - 14, 4, 7, shirt2)
-			p.r(x + 4, y - 18, 4, 4, 31)
-			p.r(x + 4, y - 19, 4, 2, 9)
+	Actors.vehicle(p, v, lib.frame("player", 0), elapsed)
 
 func arrive_text() -> String:
 	var total := clock_minutes()
@@ -1167,19 +775,37 @@ func arrive_text() -> String:
 
 func _draw_highlight(p: Pen) -> void:
 	var index := hover_index if hover_index >= 0 else selected_index
-	var pulse := 64 if int(elapsed * 4.0) % 2 == 0 else 52
+	var pulse := 102 if int(elapsed * 4.0) % 2 == 0 else 89
 	if street_active() and index >= 0:
 		var rect := shop_rect(index)
 		var x := int(rect.position.x)
 		p.frame(x, SHOP_TOP, 84, SIDEWALK_Y - SHOP_TOP, pulse)
 		p.frame(x + 1, SHOP_TOP + 1, 82, SIDEWALK_Y - SHOP_TOP - 2, pulse)
-		p.frame(x + 2, SHOP_TOP + 2, 80, SIDEWALK_Y - SHOP_TOP - 4, 53)
+		p.frame(x + 2, SHOP_TOP + 2, 80, SIDEWALK_Y - SHOP_TOP - 4, 91)
 		# Sign glow around the plate.
 		p.frame(x + 3, SHOP_TOP + 35, 78, 21, pulse)
-		p.frame(x + 4, SHOP_TOP + 36, 76, 19, 52)
+		p.frame(x + 4, SHOP_TOP + 36, 76, 19, 97)
+	if street_active() and index >= 0 and tooltip_panel != null and tooltip_panel.visible:
+		# Pointer from the tooltip down to the roofline, clear of the shop signs.
+		var cx := int(shop_rect(index).position.x) + 42
+		var ty := int(tooltip_panel.position.y + tooltip_panel.size.y) + 3
+		p.r(cx - 4, ty - 1, 9, 1, 102)
+		p.r(cx - 3, ty, 7, 1, 102)
+		p.r(cx - 2, ty + 1, 5, 1, 102)
+		p.r(cx - 1, ty + 2, 3, 1, 102)
+		p.px(cx, ty + 3, 102)
+		p.px(cx - 4, ty, 82)
+		p.px(cx + 4, ty, 82)
+		p.px(cx - 3, ty + 1, 82)
+		p.px(cx + 3, ty + 1, 82)
+		p.px(cx - 2, ty + 2, 82)
+		p.px(cx + 2, ty + 2, 82)
+		p.px(cx - 1, ty + 3, 82)
+		p.px(cx + 1, ty + 3, 82)
+		p.px(cx, ty + 4, 82)
 	if street_active() and selected_index < 0 and go_button != null:
 		p.frame(197, 331, 146, 26, pulse)
-		p.frame(198, 332, 144, 24, 53)
+		p.frame(198, 332, 144, 24, 91)
 
 func _draw_overlay(p: Pen) -> void:
 	if interactive:
@@ -1196,10 +822,12 @@ func _draw_overlay(p: Pen) -> void:
 	if interactive:
 		var total := clock_minutes()
 		label = arrive_text()
-	p.r(4, 4, Pen.text_width(label, 8) + 10, 14, 1)
-	p.frame(4, 4, Pen.text_width(label, 8) + 10, 14, 5)
-	p.text(label, 9, 7, 52)
+	var label_w := Pen.text_width(label, 8) + 10
+	p.rr(5, 6, label_w, 14, 66)
+	p.rr(4, 4, label_w, 14, 102, 82)
+	p.r(6, 5, label_w - 4, 1, 64)
+	p.text(label, 9, 7, 66)
 	var hint := "Esc / click: skip" if not interactive else str(daily_strings.commute_hint)
 	var hw := Pen.text_width(hint, 8)
-	p.r(W - hw - 14, H - 17, hw + 10, 13, 1)
-	p.text(hint, W - hw - 9, H - 15, 6)
+	p.rr(W - hw - 14, H - 17, hw + 10, 13, 66)
+	p.text(hint, W - hw - 9, H - 15, 101)

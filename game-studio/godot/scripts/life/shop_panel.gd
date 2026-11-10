@@ -5,6 +5,7 @@ extends "res://scripts/life/daily_base.gd"
 const KEEPERS := {"cafe": "linh", "noodle": "bao", "mart": "dat", "pharmacy": "vy", "news": "an", "books": "ngoc", "clothing": "sam", "bank": "rin"}
 const WALLS := {"cafe": [43, 44], "noodle": [23, 24], "mart": [56, 33], "pharmacy": [58, 53], "news": [59, 54], "books": [38, 30], "clothing": [59, 54], "bank": [13, 64]}
 const ReactionStage = preload("res://scripts/v2/reaction_stage.gd")
+const ShopArt = preload("res://scripts/v2/shop_art.gd")
 signal closed
 signal bought(shop: String, item: String, result: Dictionary)
 signal popup(kind: String, amount: int)
@@ -68,23 +69,41 @@ func _draw_interior(shop: String) -> void:
 	for node in backdrop.get_children():
 		backdrop.remove_child(node)
 		node.queue_free()
-	var wall: Array = WALLS.get(shop, [12, 11])
-	_rect(backdrop, wall[0], Rect2(0, 0, 224, 232))
-	_rect(backdrop, wall[1], Rect2(0, 0, 224, 6))
-	_rect(backdrop, 10, Rect2(0, 232, 224, 128))
-	_rect(backdrop, 9, Rect2(0, 232, 224, 3))
-	# Shelves with colored goods.
-	for row in range(3):
-		var y := 40 + row * 36
-		_rect(backdrop, 9, Rect2(10, y + 22, 204, 4))
-		for i in range(14):
-			var color: int = [51, 52, 53, 54, 56, 55, 47][(i * 3 + row + shop.length()) % 7]
-			_rect(backdrop, color, Rect2(14 + i * 14, y + 8 + (i % 3), 10, 14 - (i % 3)))
-	# Counter and shopkeeper.
-	_rect(backdrop, 9, Rect2(20, 176, 184, 54))
-	_rect(backdrop, 11, Rect2(22, 178, 180, 12))
-	_rect(backdrop, 10, Rect2(22, 190, 180, 38))
-	keeper_node = _sprite(backdrop, KEEPERS.get(shop, "rin"), 0, Vector2(136, 112), 3)
+	var art: Dictionary = ShopArt.interior(shop)
+	_picture(backdrop, art.back, Vector2(0, 0), 1)
+	keeper_node = _picture(backdrop, ShopArt.keeper(shop), Vector2(136, 108), 3)
+	_picture(backdrop, art.front, Vector2(0, 0), 1)
+
+func _picture(parent: Node, texture: Texture2D, at: Vector2, scale_factor: int) -> TextureRect:
+	var node := TextureRect.new()
+	node.texture = texture
+	node.position = at
+	node.size = texture.get_size() * scale_factor
+	node.stretch_mode = TextureRect.STRETCH_SCALE
+	node.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	node.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	node.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	node.set_meta("overlay", true)
+	parent.add_child(node)
+	return node
+
+# A 16x16 pixel icon shown at 2x inside a small pastel frame; returns the frame's right edge.
+func _icon_tile(parent: Control, id: String, at: Vector2) -> void:
+	var tile := Panel.new()
+	tile.position = at
+	tile.size = Vector2(36, 36)
+	tile.add_theme_stylebox_override("panel", WindowTheme2.pastel(101, 82))
+	tile.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	parent.add_child(tile)
+	var picture := TextureRect.new()
+	picture.texture = ShopArt.icon(id)
+	picture.position = Vector2(2, 2)
+	picture.size = Vector2(32, 32)
+	picture.stretch_mode = TextureRect.STRETCH_SCALE
+	picture.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	picture.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	picture.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	tile.add_child(picture)
 
 func open(life_game: RefCounted, ids: Array, status: Dictionary = {}) -> void:
 	_build()
@@ -128,9 +147,10 @@ func _render_items() -> void:
 	for entry in vitals.shop_items(current):
 		var id: String = entry.id
 		var price := int(entry.price)
-		_text(menu, daily.items[id], Rect2(0, y, 190, 12), 22, 8)
-		_text(menu, change_text(0, entry) + ("  Skill +%d" % int(entry.skill) if entry.has("skill") else ""), Rect2(0, y + 13, 250, 12), 24)
-		var tip_label := _text(menu, daily.item_tip[id], Rect2(0, y + 26, 290, 12), 7)
+		_icon_tile(menu, id, Vector2(0, y + 2))
+		_text(menu, daily.items[id], Rect2(44, y, 190, 12), 22, 8)
+		_text(menu, change_text(0, entry) + ("  Skill +%d" % int(entry.skill) if entry.has("skill") else ""), Rect2(44, y + 13, 246, 12), 24)
+		var tip_label := _text(menu, daily.item_tip[id], Rect2(44, y + 26, 246, 12), 7)
 		tip_label.tooltip_text = daily.item_tip[id]
 		_text(menu, "$%d" % price, Rect2(296, y + 4, 34, 12), 52 if life.wallet >= price else 51)
 		var node := button(menu, daily.buy, Rect2(334, y, 48, 22))
@@ -143,8 +163,9 @@ func _render_items() -> void:
 		y += 48
 
 func _render_bank() -> void:
-	_text(menu, daily.bank_line % life.savings, Rect2(0, 0, 384, 14), 24, 12)
-	var y := 26
+	_icon_tile(menu, "pouch", Vector2(0, 0))
+	_text(menu, daily.bank_line % life.savings, Rect2(44, 10, 330, 14), 24, 12)
+	var y := 50
 	for amount in [20, 50]:
 		var dep := button(menu, daily.bank_deposit % amount, Rect2(0, y, 180, 22))
 		dep.focus_mode = Control.FOCUS_NONE

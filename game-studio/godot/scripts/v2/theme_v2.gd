@@ -17,6 +17,42 @@ static func box(background: int, border: int = 5) -> StyleBoxFlat:
 	style.content_margin_bottom = 1
 	return style
 
+# T-029: rounded pastel panel (soft drop shadow, 4 px corners) used by the street tooltip, prompts and buttons.
+static func pastel(background: int, border: int, radius: int = 4) -> StyleBoxFlat:
+	var style := StyleBoxFlat.new()
+	style.bg_color = Palette.color(background)
+	style.border_color = Palette.color(border)
+	style.set_border_width_all(1)
+	style.set_corner_radius_all(radius)
+	style.anti_aliasing = false
+	style.shadow_color = Color(Palette.color(65), 0.55)
+	style.shadow_size = 2
+	style.shadow_offset = Vector2(1, 2)
+	style.content_margin_left = 3
+	style.content_margin_right = 3
+	style.content_margin_top = 2
+	style.content_margin_bottom = 2
+	return style
+
+# Night-blue rounded panel with a periwinkle border for the review, evening, ending and shop screens.
+static func night(border: int = 81) -> StyleBoxFlat:
+	var style := pastel(83, border, 5)
+	style.set_border_width_all(2)
+	style.content_margin_left = 3
+	style.content_margin_right = 3
+	return style
+
+# Applies the pastel look to a Button (cream normal, yellow hover, peach pressed, grey disabled).
+static func pastel_button(node: Button, fill: int = 89, border: int = 97) -> void:
+	node.add_theme_stylebox_override("normal", pastel(fill, border))
+	node.add_theme_stylebox_override("hover", pastel(95, 98))
+	node.add_theme_stylebox_override("pressed", pastel(92, 98))
+	node.add_theme_stylebox_override("focus", pastel(95, 87))
+	node.add_theme_stylebox_override("disabled", pastel(101, 100))
+	for key in ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color"]:
+		node.add_theme_color_override(key, Palette.color(66))
+	node.add_theme_color_override("font_disabled_color", Palette.color(99))
+
 static func create() -> Theme:
 	var result := Theme.new()
 	result.default_font_size = 8

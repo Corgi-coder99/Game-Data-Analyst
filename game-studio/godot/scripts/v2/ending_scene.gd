@@ -60,7 +60,7 @@ func show_ending(final_status: Dictionary) -> void:
 	var panel := Panel.new()
 	panel.position = Vector2(120, 28)
 	panel.size = Vector2(400, (244 + 24 + maxi(life_lines.size() - 3, 0) * 15) if not life_lines.is_empty() else 244)
-	panel.add_theme_stylebox_override("panel", WindowTheme.box(2, 21))
+	panel.add_theme_stylebox_override("panel", WindowTheme.night(91))
 	add_child(panel)
 	var heading := _text(panel, strings.ending[ending], Rect2(12, 8, 376, 17), 8, 12)
 	boss_category = boss_category_for(status)

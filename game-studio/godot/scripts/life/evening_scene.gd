@@ -63,7 +63,7 @@ func _build() -> void:
 	var stats := Panel.new()
 	stats.position = Vector2(8, 24)
 	stats.size = Vector2(208, 84)
-	stats.add_theme_stylebox_override("panel", WindowTheme.box(2))
+	stats.add_theme_stylebox_override("panel", WindowTheme.night())
 	add_child(stats)
 	wallet_label = _text(stats, "", Rect2(6, 3, 196, 17), 24, 12)
 	net_label = _text(stats, "", Rect2(6, 21, 196, 17), 22, 12)
@@ -94,7 +94,7 @@ func _build() -> void:
 	var chat := Panel.new()
 	chat.position = Vector2(8, 234)
 	chat.size = Vector2(208, 64)
-	chat.add_theme_stylebox_override("panel", WindowTheme.box(2))
+	chat.add_theme_stylebox_override("panel", WindowTheme.night())
 	add_child(chat)
 	message_label = _text(chat, "", Rect2(6, 3, 196, 58), 22)
 	message_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -102,7 +102,7 @@ func _build() -> void:
 	var menu := Panel.new()
 	menu.position = Vector2(224, 24)
 	menu.size = Vector2(408, 240)
-	menu.add_theme_stylebox_override("panel", WindowTheme.box(2))
+	menu.add_theme_stylebox_override("panel", WindowTheme.night())
 	add_child(menu)
 	var x := 6
 	for id in TABS:
