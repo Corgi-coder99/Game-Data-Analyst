@@ -97,14 +97,14 @@ func render() -> void:
 	for i in cfg.achievements.size():
 		var entry: Dictionary = cfg.achievements[i]
 		var owned: bool = data.achievements.has(entry.id)
-		var x := 10 + (i % 2) * 316
-		var y := 216 + (i / 2) * 26
+		var x: int = 10 + (i % 2) * 316
+		var y: int = 216 + (i / 2) * 26
 		var mark := icon(self, "check" if owned else "lock", Vector2(x, y + 2))
 		mark.set_meta("overlay", true)
 		dynamic.append(mark)
-		var name_label := _label(str(entry.name), Rect2(x + 12, y, 296, 10), 89 if owned else 100)
+		var name_label := _label(str(entry.name), Rect2(x + 12, y, 296, 12), 89 if owned else 100)
 		var desc: String = str(entry.desc) + ("  (" + str(data.achievements[entry.id]) + ")" if owned else "")
-		_label(desc, Rect2(x + 12, y + 11, 296, 10), 7 if owned else 99)
+		_label(desc, Rect2(x + 12, y + 12, 296, 12), 7 if owned else 99)
 		plaque_nodes["ach_" + str(entry.id)] = name_label
 	var stats: Dictionary = data.stats
 	_label("Reputation %d   Streak %d (best %d)   Days worked %d   Leave freezes %d" % [int(data.reputation), int(data.streak), int(data.best_streak), int(stats.days_total), int(data.freezes)], Rect2(10, 335, 510, 12), 7)
@@ -118,9 +118,9 @@ func _winner_plaque(area: Rect2, winner: Dictionary, index: int) -> void:
 	_frame(area, true)
 	_avatar(str(winner.avatar), Vector2(area.position.x + 8, area.position.y + 14), false)
 	var x := area.position.x + 46
-	_label(str(winner.name), Rect2(x, area.position.y + 7, 98, 10), 65)
-	_label(Clock.month_name(str(winner.month)), Rect2(x, area.position.y + 19, 98, 10), 88)
-	_label("%d pts, %d days" % [int(winner.score), int(winner.days)], Rect2(x, area.position.y + 31, 98, 10), 66)
+	_label(str(winner.name), Rect2(x, area.position.y + 7, 98, 12), 65)
+	_label(Clock.month_name(str(winner.month)), Rect2(x, area.position.y + 19, 98, 12), 88)
+	_label("%d pts, %d days" % [int(winner.score), int(winner.days)], Rect2(x, area.position.y + 31, 98, 12), 66)
 	_label(str(winner.title), Rect2(x, area.position.y + 43, 98, 22), 99, 2)
 	plaque_nodes["winner_%d" % index] = true
 
@@ -128,7 +128,7 @@ func _empty_plaque(area: Rect2, index: int, first_ever: bool) -> void:
 	_frame(area, false)
 	_avatar("player", Vector2(area.position.x + 8, area.position.y + 14), true)
 	var x := area.position.x + 46
-	_label("Empty plaque", Rect2(x, area.position.y + 7, 98, 10), 99)
+	_label("Empty plaque", Rect2(x, area.position.y + 7, 98, 12), 99)
 	var hint := "Work a full month to claim it." if first_ever and index == 0 else "Waiting for a winner."
 	_label(hint, Rect2(x, area.position.y + 19, 98, 34), 100, 3)
 	plaque_nodes["empty_%d" % index] = true
@@ -138,7 +138,7 @@ func _award_plaque(area: Rect2, award: Dictionary) -> void:
 	var mark := icon(self, "shield" if bool(award.earned) else "lock", Vector2(area.end.x - 14, area.position.y + 6))
 	mark.set_meta("overlay", true)
 	dynamic.append(mark)
-	_label(str(award.name), Rect2(area.position.x + 6, area.position.y + 6, 98, 10), 65 if bool(award.earned) else 99)
+	_label(str(award.name), Rect2(area.position.x + 6, area.position.y + 6, 98, 12), 65 if bool(award.earned) else 99)
 	var text: String = str(award.value) if bool(award.earned) else str(award.empty)
 	_label(text, Rect2(area.position.x + 6, area.position.y + 20, 108, 36), 88 if bool(award.earned) else 100, 3)
 	plaque_nodes["award_" + str(award.id)] = award
