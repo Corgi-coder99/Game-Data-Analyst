@@ -790,5 +790,5 @@ Kết quả chạy thật (worktree, Godot 4.7.2 console):
 ### T-033 | Claude subagent | 2026-11-10 | In progress
 - Lõi phân tích dữ liệu: engine bảng dữ liệu thô bẩn, sinh từ trạng thái ẩn, thao tác no-code, pipeline, biểu đồ, kiểm tra biểu đồ gây hiểu lầm, tham chiếu và chấm điểm, solvability. Spec docs/SPEC-T-033.md, thiết kế docs/DESIGN-data-core.md, worktree ai-company-t033, nhánh codex/T-033. Chưa có UI (T-034).
 
-### T-035a | Claude subagent | 2026-11-10 | In progress
+### T-035a | Claude subagent | 2026-11-10 | Done
 - Nội dung học tập: danh mục case, Handbook, lời huấn luyện, tutorial 5 ngày, validator. Spec docs/SPEC-T-035a.md, worktree ai-company-t035a, nhánh codex/T-035a. Không code game.
