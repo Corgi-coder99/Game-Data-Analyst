@@ -1,5 +1,5 @@
 extends SceneTree
-# T-022 tests (headless): palette v3, procedural art colors, commute scene, office floor plan, camera.
+# T-022 tests (headless): palette v4 (T-028), procedural art colors, commute scene, office floor plan, camera.
 const Palette = preload("res://scripts/v2/palette.gd")
 const Checker = preload("res://tools/check_palette.gd")
 const Pen = preload("res://scripts/v2/pen.gd")
@@ -33,22 +33,29 @@ func run() -> void:
 	quit(0 if failures == 0 else 1)
 
 func test_palette() -> void:
-	var v3: Array = Palette.colors()
+	var v4: Array = Palette.colors()
+	var v3: Array = JSON.parse_string(FileAccess.get_file_as_string("res://data/palette_v3.json")).colors
 	var v2: Array = JSON.parse_string(FileAccess.get_file_as_string("res://data/palette_v2.json")).colors
-	check(v3.size() == 64, "palette v3 has 64 colors")
+	check(v4.size() == 112, "palette v4 has 112 colors")
+	check(v3.size() == 64, "palette v3 file still has 64 colors")
 	check(v2.size() == 32, "palette v2 still has 32 colors")
+	for i in range(v3.size()):
+		check(v4[i] == v3[i], "v4 keeps v3 color %d" % i)
 	for i in range(v2.size()):
-		check(v3[i] == v2[i], "v3 keeps v2 color %d" % i)
+		check(v4[i] == v2[i], "v4 keeps v2 color %d" % i)
 	var seen := {}
-	for hex in v3: seen[hex] = true
-	check(seen.size() == 64, "palette v3 colors are unique")
-	check(Palette.ALPHABET.length() == 64, "sprite alphabet covers 64 colors")
-	for i in range(64): check(Palette.decode(Palette.ALPHABET.substr(i, 1)) == Palette.color(i + 1), "alphabet maps to index %d" % (i + 1))
-	check(FileAccess.get_file_as_bytes("res://data/palette_v3.json") == FileAccess.get_file_as_bytes(ProjectSettings.globalize_path("res://../../shared/style-bible/palette-v3.json")), "shared and game palette v3 copies identical")
-	check(Checker.validate(), "all generated sprite PNGs use only palette v3 colors with binary alpha")
+	for hex in v4: seen[hex] = true
+	check(seen.size() == 112, "palette v4 colors are unique")
+	check(Palette.ALPHABET.length() == 112, "sprite alphabet covers 112 colors")
+	var symbols := {}
+	for i in range(Palette.ALPHABET.length()): symbols[Palette.ALPHABET.substr(i, 1)] = true
+	check(symbols.size() == 112 and not symbols.has("."), "alphabet symbols are unique and never the transparent dot")
+	for i in range(112): check(Palette.decode(Palette.ALPHABET.substr(i, 1)) == Palette.color(i + 1), "alphabet maps to index %d" % (i + 1))
+	check(FileAccess.get_file_as_bytes("res://data/palette_v4.json") == FileAccess.get_file_as_bytes(ProjectSettings.globalize_path("res://../../shared/style-bible/palette-v4.json")), "shared and game palette v4 copies identical")
+	check(Checker.validate(), "all generated sprite PNGs use only palette v4 colors with binary alpha")
 
 func image_ok(image: Image, label: String) -> void:
-	check(image != null and image.get_width() > 0 and Checker.validate_image(image, label, true), "procedural art uses only v3 colors and binary alpha: " + label)
+	check(image != null and image.get_width() > 0 and Checker.validate_image(image, label, true), "procedural art uses only v4 colors and binary alpha: " + label)
 
 func test_art_colors() -> void:
 	for variety in ["wallpaper", "title", "review", "ending_good", "ending_bad"]:

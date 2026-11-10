@@ -22,21 +22,22 @@ static func _text(path: String) -> String:
 ")
 
 static func validate() -> bool:
-	var shared := ProjectSettings.globalize_path("res://../../shared/style-bible/palette-v3.json")
-	if _text(shared) != _text("res://data/palette_v3.json"):
-		printerr("FAIL palette v3 copy differs")
+	var shared := ProjectSettings.globalize_path("res://../../shared/style-bible/palette-v4.json")
+	if _text(shared) != _text("res://data/palette_v4.json"):
+		printerr("FAIL palette v4 copy differs")
 		return false
-	var shared_v2 := ProjectSettings.globalize_path("res://../../shared/style-bible/palette-v2.json")
-	if _text(shared_v2) != _text("res://data/palette_v2.json"):
-		printerr("FAIL palette v2 copy differs")
+	for version in ["v2", "v3"]:
+		var shared_old := ProjectSettings.globalize_path("res://../../shared/style-bible/palette-%s.json" % version)
+		if _text(shared_old) != _text("res://data/palette_%s.json" % version):
+			printerr("FAIL palette ", version, " copy differs")
+			return false
+	if Palette.colors().size() != 112:
+		printerr("FAIL palette v4 must have 112 colors")
 		return false
-	if Palette.colors().size() != 64:
-		printerr("FAIL palette v3 must have 64 colors")
-		return false
-	var v2: Array = JSON.parse_string(FileAccess.get_file_as_string("res://data/palette_v2.json")).colors
-	for i in range(v2.size()):
-		if Palette.colors()[i] != v2[i]:
-			printerr("FAIL palette v3 is not a superset of v2 at index ",i)
+	var v3: Array = JSON.parse_string(FileAccess.get_file_as_string("res://data/palette_v3.json")).colors
+	for i in range(v3.size()):
+		if Palette.colors()[i] != v3[i]:
+			printerr("FAIL palette v4 is not a superset of v3 at index ",i)
 			return false
 	var seen := {}
 	for hex in Palette.colors():
@@ -52,7 +53,7 @@ static func validate() -> bool:
 			var img := Image.load_from_file("res://assets/v2/" + file)
 			if img == null or not validate_image(img,file):
 				return false
-	print("Palette PASS: ",count," PNG; ",allowed.size()," allowed colors (v3); binary alpha")
+	print("Palette PASS: ",count," PNG; ",allowed.size()," allowed colors (v4); binary alpha")
 	return count > 0
 func _init() -> void:
 	quit(0 if validate() else 1)
