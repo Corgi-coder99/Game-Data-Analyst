@@ -1,23 +1,23 @@
-# Hướng dẫn cho Codex trong D:\Dev\ai-company
+# Instructions for Codex in the ai-company repository
 
-Bạn là Codex, làm việc cùng Claude Code trên một dự án. Trước khi làm bất cứ việc gì:
+You are Codex, working alongside Claude Code on one project. Before doing anything:
 
-1. Đọc docs/collaboration.md và TASKS.md.
-2. Chỉ nhận việc được giao cho Codex. Ghi owner và trạng thái In progress trước khi sửa file.
-3. Chỉ sửa các file được liệt kê trong việc đó. Cần sửa file khác thì tạo việc mới trong TASKS.md, không sửa trực tiếp.
+1. Read docs/collaboration.md and TASKS.md.
+2. Only accept tasks assigned to Codex. Record the owner and the In progress status before editing files.
+3. Only edit the files listed in the task. If you need to edit other files, create a new task in TASKS.md instead of editing them directly.
 
-## Cách làm việc
+## How to work
 
-- Làm trong worktree D:\Dev\ai-company-codex, trên nhánh codex/<id việc>.
-- Commit nhỏ, thông điệp rõ ràng. Không push khi chưa được VU đồng ý.
-- Xong việc: viết ghi chú bàn giao dưới việc trong TASKS.md (đã làm gì, file nào đổi, cách kiểm tra), rồi đổi trạng thái thành Review.
-- Không chạy lệnh xóa ngoài phạm vi việc. Không đụng tới C:\Windows hay System32.
-- Môi trường: Windows PowerShell. Python dùng môi trường .venv. Với npx dùng npx.cmd.
+- Work in your own git worktree (the Codex worktree next to the main checkout), on the branch codex/<task id>.
+- Make small commits with clear messages. Do not push without the owner's approval.
+- When done: write a handoff note under the task in TASKS.md (what was done, which files changed, how to verify), then change the status to Review.
+- Do not run delete commands outside the scope of the task. Do not touch C:\Windows or System32.
+- Environment: Windows PowerShell. Use the .venv environment for Python. Use npx.cmd for npx.
 
-## Dữ liệu
+## Data
 
-- Chỉ dùng dữ liệu đã ẩn danh hoặc tổng hợp. Dừng lại và hỏi nếu gặp dữ liệu cá nhân thô hoặc nguồn dữ liệu chưa rõ.
+- Only use anonymized or aggregated data. Stop and ask if you meet raw personal data or a data source of unclear origin.
 
-## Ngôn ngữ
+## Language
 
-- Ghi chú bàn giao và báo cáo bằng tiếng Việt, ngắn gọn. Tên biến và comment trong mã dùng tiếng Anh.
+- Handoff notes and reports are written in Vietnamese, kept short (the owner's working language). Variable names and code comments are in English. Repository documentation (README, docs/, specs) is written in English.
