@@ -12,12 +12,13 @@ Trạng thái: Backlog -> In progress -> Review -> Done. Bị chặn thì chuy�
 | T-002 (ví dụ) | Cài đặt tính năng X theo spec T-001 | Codex | codex/T-002 | src/x.py, tests/test_x.py | Kiểm thử qua, đúng spec |
 | T-008 | check_web.py: ép stdout UTF-8 để không lỗi UnicodeEncodeError trên console Windows mặc định | Codex | codex/T-008 | media-marketing/web/check_web.py | Chạy `python -I check_web.py` (không cần -X utf8) qua 6 mục |
 | T-010 | Kịch bản và video quảng cáo 30 giây (làm sau T-012 để cảnh quay không hiện công ty gần hết người dùng) | Claude/Codex | chưa chốt | media-marketing/video/* | Chưa có spec |
-| T-019c | Giao diện v2 phần c: soạn báo cáo, họp cuối ngày, vòng chơi 10 ngày, màn tiêu đề và kết thúc. Cần spec, sau T-019b | Codex | codex/T-019c | scenes/v2/*, scripts/v2/*, data/strings_v2.json, tests/* | Chưa có spec |
 | T-019d | Giao diện v2 phần d: hiệu ứng, chỉnh theo playtest và ảnh chụp. Sau T-019c | Codex | codex/T-019d | scenes/v2/*, scripts/v2/*, assets/v2/* | Chưa có spec |
 
 ## In progress
 
-(chưa có)
+| ID | Việc | Owner | Nhánh | File được sửa | Tiêu chí hoàn thành |
+|---|---|---|---|---|---|
+| T-019c | Giao diện v2 phần c: cửa sổ Báo cáo, họp cuối ngày, vòng chơi 10 ngày, màn tiêu đề và kết thúc. Codex hết hạn mức đến 15/11/2026 nên Claude subagent làm thay (VU ủy quyền toàn quyền); Claude điều phối tự review và merge | Claude subagent (thay Codex) | codex/T-019c | game-studio/godot/scenes/v2/*, scripts/v2/*, data/strings_v2.json, tools/sprites/* và assets/v2/* (nếu thêm biểu tượng), scripts/world/world_game.gd (chỉ status: max_actions), tests/test_world.gd (chỉ max_actions), tests/test_v2_flow.gd, tests/test_v2_screens_render.gd, tests/test_v2_desktop.gd | Xem game-studio/godot/docs/SPEC-T-019c.md |
 
 ## Review
 
