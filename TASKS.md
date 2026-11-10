@@ -764,5 +764,5 @@ Kết quả chạy thật (worktree, Godot 4.7.2 console):
 - Hạn chế: (1) ảnh trước/sau chỉ có 5 màn so sánh; (2) font mặc định cỡ 8 nên vài biển phải rút ngắn tên (HARBOR BANK, MOTH BOOKS); (3) hộp thoại sếp che hành lang phía dưới; (4) NPC chỉ đi dọc hành lang, chưa đi qua cửa vào từng phòng; (5) màn kết thúc vẫn dùng văn phòng làm nền (city_art có sẵn nền ending_good/ending_bad nhưng chưa nối vào); (6) icon app và thumbnail tin chưa vẽ lại; (7) commute chỉ dùng day và trust công khai, không biến thể theo cú sốc cụ thể (cố ý, để không lộ sự thật ẩn); (8) palette 64 màu cần VU duyệt đổi CLAUDE.md (docs/PROPOSAL-CLAUDE-MD-palette-v3.md).
 
 
-### T-026 | Claude subagent | 2026-11-10 | In progress
+### T-026 | Claude subagent | 2026-11-10 | Done
 - Vòng đời hằng ngày kiểu game SIM: sáng dậy, chọn phương tiện, đèn đỏ, vào cửa hàng, thanh thể lực/tâm trạng/sức khỏe/stress, làm thêm giờ, hóa đơn, ngủ. Spec docs/SPEC-T-026.md, worktree ai-company-t026, nhánh codex/T-026. Handoff: docs/HANDOFF-T-026.md. T-027 (thành phố đi bộ tự do) để sau.
