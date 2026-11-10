@@ -133,7 +133,7 @@ func _build_art() -> void:
 	layer_tex.clear()
 	var palettes: Array
 	if crisis == 0:
-		palettes = [[6, 7, 5], [5, 6, 4], [17, 18, 16]]
+		palettes = [[6, 7, 5], [5, 6, 4], [18, 19, 17]]
 	elif crisis == 1:
 		palettes = [[41, 7, 40], [40, 41, 5], [4, 5, 3]]
 	else:
@@ -203,11 +203,11 @@ func _build_street(p: Pen) -> void:
 	# Shops.
 	var shops := [
 		{"x": 0, "wall": [43, 44, 42], "awn": [53, 64], "plate": 9, "ink": 45, "kind": "cafe"},
-		{"x": 84, "wall": [22, 23, 46], "awn": [51, 52], "plate": 24, "ink": 52, "kind": "noodle"},
+		{"x": 84, "wall": [23, 24, 46], "awn": [51, 52], "plate": 46, "ink": 52, "kind": "noodle"},
 		{"x": 168, "wall": [56, 33, 17], "awn": [52, 64], "plate": 7, "ink": 56, "kind": "mart"},
-		{"x": 252, "wall": [13, 64, 12], "awn": [17, 27], "plate": 17, "ink": 27, "kind": "bank"},
+		{"x": 252, "wall": [13, 64, 12], "awn": [17, 28], "plate": 17, "ink": 28, "kind": "bank"},
 		{"x": 336, "wall": [59, 54, 38], "awn": [54, 64], "plate": 2, "ink": 52, "kind": "news"},
-		{"x": 420, "wall": [38, 29, 28], "awn": [55, 64], "plate": 10, "ink": 45, "kind": "books"}]
+		{"x": 420, "wall": [38, 30, 29], "awn": [55, 64], "plate": 10, "ink": 45, "kind": "books"}]
 	for i in range(shops.size()):
 		_shop(p, shops[i], i)
 	_tower(p)
@@ -320,7 +320,7 @@ func _shop(p: Pen, s: Dictionary, index: int) -> void:
 					p.r(bx, sy + 1, 4, 7, [51, 52, 53, 54, 56, 55, 47][shelf_rng.randi_range(0, 6)])
 			_door(p, x + 56, awning_y + 12, 22, bottom, 7)
 		"bank":
-			p.box(x + 14, awning_y + 6, 56, 3, 17, 18, 16)
+			p.box(x + 14, awning_y + 6, 56, 3, 17, 18, 1)
 			_door(p, x + 34, awning_y + 12, 22, bottom, 27)
 			p.box(x + 10, awning_y + 20, 16, 22, 34, 35, 5)
 			p.box(x + 58, awning_y + 20, 16, 22, 34, 35, 5)
@@ -349,7 +349,7 @@ func _shop(p: Pen, s: Dictionary, index: int) -> void:
 			_door(p, x + 56, awning_y + 12, 22, bottom, 9)
 	# Crisis banners are drawn here so they stay on the facade.
 	if s.kind == "books" and day >= 4:
-		p.box(x + 4, 120, 76, 10, 51, 25, 24)
+		p.box(x + 4, 120, 76, 10, 51, 26, 25)
 		signs.append({"text": "CLOSING SALE", "x": x + 6, "y": 121, "ink": 64, "size": 8})
 		for tx in [x + 12, x + 34, x + 58]:
 			p.r(tx, win_top + 12, 8, 10, 64)
@@ -368,7 +368,7 @@ func _tower(p: Pen) -> void:
 	var x := 504
 	var w := 136
 	var top := 36
-	p.box(x, top, w, SIDEWALK_Y - top, 17, 18, 16)
+	p.box(x, top, w, SIDEWALK_Y - top, 17, 18, 1)
 	# Glass grid with day/dusk sky reflection.
 	for gy in range(top + 24, SIDEWALK_Y - 52, 12):
 		for gx in range(x + 8, x + w - 10, 14):
@@ -446,8 +446,8 @@ func _build_actors() -> void:
 	var kinds_down := ["car", "bus", "moto", "car", "bike", "car"] if crisis < 2 else ["car", "moto", "car"]
 	var kinds_up := ["car", "moto", "car", "bus", "bike"] if crisis < 2 else ["bus", "car"]
 	var colors := [51, 56, 52, 53, 54, 55, 7]
-	var shades := {51: 24, 56: 17, 52: 27, 53: 58, 54: 38, 55: 43, 7: 6}
-	var lights := {51: 25, 56: 33, 52: 64, 53: 34, 54: 37, 55: 36, 7: 64}
+	var shades := {51: 25, 56: 17, 52: 27, 53: 58, 54: 38, 55: 43, 7: 6}
+	var lights := {51: 26, 56: 33, 52: 64, 53: 34, 54: 37, 55: 36, 7: 64}
 	for lane in range(2):
 		var kinds: Array = kinds_down if lane == 0 else kinds_up
 		var dir := 1 if lane == 0 else -1

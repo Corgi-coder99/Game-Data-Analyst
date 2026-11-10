@@ -4,6 +4,8 @@ extends RefCounted
 const Palette = preload("res://scripts/v2/palette.gd")
 var img: Image
 var item: CanvasItem
+var oy := 0
+var origin := Vector2i.ZERO
 
 func _init(target = null) -> void:
 	if target is Image:
@@ -23,9 +25,9 @@ func r(x: int, y: int, w: int, h: int, i: int) -> void:
 	if w <= 0 or h <= 0:
 		return
 	if img != null:
-		img.fill_rect(Rect2i(x, y, w, h), Palette.color(i))
+		img.fill_rect(Rect2i(x + origin.x, y + oy + origin.y, w, h), Palette.color(i))
 	else:
-		item.draw_rect(Rect2(x, y, w, h), Palette.color(i))
+		item.draw_rect(Rect2(x + origin.x, y + oy + origin.y, w, h), Palette.color(i))
 
 func px(x: int, y: int, i: int) -> void:
 	r(x, y, 1, 1, i)

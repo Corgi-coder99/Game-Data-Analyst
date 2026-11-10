@@ -9,6 +9,7 @@ const DesktopScene = preload("res://scenes/v2/desktop.tscn")
 const TitleScene = preload("res://scenes/v2/title.tscn")
 const ReviewScene = preload("res://scenes/v2/review.tscn")
 const EndingScene = preload("res://scenes/v2/ending.tscn")
+const CommuteScene = preload("res://scenes/v2/commute.tscn")
 const HORIZON := 10
 const FADE_STEP := 0.035
 const NOON := 12 * 60
@@ -24,6 +25,8 @@ var phase := "sang"
 var current: Node
 var desktop: Control
 var office: Node2D
+var commute: Node2D
+var commute_enabled := true
 var title_view: Control
 var review_view: Control
 var ending_view: Control
@@ -112,6 +115,7 @@ func _reset_game() -> void:
 		if current == desktop: current = null
 		desktop.queue_free()
 	desktop = null
+	commute = null
 	office = null
 	review_view = null
 	ending_view = null
@@ -157,7 +161,28 @@ func _enter_day_start() -> void:
 	boss_shown = false
 	first_tool_done = false
 	var day := int(game.status().day)
+	if commute_enabled:
+		_show(func(): _build_commute(day))
+	else:
+		_show(func(): _build_office(day))
+
+# T-022: the morning commute plays before the office; it only uses public values (day, trust).
+func _build_commute(day: int) -> void:
+	office = null
+	commute = CommuteScene.instantiate()
+	commute.day = day
+	commute.trust = int(game.status().trust)
+	commute.setup(day, commute.trust)
+	_swap(commute)
+	commute.finished.connect(func(): _commute_done(day), CONNECT_ONE_SHOT)
+
+func _commute_done(day: int) -> void:
+	if state != "DAY_START": return
+	commute = null
 	_show(func(): _build_office(day))
+
+func skip_commute() -> void:
+	if commute != null and is_instance_valid(commute): commute.skip()
 
 func _build_office(day: int) -> void:
 	office = OfficeScene.instantiate()
@@ -187,7 +212,9 @@ func _on_desk_clicked() -> void:
 
 # Skips the arrival animation, then the boss line, straight to the desk.
 func skip_intro() -> void:
-	if state != "DAY_START" or office == null: return
+	if state != "DAY_START": return
+	if commute != null and is_instance_valid(commute): skip_commute()
+	if office == null: return
 	if not boss_shown: office.seat_now()
 	if state == "DAY_START" and office.dialog.visible: office.hide_dialog()
 

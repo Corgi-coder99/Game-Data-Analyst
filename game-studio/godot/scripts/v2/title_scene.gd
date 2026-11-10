@@ -1,9 +1,9 @@
 extends "res://scripts/v2/windows/window_base.gd"
-const OfficeScene = preload("res://scenes/v2/office.tscn")
+const CityArt = preload("res://scripts/v2/city_art.gd")
 signal play_requested
 signal quit_requested
 var strings: Dictionary
-var office: Node2D
+
 var name_label: Label
 var tagline_label: Label
 var play_button: Button
@@ -22,18 +22,18 @@ func _build() -> void:
 	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	theme = WindowTheme.create()
 	strings = JSON.parse_string(FileAccess.get_file_as_string("res://data/strings_v2.json"))
-	# The T-019a office sits behind a dark veil as the backdrop.
-	office = OfficeScene.instantiate()
-	add_child(office)
-	office.set_hint_visible(false)
-	office.desk_button.hide()
-	office.set_process_unhandled_input(false)
-	office.seat_now()
-	var veil := ColorRect.new()
-	veil.color = Color(Palette.color(1), 0.75)
-	veil.size = size
-	veil.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(veil)
+	# T-022: a dusk city skyline with the company tower is the title backdrop.
+	var backdrop := TextureRect.new()
+	backdrop.texture = CityArt.backdrop("title")
+	backdrop.size = size
+	backdrop.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(backdrop)
+	var plate := ColorRect.new()
+	plate.color = Color(Palette.color(1), 0.72)
+	plate.position = Vector2(150, 86)
+	plate.size = Vector2(340, 130)
+	plate.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(plate)
 	name_label = label(self, strings.title.name, Rect2(0, 96, 640, 17), 8)
 	name_label.add_theme_font_size_override("font_size", 12)
 	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER

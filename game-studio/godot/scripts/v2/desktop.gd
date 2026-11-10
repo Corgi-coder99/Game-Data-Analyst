@@ -10,6 +10,7 @@ const CompanyWindow = preload("res://scripts/v2/windows/company_window.gd")
 const ToolsWindow = preload("res://scripts/v2/windows/tools_window.gd")
 const ReportWindow = preload("res://scripts/v2/windows/report_window.gd")
 const TutorialPanel = preload("res://scripts/v2/tutorial_panel.gd")
+const CityArt = preload("res://scripts/v2/city_art.gd")
 const START_MINUTES := 8 * 60 + 30
 const TOOL_MINUTES := 30
 const PUBLIC_FIELDS := ["uid", "day", "source_id", "source_tier", "source_name", "headline", "topic", "verification", "verified_by"]
@@ -65,13 +66,14 @@ func _build() -> void:
 	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	theme = WindowTheme.create()
 	strings = JSON.parse_string(FileAccess.get_file_as_string("res://data/strings_v2.json"))
-	var background := ColorRect.new()
-	background.color = Palette.color(17)
+	var background := TextureRect.new()
+	background.name = "Wallpaper"
+	background.texture = CityArt.backdrop("wallpaper")
 	background.size = size
 	background.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(background)
 	var dock := ColorRect.new()
-	dock.color = Palette.color(2)
+	dock.color = Color(Palette.color(2), 0.78)
 	dock.position = Vector2(0, 28)
 	dock.size = Vector2(56, 292)
 	dock.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -140,7 +142,9 @@ func _build_home() -> void:
 	home = Panel.new()
 	home.position = WORK_AREA.position
 	home.size = WORK_AREA.size
-	home.add_theme_stylebox_override("panel", WindowTheme.box(1, 18))
+	var home_style := WindowTheme.box(1, 53)
+	home_style.bg_color = Color(Palette.color(1), 0.8)
+	home.add_theme_stylebox_override("panel", home_style)
 	home.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(home)
 	var title := _plain_label(home, Rect2(12, 12, 418, 18), 12, 21)
