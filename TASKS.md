@@ -766,3 +766,9 @@ Kết quả chạy thật (worktree, Godot 4.7.2 console):
 
 ### T-026 | Claude subagent | 2026-11-10 | Done
 - Vòng đời hằng ngày kiểu game SIM: sáng dậy, chọn phương tiện, đèn đỏ, vào cửa hàng, thanh thể lực/tâm trạng/sức khỏe/stress, làm thêm giờ, hóa đơn, ngủ. Spec docs/SPEC-T-026.md, worktree ai-company-t026, nhánh codex/T-026. Handoff: docs/HANDOFF-T-026.md. T-027 (thành phố đi bộ tự do) để sau.
+
+### T-027 | Claude subagent | 2026-11-10 | In progress
+- Chọn cửa hàng tự do trên phố (bấm vào cửa hàng, nút Go to work). Spec docs/SPEC-T-027.md, worktree ai-company-t027, nhánh codex/T-027. Handoff: docs/HANDOFF-T-027.md.
+
+### T-028 | Claude subagent | 2026-11-10 | In progress
+- Art cozy hiện đại phần A (palette v4, văn phòng, nhà, desktop, nhân vật, tiêu đề). Tham khảo phong cách ảnh VU gửi, không sao chép. Spec docs/SPEC-T-028.md, worktree ai-company-t028, nhánh codex/T-028. Phần B (phố, cửa hàng) sau T-027.
