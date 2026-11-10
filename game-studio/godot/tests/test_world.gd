@@ -23,7 +23,7 @@ func near(value: float, expected: float, message: String) -> void:
 func public_only(value: Variant) -> bool:
 	if value is Dictionary:
 		for key in value:
-			if key in ["truth", "kind", "link", "state_direction", "exaggerates", "answer", "scenario"]: return false
+			if key in ["truth", "kind", "link", "state_direction", "exaggerates", "answer", "scenario", "volatile", "shifted", "original_answer", "late_answer", "late_plan", "honest"]: return false
 			if not public_only(value[key]): return false
 	elif value is Array:
 		for item in value:

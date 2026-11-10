@@ -42,6 +42,8 @@ var question_offset := -36.0
 var ticker_offset := -36.0
 var question: Label
 var clock: Label
+var clock_bar: Control
+var clock_band := "on_time"
 var entries: Array = []
 var pinned: Array = []
 var selected := ""
@@ -106,6 +108,7 @@ func _build() -> void:
 	report_window.open_browser_requested.connect(open_window.bind("news"))
 	report_window.draft_changed.connect(_on_draft_changed)
 	report_window.locked_changed.connect(_on_report_locked)
+	report_window.wait_requested.connect(wait_for_data)
 	report_window.submit_requested.connect(func(input): report_submitted.emit(input))
 	_build_icons()
 	coach = TutorialPanel.new()
@@ -268,11 +271,23 @@ func _build_taskbar() -> void:
 	clock = TooltipLabel.new()
 	clock.add_theme_font_size_override("font_size", 8)
 	clock.position = Vector2(452, 0)
-	clock.size = Vector2(184, 16)
+	clock.size = Vector2(184, 12)
 	clock.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	clock.tooltip_text = strings.ui.disclaimer
 	taskbar.add_child(clock)
-	clock.size = Vector2(184, 16)
+	clock.size = Vector2(184, 12)
+
+# Thin deadline bar under the taskbar clock: green until 15:00, yellow until 17:00, red after.
+func _refresh_clock_bar(state: Dictionary) -> void:
+	if clock_bar != null and is_instance_valid(clock_bar):
+		clock_bar.get_parent().remove_child(clock_bar)
+		clock_bar.queue_free()
+		clock_bar = null
+	if not state.has("band"): return
+	clock_band = str(state.band)
+	var info := {"minutes":clock_minutes, "band":clock_band, "deadline_on_time":state.deadline_on_time, "deadline_late":state.deadline_late}
+	clock_bar = ReportWindow.deadline_bar(clock.get_parent(), Rect2(452, 12, 184, 3), info)
+	clock.add_theme_color_override("font_color", Palette.color(ReportWindow.CLOCK_COLORS[clock_band]))
 
 func setup(value: RefCounted) -> void:
 	game = value
@@ -306,7 +321,8 @@ func refresh() -> void:
 		for field in PUBLIC_FIELDS:
 			entry[field] = item[field].duplicate(true) if item[field] is Array else item[field]
 		entries.append(entry)
-	entries.sort_custom(func(a, b): return int(a.day) > int(b.day))
+	# The 15:00 market update (public uid suffix) sorts first within its day.
+	entries.sort_custom(func(a, b): return int(a.day) * 2 + int(str(a.uid).ends_with("-late")) > int(b.day) * 2 + int(str(b.uid).ends_with("-late")))
 	var valid: Array = entries.map(func(item): return item.uid)
 	var retained := pinned.filter(func(uid): return uid in valid)
 	if retained != pinned:
@@ -326,7 +342,9 @@ func refresh() -> void:
 	var ticker_text := "   ·   ".join(entries.map(func(item): return item.headline))
 	if ticker.text != ticker_text: ticker_offset = -36.0
 	ticker.text = ticker_text
+	if state.has("minutes"): clock_minutes = int(state.minutes)
 	clock.text = strings.ui.clock % [clock_minutes / 60, clock_minutes % 60] + "  " + strings.ui.day % [state.day, state.horizon] + "  " + ToolsWindow.dots(state)
+	_refresh_clock_bar(state)
 	news_window.display(entries, pinned, selected)
 	company_window.display(game.report_snapshot(), state)
 	tools_window.display(game.tools(), state, _selected_entry(), message)
@@ -336,8 +354,12 @@ func refresh() -> void:
 		for uid in pinned:
 			for item in entries:
 				if item.uid == uid: pinned_entries.append({"uid":item.uid, "headline":item.headline, "verification":item.verification})
-		report_window.display(str(game.question_today().get("id", "")), game.hand(), pinned_entries, int(state.get("max_actions", 1)), question_body)
+		report_window.display(str(game.question_today().get("id", "")), game.hand(), pinned_entries, int(state.get("max_actions", 1)), question_body, _clock_info(state))
 	_refresh_tray()
+
+func _clock_info(state: Dictionary) -> Dictionary:
+	if not state.has("band"): return {}
+	return {"minutes":clock_minutes, "band":state.band, "deadline_on_time":state.deadline_on_time, "deadline_late":state.deadline_late}
 
 func _refresh_tray() -> void:
 	for i in tray_slots.size():
@@ -412,12 +434,25 @@ func use_tool(tool_id: String) -> Dictionary:
 		_note("checked")
 		coach.set_goal("verify")
 	else: message = strings.errors.get(result.error, strings.ui.unknown)
-	# Each paid verification takes half an hour; repeated (cached) lookups are free.
+	# Each paid verification takes time (per tool, from world.json); repeated (cached) lookups are free.
 	if result.ok and int(game.status().get("energy", 0)) < energy_before:
-		clock_minutes += TOOL_MINUTES
+		var after: Dictionary = game.status()
+		clock_minutes = int(after.minutes) if after.has("minutes") else clock_minutes + TOOL_MINUTES
 		time_changed.emit(clock_minutes)
 	refresh()
 	tool_used.emit(selected, tool_id, result.duplicate(true))
+	return result
+
+# Mail's "Wait" button: only time passes; the 15:00 update may appear.
+func wait_for_data() -> Dictionary:
+	if game == null or not game.has_method("wait_for_data"): return {"ok":false, "error":"day_closed"}
+	var result: Dictionary = game.wait_for_data()
+	if result.ok:
+		clock_minutes = int(result.minutes)
+		time_changed.emit(clock_minutes)
+		message = ""
+	else: message = strings.errors.get(result.error, strings.ui.unknown)
+	refresh()
 	return result
 
 func set_time(minutes: int) -> void:
@@ -437,6 +472,8 @@ func start_day() -> void:
 	if day > 1 and coach.active:
 		coach.active = false
 		coach.layout()
+	# Day 2 introduces the deadline once, unless the player skipped the coach.
+	if day == 2 and not coach.skipped: coach.start_deadline()
 	open_ids.clear()
 	front = ""
 	if day > 1:
@@ -522,6 +559,7 @@ func coach_rect() -> Rect2:
 	if coach == null or not coach.active: return Rect2()
 	match coach.current_id():
 		"question": return question_scroll.get_global_rect()
+		"deadline": return clock.get_global_rect()
 		"browser": return icon_buttons.news.get_global_rect()
 		"select":
 			if front == "news" and not news_window.rows.is_empty():

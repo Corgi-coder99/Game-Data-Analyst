@@ -31,7 +31,8 @@ func display(available: Array, state: Dictionary, selected: Dictionary, message:
 		var tool: Dictionary = available[i]
 		var y := 42 + i * 24
 		label(content, strings.tools[tool.id], Rect2(0, y, 230, 12))
-		label(content, strings.ui.cost % [tool.energy, tool.budget], Rect2(0, y + 12, 230, 12), 7)
+		var cost_text: String = strings.ui.cost_time % [tool.energy, tool.budget, tool.minutes] if tool.has("minutes") else strings.ui.cost % [tool.energy, tool.budget]
+		label(content, cost_text, Rect2(0, y + 12, 230, 12), 7)
 		var use := button(content, strings.ui.use, Rect2(238, y + 2, 50, 18))
 		var cached: bool = tool.id in selected.get("verified_by", [])
 		use.disabled = selected.is_empty() or bool(state.finished) or (not cached and (int(state.energy) < int(tool.energy) or float(state.cash_report) < float(tool.budget)))

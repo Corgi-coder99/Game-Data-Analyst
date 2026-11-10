@@ -7,6 +7,7 @@ const VERIFY_ICONS := {"xac_nhan":"check", "bac_bo":"cross", "chua_du_can_cu":"q
 const VERIFY_COLORS := {"xac_nhan":24, "bac_bo":26, "chua_du_can_cu":28, "cu":6, "chua_kiem_chung":28}
 const AREA := Rect2(58, 30, 442, 290)
 const SLOTS := 3
+const CLOCK_COLORS := {"on_time":24, "late":28, "missed":26}
 var strings: Dictionary
 var question_id := ""
 var subject := ""
@@ -33,6 +34,11 @@ var confirm_yes: Button
 var confirm_no: Button
 var message_label: Label
 var checklist_labels: Array = []
+# T-023: public clock info from WorldGame.status(): minutes, band and the two deadlines.
+var clock_info: Dictionary = {}
+var wait_button: Button
+var banner: Panel
+signal wait_requested
 signal submit_requested(input: Dictionary)
 signal unpin_requested(uid: String)
 signal clear_requested
@@ -45,7 +51,8 @@ func initialize(texts: Dictionary) -> void:
 	build(strings.windows.report, AREA)
 
 # `pinned` holds public news entries: only uid, headline and verification are read.
-func display(question: String, hand: Array, pinned: Array, limit: int, subject_text: String = "") -> void:
+func display(question: String, hand: Array, pinned: Array, limit: int, subject_text: String = "", clock: Dictionary = {}) -> void:
+	clock_info = clock.duplicate()
 	question_id = question
 	subject = subject_text
 	cards = hand.duplicate(true)
@@ -172,6 +179,9 @@ func render() -> void:
 	slot_panels.clear()
 	open_browser_buttons.clear()
 	checklist_labels.clear()
+	wait_button = null
+	banner = null
+	_render_clock()
 	label(content, strings.report.to, Rect2(0, 0, 210, 12), 7)
 	var subject_label := label(content, strings.report.subject % subject, Rect2(0, 12, 210, 28))
 	subject_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -278,9 +288,70 @@ func render() -> void:
 		confirm_panel.size = Vector2(216, 76)
 		confirm_panel.add_theme_stylebox_override("panel", WindowTheme.box(2, 21))
 		content.add_child(confirm_panel)
-		var ask := label(confirm_panel, strings.report.confirm, Rect2(6, 6, 204, 26))
+		var confirm_key := "confirm"
+		if clock_info.get("band", "on_time") == "late": confirm_key = "confirm_late"
+		elif clock_info.get("band", "on_time") == "missed": confirm_key = "confirm_missed"
+		var ask := label(confirm_panel, strings.report[confirm_key], Rect2(6, 6, 204, 32))
 		ask.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		confirm_yes = button(confirm_panel, strings.report.yes, Rect2(6, 42, 98, 26))
 		confirm_no = button(confirm_panel, strings.report.no, Rect2(112, 42, 98, 26))
 		confirm_yes.pressed.connect(confirm_submit)
 		confirm_no.pressed.connect(cancel_submit)
+
+# Clock, deadline bar and the late banner share the top-right corner of the composer.
+func _render_clock() -> void:
+	if clock_info.is_empty(): return
+	var band: String = clock_info.band
+	var minutes := int(clock_info.minutes)
+	var limit := int(clock_info.deadline_on_time)
+	var color: int = CLOCK_COLORS[band]
+	var text: String = strings.report.clock_on_time % [minutes / 60, minutes % 60, limit / 60, limit % 60]
+	if band == "late": text = strings.report.clock_late % [minutes / 60, minutes % 60]
+	elif band == "missed": text = strings.report.clock_missed % [minutes / 60, minutes % 60]
+	var clock_label := label(content, text, Rect2(218, 1, 140, 12), color)
+	clock_label.name = "ClockLabel"
+	wait_button = button(content, strings.report.wait, Rect2(362, 0, 72, 13))
+	wait_button.tooltip_text = strings.report.wait_tip
+	wait_button.disabled = locked or band == "missed"
+	wait_button.pressed.connect(func(): if not locked: wait_requested.emit())
+	deadline_bar(content, Rect2(218, 14, 216, 5), clock_info)
+	if band != "on_time" and not locked:
+		banner = Panel.new()
+		banner.name = "LateBanner"
+		banner.position = Vector2(218, 21)
+		banner.size = Vector2(216, 18)
+		banner.add_theme_stylebox_override("panel", WindowTheme.box(5 if band == "late" else 4, color))
+		banner.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		content.add_child(banner)
+		var words := label(banner, strings.report.banner_late if band == "late" else strings.report.banner_missed, Rect2(2, 2, 212, 14), color)
+		words.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		words.tooltip_text = words.text
+
+# A thin progress bar from the start of the day to the last accepted minute, with a tick at the on-time limit.
+static func deadline_bar(parent: Control, area: Rect2, info: Dictionary) -> Control:
+	var holder := Control.new()
+	holder.name = "DeadlineBar"
+	holder.position = area.position
+	holder.size = area.size
+	holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	parent.add_child(holder)
+	var back := ColorRect.new()
+	back.color = Palette.color(3)
+	back.size = area.size
+	back.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	holder.add_child(back)
+	var start := 510.0
+	var last := float(info.deadline_late)
+	var fraction := clampf((float(info.minutes) - start) / (last - start), 0.0, 1.0)
+	var fill := ColorRect.new()
+	fill.color = Palette.color(CLOCK_COLORS[info.band])
+	fill.size = Vector2(maxf(1.0, area.size.x * fraction), area.size.y)
+	fill.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	holder.add_child(fill)
+	var tick := ColorRect.new()
+	tick.color = Palette.color(8)
+	tick.position = Vector2(floorf(area.size.x * (float(info.deadline_on_time) - start) / (last - start)), 0)
+	tick.size = Vector2(1, area.size.y)
+	tick.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	holder.add_child(tick)
+	return holder

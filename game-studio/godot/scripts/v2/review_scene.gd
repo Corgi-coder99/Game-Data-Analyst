@@ -182,7 +182,10 @@ func _render_step() -> void:
 
 func _step_reaction() -> void:
 	var category := reaction_category()
-	_say(category, strings.boss_lines[category])
+	var line: String = strings.boss_lines[category]
+	var timing := str(data.get("timing", "on_time"))
+	if timing != "on_time": line += " " + strings.review["line_" + timing]
+	_say(category, line)
 	var trust_before := float(before.get("trust", status.trust))
 	_text(body, strings.review.trust % [trust_before, float(status.trust)], Rect2(0, 0, 300, 17), 22, 12)
 	var bar := ProgressBar.new()
@@ -201,6 +204,9 @@ func _step_reaction() -> void:
 	var acc := float(data.result.acc)
 	icon(body, "check" if acc >= 1.0 else ("question" if acc > 0.0 else "cross"), Vector2(0, 50))
 	_text(body, strings.review.accuracy % _accuracy_text(), Rect2(12, 46, 380, 17), 22, 12)
+	if timing != "on_time":
+		var tag_key := "timing_late" if timing == "late" else "timing_missed"
+		_text(body, strings.review[tag_key], Rect2(0, 66, 380, 14), 28 if timing == "late" else 26, 12)
 	_show_stage(category)
 
 func _accuracy_text() -> String:
@@ -217,6 +223,8 @@ func _step_answer() -> void:
 	_text(body, strings.review.accuracy % _accuracy_text(), Rect2(12, 40, 590, 17), 24 if acc >= 1.0 else (28 if acc > 0.0 else 26), 12)
 	var cited: Array = submission.get("evidence", [])
 	_text(body, strings.review.evidence_count % cited.size() if not cited.is_empty() else strings.review.no_evidence, Rect2(0, 66, 608, 12), 7)
+	if bool(data.get("shifted", false)):
+		_wrapped(body, strings.review.shifted % [strings.forecast[data.original_answer], strings.forecast[data.answer]], Rect2(0, 82, 608, 24), 28, 2)
 
 func _step_news() -> void:
 	var cited: Array = submission.get("evidence", [])

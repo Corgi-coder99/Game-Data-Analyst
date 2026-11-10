@@ -13,6 +13,7 @@ const STEP_FLAGS := {"question":"", "browser":"opened_browser", "select":"select
 var strings: Dictionary
 var sprites := Sprites.new()
 var steps: Array = []
+var full_steps: Array = []
 var step := 0
 var active := false
 var skipped := false
@@ -55,7 +56,8 @@ class Overlay extends Control:
 
 func build(texts: Dictionary) -> void:
 	strings = texts
-	steps = strings.tutorial.steps
+	full_steps = strings.tutorial.steps
+	steps = full_steps
 	position = AREA.position
 	size = AREA.size
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -161,7 +163,8 @@ func layout() -> void:
 	overlay.visible = active
 	if active:
 		var current: Dictionary = steps[step]
-		step_label.text = strings.tutorial.name + " · " + strings.tutorial.step % int(current.group)
+		if current.id == "deadline": step_label.text = strings.tutorial.name + " · " + strings.tutorial.deadline_label
+		else: step_label.text = strings.tutorial.name + " · " + strings.tutorial.step % int(current.group)
 		text_label.text = current.text
 		overlay.origin = global_position + Vector2(0, BUBBLE_HEIGHT * 0.5)
 	changed.emit()
@@ -169,7 +172,16 @@ func layout() -> void:
 func current_id() -> String:
 	return str(steps[step].id) if active and step < steps.size() else ""
 
+# Day 2 only: one extra coach-mark about the deadline.
+func start_deadline() -> void:
+	steps = [{"id":"deadline", "group":0, "text":strings.tutorial.deadline}]
+	flags.clear()
+	active = true
+	step = 0
+	layout()
+
 func start() -> void:
+	steps = full_steps
 	skipped = false
 	finished = false
 	flags.clear()

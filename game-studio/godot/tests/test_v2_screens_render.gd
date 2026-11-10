@@ -199,6 +199,15 @@ func run() -> void:
 		var button: Button = window.action_buttons[action_name]
 		check(text_width(button.get_theme_font("font"), button.text, 8) + 12 <= button.size.x, "action name fits its row: " + button.text)
 	window.cancel_submit()
+	for i in 7: desktop.wait_for_data()
+	await inspect("work-report-late")
+	check(window.banner != null and window.banner.is_visible_in_tree(), "late banner visible in Mail")
+	window.request_submit()
+	await inspect("work-report-late-confirm")
+	window.cancel_submit()
+	desktop.open_window("tools")
+	await inspect("work-codepad-late")
+	desktop.open_window("report")
 	window.confirm_submit()
 	check(flow.state == "WORK", "cancelled confirmation keeps working")
 	window.request_submit()
@@ -260,5 +269,31 @@ func run() -> void:
 		submit("tang", "thap")
 		while flow.state == "REVIEW": flow.continue_review()
 	await inspect("ending-survived-lost")
+	# 6. Missed deadline, and a late report on a day whose answer shifted.
+	flow.start_with_game(Game.new(104, 10))
+	flow.skip_intro()
+	desktop = flow.desktop
+	desktop.open_window("report")
+	for i in 12: desktop.wait_for_data()
+	await inspect("work-report-missed")
+	check(desktop.report_window.banner != null and desktop.clock_band == "missed", "missed banner and red clock")
+	submit("tang", "cao")
+	await review_steps("review-missed")
+	var shifted_seed := -1
+	for candidate in range(1, 200):
+		var probe := Game.new(candidate, 10)
+		if probe._late_plan[0].answer != probe._scenario._answers[0]:
+			shifted_seed = candidate
+			break
+	var shifted_game := Game.new(shifted_seed, 10)
+	flow.start_with_game(shifted_game)
+	flow.skip_intro()
+	desktop = flow.desktop
+	for i in 7: desktop.wait_for_data()
+	desktop.open_window("news")
+	await inspect("work-browser-update")
+	submit(shifted_game._scenario._answers[0], "cao")
+	await review_steps("review-late-shifted")
+	check(flow.review_view.data.shifted and flow.review_view.data.timing == "late", "shifted late review rendered")
 	print("test_v2_screens_render: %d checks, %d failures, %d screens, %d controls" % [checks, failures, screens, measured])
 	quit(1 if failures else 0)
