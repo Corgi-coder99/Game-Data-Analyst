@@ -16,14 +16,11 @@ Trạng thái: Backlog -> In progress -> Review -> Done. Bị chặn thì chuy�
 
 ## In progress
 
-| ID | Việc | Owner | Nhánh | File được sửa | Tiêu chí hoàn thành |
-|---|---|---|---|---|---|
+(chưa có)
 
 ## Review
 
-| ID | Việc | Owner | Nhánh | File được sửa | Tiêu chí hoàn thành |
-|---|---|---|---|---|---|
-| T-012 | Chữa gốc kinh tế: người thắng demo còn khoảng 24/1.000 người dùng (chiến lược chỉ tối ưu còn khoảng 5), điều kiện thắng min_users 0,1 vô nghĩa; ván 30 tuần đang dùng hệ số chi phí nhân 0,1/0,05 từ tuần 11 và xác suất sự kiện 0,2 trái GDD mục 8. VU đã duyệt spec | Codex | codex/T-012 | game-studio/godot/scripts/sim/*, data/cards.json, events.json, config.json, tests/balance_sim.gd, tests/test_sim.gd | Xem game-studio/godot/docs/SPEC-T-012.md |
+(chưa có)
 
 ## Done
 
@@ -38,6 +35,7 @@ Trạng thái: Backlog -> In progress -> Review -> Done. Bị chặn thì chuy�
 | T-007 | Landing page trung thực (media-marketing/web). Claude đã chạy check_web.py (6/6 PASS khi dùng UTF-8) và kiểm tra trình duyệt 360px/1280px; VU duyệt merge vào master | Codex | 2026-11-10 |
 | T-009 | Cân bằng lại bản demo 10 tuần (Codex). Đạt 4/5 mục tiêu demo; chưa đạt: analyst không hơn balanced, 30 tuần quá khó (chuyển sang T-011). Claude đã review, VU duyệt merge vào master | Codex | 2026-11-10 |
 | T-011 | Thẻ xử lý chỉ gỡ sự kiện khi đã lộ nguyên nhân; analyst hơn balanced 11,55 điểm % ở demo; 30 tuần khả thi về thống kê (Codex). Còn nợ kinh tế chuyển sang T-012. Claude đã review, VU duyệt merge vào master | Codex | 2026-11-10 |
+| T-012 | Chữa gốc kinh tế (Codex): Retention 85%, Cash 18.000, người thắng demo giữ khoảng 147% Users khởi điểm; bỏ hệ số chỉnh gượng ván 30 tuần; sửa 1 dòng fixture test_ui.gd (dòng 29) theo spec. GDD đã cập nhật lên 0.2. Claude đã review và chạy check_web.py, VU duyệt merge vào master | Codex | 2026-11-10 |
 
 ## Blocked
 

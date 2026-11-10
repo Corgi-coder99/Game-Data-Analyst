@@ -1,6 +1,6 @@
 # GDD: Data Corp (tên tạm)
 
-Phiên bản 0.1, 2026-11-09. Owner: Claude (thiết kế). Số liệu trong tài liệu là giá trị khởi điểm, sẽ chỉnh bằng mô phỏng cân bằng.
+Phiên bản 0.2, 2026-11-10. Owner: Claude (thiết kế). Số liệu khớp `data/config.json` sau T-012 (cập nhật các mục 3, 4, 6, 7, 8, 10). Giá trị thật luôn lấy từ `data/`; khi lệch, `data/` đúng.
 
 ## 1. Tóm tắt
 
@@ -22,12 +22,12 @@ Mục tiêu học: phân biệt triệu chứng với nguyên nhân, đọc LTV/
 
 | Chỉ số | Ý nghĩa | Khởi điểm |
 |---|---|---|
-| Cash | Tiền mặt. Về 0 là thua | 10,000 |
+| Cash | Tiền mặt. Về 0 là thua | 18,000 |
 | Users | Người dùng hoạt động | 1,000 |
-| ARPU | Doanh thu mỗi user mỗi tuần | 25 |
-| Conversion | Tỷ lệ user trả tiền | 2% |
-| Retention | Tỷ lệ giữ lại mỗi tuần, Churn = 1 - Retention | 40% |
-| CAC | Chi phí mua 1 user mới | 15 |
+| ARPU | Doanh thu mỗi user mỗi tuần | 24 |
+| Conversion | Tỷ lệ user trả tiền (trần 8%) | 1% |
+| Retention | Tỷ lệ giữ lại mỗi tuần, Churn = 1 - Retention (trần 95%) | 85% |
+| CAC | Chi phí mua 1 user mới | 80 |
 | LTV | ARPU x thời gian sống trung bình (1 / Churn) | tính ra |
 | LTV/CAC | Mục tiêu từ 3 trở lên | tính ra |
 | Data Integrity | Độ tin cậy dữ liệu, 0 đến 100 | 80 |
@@ -44,8 +44,9 @@ revenue     = Users' x Conversion x ARPU
 Cash'       = Cash - chi_tieu + revenue
 ```
 
-- `CAC_hieu_dung = CAC x (1 + 0.1 x (ad_spend / 1000))`: chi quảng cáo càng nhiều càng đắt (hiệu suất giảm dần).
-- Chi phí cố định mỗi tuần (lương, server): 800. Tăng dần theo Users.
+- `CAC_hieu_dung = CAC x (1 + 0.01 x (ad_spend / 1000))`: chi quảng cáo càng nhiều càng đắt (hiệu suất giảm dần).
+- Chi phí cố định mỗi tuần (lương, server): 200, cộng 0,05 mỗi user.
+- Ở mức khởi điểm, nếu không làm gì công ty lỗ rất nhẹ và co chậm (tuần 1 còn khoảng 850 người dùng). Thẻ nâng cấp (Onboarding, Fix Checkout, Support, SEO) giảm hiệu quả một nửa mỗi lần chơi lại, nên không cộng dồn vô hạn.
 - Mọi hệ số nằm trong `data/` (JSON), không viết cứng trong mã.
 
 ## 5. Thẻ quyết định (bản đầu 12 thẻ, mỗi thẻ có Budget và Energy)
@@ -64,17 +65,17 @@ Hiệu quả cụ thể của từng thẻ do `data/cards.json` quyết định.
 
 Mỗi sự kiện có **nguyên nhân gốc** ẩn và **triệu chứng** hiện trên dashboard. Người chơi phải phân biệt hai thứ này.
 
-Ví dụ: Retention tụt. Nguyên nhân có thể là bug app (hiện ở một cohort), đối thủ giảm giá (hiện ở nhóm nhạy giá), hoặc dữ liệu log lỗi (Data Integrity thấp, thực tế không có gì xảy ra). Thẻ phân tích đúng giúp lộ nguyên nhân.
+Ví dụ: Retention tụt. Nguyên nhân có thể là bug app (hiện ở một cohort), đối thủ giảm giá (hiện ở nhóm nhạy giá), hoặc dữ liệu log lỗi (Data Integrity thấp, thực tế không có gì xảy ra). Thẻ phân tích đúng giúp lộ nguyên nhân. **Thẻ xử lý chỉ gỡ được sự kiện khi nguyên nhân của nó đã lộ.** Chơi thẻ xử lý "đoán mò" vẫn có hiệu ứng riêng của thẻ nhưng sự kiện vẫn còn và không tính điểm xử lý.
 
 ## 7. Thắng và thua
 
 - **Thua:** Cash về 0, hoặc LTV/CAC dưới 1 trong 4 tuần liên tiếp mà Cash dưới 2,000.
-- **Thắng:** qua tuần 30 với Cash dương. Điểm tính từ Cash cuối, LTV/CAC, và số lần xử lý đúng nguyên nhân gốc.
-- Bản demo: 10 tuần, điểm tính cùng cách.
+- **Thắng:** qua hết số tuần của ván và giữ được công ty. Bản demo (10 tuần): Cash từ 9,500, LTV/CAC từ 2 và Users từ 750 (75% số khởi điểm). Bản đầy đủ (30 tuần): Cash từ 15,000, LTV/CAC từ 2, Users từ 750.
+- **Điểm:** ván thắng = 1,000 + 0,1 x Cash + 100 x min(LTV/CAC, 5) + 100 x số sự kiện xử lý đúng. Ván thua tối đa 900 điểm (theo số tuần sống sót và sự kiện xử lý đúng), nên luôn thấp hơn mọi ván thắng.
 
 ## 8. Độ khó
 
-Tuần 1 đến 10: ít sự kiện, dữ liệu sạch. Tuần 11 đến 20: nhiều sự kiện chồng nhau, Data Integrity bắt đầu tụt. Tuần 21 đến 30: sự kiện gây nhiễu nhiều, ngân sách chặt.
+Xác suất có sự kiện mỗi tuần tăng dần theo pha: tuần 1 đến 10 là 45%, tuần 11 đến 20 là 55%, tuần 21 đến 30 là 70%. Data Integrity tụt dần từ tuần 11 (1 điểm mỗi tuần), và từ tuần 21 (2 điểm mỗi tuần), nên dữ liệu càng về sau càng nhiễu.
 
 ## 9. Giao diện và mỹ thuật
 
@@ -88,7 +89,7 @@ Tuần 1 đến 10: ít sự kiện, dữ liệu sạch. Tuần 11 đến 20: nh
 - Godot 4, GDScript. Dữ liệu ở `data/*.json` (config, cards, events), nạp qua `scripts/data.gd`.
 - Lõi mô phỏng thuần logic ở `scripts/sim/` (không phụ thuộc node) để chạy headless.
 - `tests/balance_sim.gd`: chạy hàng nghìn ván với vài chiến lược (ngẫu nhiên, chỉ chi quảng cáo, chỉ tối ưu, cân bằng), in tỷ lệ thắng và phân bố Cash.
-- Mục tiêu cân bằng khởi điểm: chiến lược chỉ chi quảng cáo thua trước tuần 15 ở phần lớn ván. Chiến lược cân bằng thắng 40 đến 60%.
+- Mục tiêu cân bằng (đo ở demo 10 tuần, 2.000 ván mỗi chiến lược): chỉ quảng cáo không thắng (tối đa 10%), ngẫu nhiên tối đa 20%, chiến lược cân bằng thắng 35 đến 55%, chiến lược phân tích (lộ nguyên nhân rồi mới xử lý) thắng cao hơn cân bằng ít nhất 10 điểm %. Kết quả đo sau T-012: ngẫu nhiên 18,9%, cân bằng 43,05%, phân tích 55,5%, chỉ quảng cáo và chỉ tối ưu 0%. Con số này đo trên bot giả lập, cần playtest người thật để xác nhận.
 
 ## 11. Phạm vi bản demo (10 tuần)
 
