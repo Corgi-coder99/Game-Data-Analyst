@@ -1,0 +1,23 @@
+{
+ "version":1,
+ "variables":["lai_suat","ty_gia","nguyen_lieu","suc_mua","chung_khoan","tin_dung"],
+ "directions":["tang","giam","ngang"],
+ "magnitudes":["low","mid","high"],
+ "markov_keep":0.78,
+ "shock_count":{"10":4,"30":12},
+ "shock_probability":0.85,
+ "precursors":{"competitor_discount":{"variable":"ty_gia","direction":"tang"},"price_fatigue":{"variable":"nguyen_lieu","direction":"tang"}},
+ "precursor_weight":3,
+ "news_per_day":{"10":6,"30":7},
+ "kind_weights":{"signal":45,"trap":25,"partial":5,"stale":10,"noise":10},
+ "repeat_days":3,"news_lifetime":3,"event_recent_days":2,
+ "noise_factor":0.5,
+ "macro":{"lai_suat":{"tang":{"fixed_cost":8},"giam":{"fixed_cost":-4}},"ty_gia":{"tang":{"cac":2.4},"giam":{"cac":-1.2}},"nguyen_lieu":{"tang":{"fixed_cost":6},"giam":{"fixed_cost":-3}},"suc_mua":{"tang":{"conversion":0.0003,"retention":0.003},"giam":{"conversion":-0.0003,"retention":-0.003}},"tin_dung":{"giam":{"fixed_cost":4}}},
+ "magnitude_scale":{"low":0.5,"mid":1,"high":1.5},
+ "tools":{"truy_van_lich_su":"sql_deep_dive","kiem_dinh_gia_thuyet":"ab_test","doi_chieu_nguon":"funnel_report","lam_sach_du_lieu":"clean_data"},
+ "grading":{"base":5,"adjacent":0.4,"partial_reward":0.3,"evidence_factor":1,"confidence":{"thap":0.6,"vua":1,"cao":1.5},"evidence":{"xac_nhan":1,"chua_du_can_cu":0,"bac_bo":-1,"cu":-1},"unverified":{"sai":-1,"cu":-1,"dung":0.25,"mot_phan":0,"khong_lien_quan":0},"max_evidence":3},
+ "career":{"initial_trust":42,"reset_promotion":55,"reset_demotion":40,"warning":35,"demote":25,"minimum_days":2,"correct_streak":2,"max_demotions":2,"bonus_fraction":0.5,"adopt_min":0.4,"adopt_max":1},
+ "ranks":[{"id":"thuc_tap","actions":1,"promote":70,"salary":100},{"id":"chuyen_vien","actions":2,"promote":75,"salary":160},{"id":"chuyen_vien_chinh","actions":2,"promote":80,"salary":240},{"id":"truong_nhom","actions":3,"promote":85,"salary":340},{"id":"giam_doc","actions":3,"promote":101,"salary":460}],
+ "score":{"win_bonus":6000,"trust":5,"positive_delta":10,"demotion":150,"fired":300},
+ "balance":{"seed":104,"games":2000}
+}

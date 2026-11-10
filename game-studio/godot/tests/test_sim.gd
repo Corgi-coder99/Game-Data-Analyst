@@ -14,6 +14,7 @@ func near(actual: float, expected: float, message: String) -> void:
 	check(absf(actual - expected) < 0.00001, message)
 
 func _init() -> void:
+	test_use_tool()
 	var ui_fixture := Sim.new(105, {}, 10)
 	while not ui_fixture.state.lost and not ui_fixture.state.won:
 		ui_fixture.begin_week()
@@ -418,3 +419,32 @@ func test_scores() -> void:
 	check(wins > 0 and losses > 0, "sweep includes wins and losses")
 	check(max_loss < min_win, "all swept losses below minimum win across strategies")
 	print("score sweep: 500 games/strategy; wins=%d losses=%d min_win=%.2f max_loss=%.2f" % [wins, losses, min_win, max_loss])
+
+func test_use_tool() -> void:
+	var sim := Sim.new(42)
+	check(not sim.use_tool("sql_deep_dive"), "tool requires open week")
+	sim.begin_week(false)
+	var hand_before: Array = sim.hand.duplicate(true)
+	var cash: float = sim.state.base.cash
+	check(not sim.use_tool("onboarding_redesign"), "reject non analysis tool")
+	check(not sim.use_tool("missing"), "reject unknown tool")
+	check(sim.hand == hand_before and sim.state.base.cash == cash, "rejection atomic")
+	sim.apply_event(sim.events[0])
+	check(sim.use_tool("sql_deep_dive"), "analysis available outside hand")
+	check(sim.hand == hand_before, "tool never consumes hand")
+	near(sim.state.base.cash, cash - 500, "tool budget")
+	check(sim.active_events[0].revealed, "tool reveals cause")
+	check(sim.use_tool("ab_test"), "hypothesis tool")
+	near(sim.prediction_multiplier, 0.1, "tool prediction effect")
+	var integrity: float = sim.state.base.integrity
+	check(sim.use_tool("clean_data"), "clean tool")
+	near(sim.state.base.integrity, integrity + 25, "tool applies effects")
+	sim.state.energy = 0
+	cash = sim.state.base.cash
+	check(not sim.use_tool("clean_data") and sim.state.base.cash == cash, "energy refusal atomic")
+	sim.state.energy = 3
+	sim.state.base.cash = 0
+	check(not sim.use_tool("sql_deep_dive"), "budget refusal")
+	sim.state.base.cash = cash
+	sim.finish_week()
+	check(not sim.use_tool("sql_deep_dive"), "closed week tool refusal")

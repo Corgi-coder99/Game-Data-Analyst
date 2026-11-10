@@ -105,6 +105,38 @@ func play(card_id: String) -> bool:
 		return true
 	return false
 
+func use_tool(card_id: String) -> bool:
+	if state.lost or state.won or not week_open:
+		return false
+	for i in cards.size():
+		var card: Dictionary = cards[i]
+		if card.id != card_id or card.category != "analysis":
+			continue
+		var budget := float(card.budget)
+		if state.energy < card.energy or state.base.cash < budget:
+			return false
+		state.energy -= int(card.energy)
+		state.base.cash -= budget
+		for event in active_events.duplicate():
+			if card_id in event.definition.revealed_by:
+				event.revealed = true
+			if event.revealed and card_id in event.definition.resolved_by:
+				var source: int = event.source
+				state.modifiers = state.modifiers.filter(func(e): return e.source != source)
+				active_events.erase(event)
+				state.resolved += 1
+		for effect in card.effects:
+			var scaled: Dictionary = effect.duplicate(true)
+			if card.get("diminishing", false):
+				scaled.add = float(effect.add) * pow(0.5, upgrade_plays.get(card_id, 0))
+			apply_effect(scaled, 0)
+		upgrade_plays[card_id] = upgrade_plays.get(card_id, 0) + 1
+		if card.has("sets_flag"):
+			state.flags[card.sets_flag] = true
+		prediction_multiplier = float(card.get("prediction_multiplier", 1.0))
+		return true
+	return false
+
 func report() -> Dictionary:
 	var result := {}
 	var amplitude: float = (1.0 - state.value("integrity", config) / config.limits.integrity[1]) * config.noise_scale * prediction_multiplier

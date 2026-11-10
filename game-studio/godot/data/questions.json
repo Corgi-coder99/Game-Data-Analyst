@@ -1,0 +1,9 @@
+{"questions":[
+ {"id":"q1","text":"Giá nguyên liệu nhập khẩu tuần này sẽ tăng, giảm hay đi ngang?","variable":"nguyen_lieu","window_days":1,"answer_rule":"next_state"},
+ {"id":"q3","text":"Lãi suất vay doanh nghiệp tuần tới sẽ đổi hướng thế nào?","variable":"lai_suat","window_days":0,"answer_rule":"state"},
+ {"id":"q4","text":"Sức mua hàng gia dụng quý này sẽ hồi phục hay tiếp tục giảm?","variable":"suc_mua","window_days":0,"answer_rule":"state"},
+ {"id":"q5","text":"Đối thủ giảm giá có đáng lo không, hay chỉ là quảng cáo?","variable":"competitor_discount","window_days":1,"answer_rule":"event"},
+ {"id":"q6","text":"Ngân hàng đối tác có đáng tin để dồn khoản thanh toán lớn không?","variable":"tin_dung","window_days":0,"answer_rule":"state"},
+ {"id":"q8","text":"Số liệu báo cáo tuần có đáng tin để trình lên ban giám đốc không?","variable":"logging_error","window_days":0,"answer_rule":"integrity"},
+ {"id":"q9","text":"Tin đồn về một ngân hàng sắp sụp có cần hành động ngay không?","variable":"tin_dung","window_days":0,"answer_rule":"bank_rumor"}
+]}

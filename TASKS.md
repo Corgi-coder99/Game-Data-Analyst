@@ -18,12 +18,12 @@ Trạng thái: Backlog -> In progress -> Review -> Done. Bị chặn thì chuy�
 
 | ID | Việc | Owner | Nhánh | File được sửa | Tiêu chí hoàn thành |
 |---|---|---|---|---|---|
-| T-018 | Tầng thế giới (scripts/world/): kịch bản ẩn theo seed, phát sinh tin (đúng, sai, cũ, nhiễu), công cụ kiểm chứng, báo cáo chấm điểm, sự nghiệp, bot cân bằng. VU đã duyệt spec | Codex | codex/T-018 | game-studio/godot/scripts/world/*, data/world.json, data/questions.json, scripts/sim/simulation.gd (chỉ use_tool), tests/test_world.gd, tests/balance_world.gd, tests/test_sim.gd (chỉ use_tool) | Xem game-studio/godot/docs/SPEC-T-018.md |
 
 ## Review
 
 | ID | Việc | Owner | Nhánh | File được sửa | Tiêu chí hoàn thành |
 |---|---|---|---|---|---|
+| T-018 | Tầng thế giới (scripts/world/): kịch bản ẩn theo seed, phát sinh tin (đúng, sai, cũ, nhiễu), công cụ kiểm chứng, báo cáo chấm điểm, sự nghiệp, bot cân bằng. VU đã duyệt spec | Codex | codex/T-018 | game-studio/godot/scripts/world/*, data/world.json, data/questions.json, scripts/sim/simulation.gd (chỉ use_tool), tests/test_world.gd, tests/balance_world.gd, tests/test_sim.gd (chỉ use_tool) | Xem game-studio/godot/docs/SPEC-T-018.md |
 | T-016 | Style bible pixel mới: bảng màu 32 màu, kích thước sprite, ánh sáng, giao diện máy tính, hoạt ảnh, kiểm tra tự động. Chờ VU xem | Claude | v2 | shared/style-bible/pixel-office-v2.md, palette-v2.json | VU duyệt style bible; quyết định có sửa CLAUDE.md mục 4 không |
 | T-017 | Content bible v2 (thế giới hư cấu Tân Lạc, công ty Lục Châu, nhân vật, 10 nguồn tin, ánh xạ 8 cú sốc) và data/news.json (41 mẫu tin, đã kiểm hợp lệ). Chờ VU xem | Claude | v2 | game-studio/godot/docs/CONTENT-BIBLE-v2.md, data/news.json | VU duyệt nội dung |
 
@@ -415,3 +415,76 @@ elapsed_seconds=32.061
 - Kiểm tra: Godot console 4.7.2 đúng đường dẫn VU giao, --headless --path game-studio/godot --script res://tests/<script>.gd. test_sim: 2.608 checks, 0 failures (cũ 2.392 giữ nguyên); test_ui: 134 checks, 0 failures (cũ 106 giữ nguyên), gồm bounds 640x360 và chiều cao chữ thẻ. balance_sim: exit 0, 20.000 ván, khớp nguyên 47 dòng theo thứ tự với master b7c4b94 sau khi CHỈ bỏ elapsed_seconds. Bản gốc đã chạy trước khi sửa khi HEAD trùng master; output lưu tại thư mục TEMP hệ thống, T-013-balance-master.txt và T-013-balance-result.txt. git diff --check qua. Console còn lỗi môi trường log user:// và root certificate store; không lỗi script.
 - Python: D:\Dev\ai-company\.venv\Scripts\python.exe -X utf8 -I media-marketing/web/check_web.py bị Unable to create process / Access is denied trong sandbox; chưa xác nhận 6/6, Claude tự chạy lại.
 - Git: nhánh codex/T-013, ban đầu sạch và HEAD trùng master; git add bị Permission denied khi tạo D:/Dev/ai-company/.git/worktrees/ai-company-codex/index.lock. Để file chưa stage/commit; không vượt sandbox, không push, không merge.
+
+### T-018 | Codex | 2026-11-10 | Review
+
+- Đã nhận trên codex/T-018, nền v2, cây làm việc ban đầu sạch; owner Codex/In progress có sẵn trước khi sửa. Không push, không merge.
+- Đã làm: sáu class RefCounted cho kịch bản Markov/cú sốc, tin hợp lệ theo thời gian và nguồn, kiểm chứng có cache theo công cụ, báo cáo hợp lệ/chấm điểm, sự nghiệp, điều phối ngày. Có dữ liệu câu hỏi/hệ số, bot chỉ quyết định qua API công khai và kiểm thử headless.
+- File đổi (dưới game-studio/godot/): scripts/world/{world_scenario,news_engine,verifier,report,career,world_game}.gd; data/world.json; data/questions.json; scripts/sim/simulation.gd (CHỈ thêm use_tool); tests/test_world.gd; tests/balance_world.gd; tests/test_sim.gd (CHỈ thêm/gọi test_use_tool). TASKS.md cho bàn giao/trạng thái. Không sửa news.json, cards.json, events.json, config.json, UI, scenes, docs, shared, media-marketing.
+- Kiểm thử thực tế bằng Godot console 4.7.2 đúng đường dẫn VU giao, --headless --path game-studio/godot --script res://tests/<tên>.gd: test_sim 2.623 checks/0 failures (giữ đủ 2.608 kiểm tra cũ, thêm 15); test_ui 134/0; test_world cuối 31.655/0. World gồm rà khóa đệ quy API, bản sao sâu/cache, hash nhật ký cùng seed, tin/câu hỏi trên 200 seed, bảng kiểm chứng/chấm điểm và ví dụ tính tay, sự nghiệp, overrides/kết thúc, tích hợp 10 ngày. Quét điểm 500 ván/bot: 787 thắng/1.713 thua, min_win 6.509,50 > max_loss 1.211,00; thêm kiểm tra giới hạn lý thuyết cho 30 ngày.
+- Không lộ: tin công khai chỉ 10 khóa theo spec; không trả template_id/verify_with/reliability hoặc nhãn ẩn. Rà truth/kind/link/state_direction/exaggerates/answer/scenario trên các API đọc và kết quả verify/submit/end; review ngày hiện tại/tương lai bị từ chối. end_day không trả acc/delta/đáp án; review chỉ sao chép sự thật của ngày đã kết thúc. Dữ liệu có sẵn cho ngày tương lai vẫn nằm trong phần nội bộ.
+- Hồi quy v1: đã chạy balance_sim gốc TRƯỚC sửa, lưu TEMP/T-018-balance-before.txt; bản sau TEMP/T-018-balance-after.txt. Compare-Object -SyncWindow 0 khớp đủ 47 dòng, chỉ bỏ elapsed_seconds. Không sửa test/balance v1 hay hành vi play. git diff --check qua. Console vẫn có lỗi môi trường ghi user://logs/godot.log và root certificate store; không có lỗi script ở các lượt cuối. Không cần Python cho việc này.
+- Cân bằng: mỗi bảng 2.000 ván/bot, seed 104..2103; --games=2000 --days=10 hoặc --days=30. Đủ 5 kind trong 100% ván của từng bot/cả hai kỳ; cả 8 cú sốc xuất hiện. acc là điểm chính xác (1/0,4/0), không phải tỷ lệ đoán đúng tuyệt đối; rank trung vị dùng chỉ số 0=thực tập, 1=chuyên viên, 2=chuyên viên chính, 3=trưởng nhóm, 4=giám đốc.
+
+| Ngày | Bot | N | Thắng % | Fired % | Bankrupt % | Survived % | Trust trung vị | Rank trung vị | acc TB | ev TB | Đủ 5 kind % |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 10 | random_reporter | 2000 | 7.80 | 1.60 | 0.00 | 98.40 | 55.50 | 0.0 | 0.5189 | 0.0000 | 100.00 |
+| 10 | rumor_follower | 2000 | 13.85 | 1.40 | 0.00 | 98.60 | 56.40 | 0.0 | 0.5352 | -0.3604 | 100.00 |
+| 10 | official_only | 2000 | 33.85 | 0.00 | 0.00 | 100.00 | 61.30 | 0.0 | 0.6985 | -0.1048 | 100.00 |
+| 10 | verifier | 2000 | 69.50 | 0.10 | 0.00 | 99.90 | 63.00 | 1.0 | 0.7197 | 0.3120 | 100.00 |
+| 10 | careful_hedger | 2000 | 30.50 | 0.00 | 0.00 | 100.00 | 62.70 | 0.0 | 0.7200 | 0.3120 | 100.00 |
+| 30 | random_reporter | 2000 | 63.95 | 3.25 | 0.65 | 96.10 | 62.80 | 1.0 | 0.5141 | 0.0000 | 100.00 |
+| 30 | rumor_follower | 2000 | 69.00 | 4.45 | 0.05 | 95.50 | 62.50 | 1.0 | 0.5345 | -0.4015 | 100.00 |
+| 30 | official_only | 2000 | 98.50 | 0.00 | 0.05 | 99.95 | 68.15 | 2.0 | 0.7008 | -0.0564 | 100.00 |
+| 30 | verifier | 2000 | 62.35 | 0.15 | 36.85 | 63.00 | 71.20 | 3.0 | 0.7006 | 0.2784 | 100.00 |
+| 30 | careful_hedger | 2000 | 41.35 | 0.00 | 58.00 | 42.00 | 68.80 | 2.0 | 0.7061 | 0.3007 | 100.00 |
+
+- Mục tiêu demo: đạt 5/5. Random 7,80 <=10; rumor 13,85 <=15; official 33,85 trong [30,55]; hedger 30,50 trong [25,60] và thấp hơn verifier; verifier 69,50 <=85, hơn official 35,65 điểm %. Chưa có mục tiêu định lượng chưa đạt trong spec. Bản 30 ngày chưa có ngưỡng thắng được giao: cần review/playtest chi phí tích lũy, vì official thắng 98,50%, verifier phá sản 36,85%, hedger phá sản 58%; không tuyên bố full đã cân bằng về trải nghiệm.
+
+Lịch sử chỉnh số (R/U/O/V/H = random/rumor/official/verifier/hedger; các vòng 2..7 là mẫu 200 ván/bot/10 ngày, không thay thế lượt 2.000 cuối):
+
+| Vòng | Thay đổi chính; giá trị khác giữ trước | N/bot | Thắng R / U / O / V / H % |
+|---|---|---:|---|
+| 2 | Sau sửa smoke use_tool: base=6, trust=50, ev_factor=0,25, thap=0,5 | 200 | 29,50 / 55,00 / 62,00 / 63,50 / 40,00 |
+| 3 | base=4 | 200 | 10,00 / 35,50 / 36,50 / 36,50 / 2,50 |
+| 4 | base=5; bot đọc thêm cụm nghĩa từ tiêu đề; verifier cao khi có >=1 bằng chứng; cooldown tin là khoảng cách >=3 ngày | 200 | 21,50 / 44,50 / 54,50 / 69,50 / 20,50 |
+| 5 | trust=45, ev_factor=1 | 200 | 10,50 / 24,50 / 22,50 / 71,50 / 23,00 |
+| 6 | Official bỏ bản tin nói kỳ trước khi có tin mới; rumor dẫn một tin; hedger bỏ hành động ở 50% ngày | 200 | 10,50 / 24,00 / 46,00 / 71,50 / 22,50 |
+| 7 | trust=44, thap=0,6; trọng số signal/trap/partial/stale/noise=45/25/5/10/10 | 200 | 10,00 / 17,50 / 43,00 / 68,50 / 34,50 |
+| 8 | trust=43; công cụ phù hợp chủ đề trước; kịch bản phải có đủ 5 kind ngay ngày đầu và đủ số tin cả kỳ | 2.000 | 9,20 / 15,90 / 35,90 / 70,90 / 34,60 |
+| 9 (cuối) | trust=42 | 2.000 | 7,80 / 13,85 / 33,85 / 69,50 / 30,50 |
+
+- Tự quyết: trọng số kind là trọng số tương đối (chuẩn hóa trên các mẫu hợp lệ), không phải bảo đảm đúng tỷ lệ ở từng ngày. Chọn lại kịch bản bằng luồng seed xác định nếu không có đủ tin hợp lệ/số lượng/cả 5 kind ngày đầu; không bịa nhãn hay đổi hướng mẫu. Tin ngày 1 có thể lặp lại ngày 4 (mỗi cửa sổ 3 ngày không lặp); câu hỏi không trùng 3 ngày trước. Sinh thêm một ngày trạng thái cho câu giá nguyên liệu dự báo ngày sau; câu q5 xét cả ngày hiện tại và hết window_days. Tín hiệu sự kiện hợp lệ khi còn diễn ra hoặc trong 2 ngày từ lúc xảy ra, kèm độ trễ nguồn.
+- Tự quyết: cho Simulation chạy horizon+1 để v2 dùng ending sự nghiệp, tránh gate thắng Cash/Users/ratio cuối kỳ riêng của v1; vẫn tôn trọng state.lost của lõi. Tác động macro duration=1, không sửa hệ số kinh tế v1. Dùng báo cáo integrity công khai để tính nhiễu kiểm chứng; kết quả chưa đủ căn cứ không xóa kết luận dứt khoát trước đó. Cache kiểm chứng theo cặp uid/tool và cache chuẩn bị theo seed/horizon/hệ số, mỗi ván nhận bản sao sâu. Chạy lại 2.000 ván/bot demo sau cache: mọi dòng khớp bản không cache. Overrides hỗ trợ world (gộp đệ quy), simulation, questions, news, scenario.days/scenario.shocks.
+- Tự quyết về điểm: giữ dạng công thức cộng/trừ của spec, không dùng trần điểm ván thua. Win bonus=6.000, Trust*5, positive_delta*10, demotion*150, fired*300. Với bộ số cuối, delta dương <=15/ngày, ván thua 30 ngày <=5.000 điểm; ngay cả cận thắng bảo thủ trừ 2 lần giáng chức vẫn >=5.700. Điều này bảo đảm bất biến cho cả hai kỳ. Thay đổi hệ số điểm không được bot dùng để quyết định nên không đổi bảng thắng/thua.
+- Bot không tra nhãn hoặc kịch bản ẩn: đọc chủ đề/cụm từ tiêu đề, nguồn, kết quả xác nhận và tay bài. Công cụ theo nhóm chủ đề khớp verify_with hiện có; rumor dùng nguồn xã hội/nặc danh, official lọc tin cũ khi có tin mới, verifier/hedger chỉ dẫn tin xác nhận. Không có tin phù hợp thì dùng dự báo mặc định ngang, riêng rumor chọn hướng ngẫu nhiên; random chọn cả hướng/tự tin/hành động bằng RNG riêng. Hành động ưu tiên chung theo dữ liệu công khai; hedger đề xuất ít hơn. Đây là baseline headless, cần đối chiếu chơi tay.
+- news.json: không sửa và chưa phát hiện lỗi dữ liệu bắt buộc sửa. Mẫu partial gắn event được xét khi cú sốc thật còn phù hợp cửa sổ; phóng đại có sẵn trong tiêu đề được giữ nguyên. Mọi dữ liệu đều hư cấu trong kho, không dùng mạng hay dữ liệu cá nhân.
+- Git: git add bị fatal: Unable to create D:/Dev/ai-company/.git/worktrees/ai-company-codex/index.lock: Permission denied. Chưa stage/commit, giữ nguyên file trong worktree; không vượt sandbox, không push/merge.
+
+world.json cuối đầy đủ:
+
+```json
+{
+ "version":1,
+ "variables":["lai_suat","ty_gia","nguyen_lieu","suc_mua","chung_khoan","tin_dung"],
+ "directions":["tang","giam","ngang"],
+ "magnitudes":["low","mid","high"],
+ "markov_keep":0.78,
+ "shock_count":{"10":4,"30":12},
+ "shock_probability":0.85,
+ "precursors":{"competitor_discount":{"variable":"ty_gia","direction":"tang"},"price_fatigue":{"variable":"nguyen_lieu","direction":"tang"}},
+ "precursor_weight":3,
+ "news_per_day":{"10":6,"30":7},
+ "kind_weights":{"signal":45,"trap":25,"partial":5,"stale":10,"noise":10},
+ "repeat_days":3,"news_lifetime":3,"event_recent_days":2,
+ "noise_factor":0.5,
+ "macro":{"lai_suat":{"tang":{"fixed_cost":8},"giam":{"fixed_cost":-4}},"ty_gia":{"tang":{"cac":2.4},"giam":{"cac":-1.2}},"nguyen_lieu":{"tang":{"fixed_cost":6},"giam":{"fixed_cost":-3}},"suc_mua":{"tang":{"conversion":0.0003,"retention":0.003},"giam":{"conversion":-0.0003,"retention":-0.003}},"tin_dung":{"giam":{"fixed_cost":4}}},
+ "magnitude_scale":{"low":0.5,"mid":1,"high":1.5},
+ "tools":{"truy_van_lich_su":"sql_deep_dive","kiem_dinh_gia_thuyet":"ab_test","doi_chieu_nguon":"funnel_report","lam_sach_du_lieu":"clean_data"},
+ "grading":{"base":5,"adjacent":0.4,"partial_reward":0.3,"evidence_factor":1,"confidence":{"thap":0.6,"vua":1,"cao":1.5},"evidence":{"xac_nhan":1,"chua_du_can_cu":0,"bac_bo":-1,"cu":-1},"unverified":{"sai":-1,"cu":-1,"dung":0.25,"mot_phan":0,"khong_lien_quan":0},"max_evidence":3},
+ "career":{"initial_trust":42,"reset_promotion":55,"reset_demotion":40,"warning":35,"demote":25,"minimum_days":2,"correct_streak":2,"max_demotions":2,"bonus_fraction":0.5,"adopt_min":0.4,"adopt_max":1},
+ "ranks":[{"id":"thuc_tap","actions":1,"promote":70,"salary":100},{"id":"chuyen_vien","actions":2,"promote":75,"salary":160},{"id":"chuyen_vien_chinh","actions":2,"promote":80,"salary":240},{"id":"truong_nhom","actions":3,"promote":85,"salary":340},{"id":"giam_doc","actions":3,"promote":101,"salary":460}],
+ "score":{"win_bonus":6000,"trust":5,"positive_delta":10,"demotion":150,"fired":300},
+ "balance":{"seed":104,"games":2000}
+}
+```
