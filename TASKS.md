@@ -47,6 +47,7 @@ Trạng thái: Backlog -> In progress -> Review -> Done. Bị chặn thì chuy�
 | T-018 | Tầng thế giới v2 (scripts/world/): kịch bản ẩn, tin đúng/sai/cũ/nhiễu, kiểm chứng, báo cáo chấm điểm, sự nghiệp, bot cân bằng (Codex). Đạt 5/5 mục tiêu demo, không lộ dữ liệu ẩn (Claude quét 450 kết quả API). Còn nợ: thưởng phạt quá nhẹ, bản 30 ngày chưa dùng được (chuyển sang T-018b). Claude đã review; VU duyệt merge vào v2 | Codex | 2026-11-10 |
 | T-018b | Siết thưởng phạt và sửa ván 30 ngày (Codex). Claude chạy lại balance_world 1.000 ván/bot: mọi mục tiêu A (demo) và B (30 ngày) đạt; test_sim 2.630, test_ui 134, test_world 32.419 qua; balance_sim giống hệt; không lộ dữ liệu ẩn. Claude tự quyết merge vào v2 (VU ủy quyền) | Codex | 2026-11-10 |
 | T-019a | Giao diện v2 phần a (Codex): đường ống sprite GDScript, 26 dải PNG đúng 32 màu, cảnh văn phòng pixel. Claude chạy lại test_v2_assets (2.255), check_palette PASS, render và duyệt ảnh cảnh; tự quyết merge vào v2 (VU ủy quyền) | Codex | 2026-11-10 |
+| T-019b | Giao diện v2 phần b (Codex): màn hình máy tính với cửa sổ Tin tức, Công ty, Công cụ kiểm chứng, ghim bằng chứng, thanh tác vụ. Claude chạy lại kiểm thử (v2_desktop 2.332, layout_render 2.614 không headless, assets 2.255, sim 2.630, ui 134, world 32.438), đo thanh tác vụ trong render thật (108x14), balance_sim giống hệt; qua 2 vòng trả lại vì bố cục tràn; tự quyết merge vào v2 (VU ủy quyền) | Codex | 2026-11-10 |
 
 ## Blocked
 
