@@ -1,0 +1,11 @@
+{
+ "windows":{"news":"Tin tức","company":"Công ty","tools":"Công cụ kiểm chứng"},
+ "tiers":{"chinh_thuc":"Chính thức","bao_chi":"Báo chí","mang_xa_hoi":"Mạng xã hội","noi_bo":"Nội bộ"},
+ "topics":{"lai_suat":"Lãi suất","ty_gia":"Tỷ giá","nguyen_lieu":"Nguyên liệu","suc_mua":"Sức mua","chung_khoan":"Chứng khoán","tin_dung":"Tín dụng","noi_bo":"Nội bộ"},
+ "verification":{"chua_kiem_chung":"","xac_nhan":"Xác nhận","bac_bo":"Bác bỏ","chua_du_can_cu":"Chưa đủ căn cứ","cu":"Đã cũ"},
+ "tools":{"truy_van_lich_su":"Truy vấn dữ liệu lịch sử","kiem_dinh_gia_thuyet":"Kiểm định giả thuyết","doi_chieu_nguon":"Đối chiếu nguồn tin","lam_sach_du_lieu":"Làm sạch dữ liệu"},
+ "metrics":{"cash":"Tiền mặt","users":"Đại lý hoạt động","retention":"Giữ chân đại lý","conversion":"Chốt đơn hàng","cac":"Chi phí / đại lý","arpu":"Doanh thu / đại lý","ratio":"LTV/CAC","integrity":"Độ sạch dữ liệu"},
+ "ranks":{"thuc_tap":"Thực tập","chuyen_vien":"Chuyên viên","chuyen_vien_chinh":"Chuyên viên chính","truong_nhom":"Trưởng nhóm","giam_doc":"Giám đốc Phân tích"},
+ "errors":{"day_closed":"Ngày đã đóng hoặc đã nộp báo cáo.","invalid_uid":"Hãy chọn một tin còn hiệu lực.","invalid_tool":"Công cụ không hợp lệ.","insufficient_resources":"Không đủ năng lượng hoặc ngân sách.","already_submitted":"Đã nộp báo cáo.","report_required":"Cần nộp báo cáo.","day_not_reviewable":"Chưa thể xem lại ngày này.","invalid_question":"Câu hỏi không hợp lệ.","invalid_forecast":"Dự báo không hợp lệ.","invalid_confidence":"Mức tự tin không hợp lệ.","invalid_evidence":"Bằng chứng không hợp lệ.","invalid_actions":"Danh sách hành động không hợp lệ.","invalid_action":"Hành động không hợp lệ.","too_many_evidence":"Chỉ được ghim tối đa 3 tin.","too_many_actions":"Quá nhiều hành động."},
+ "ui":{"question":"Câu hỏi của sếp: ","day":"Ngày %d/%d","published":"Ngày %d","energy":"Năng lượng","cost":"%d NL · %d ngân sách","use":"Dùng","pin":"Ghim tin","unpin":"Bỏ ghim","pin_limit":"Chỉ được ghim tối đa 3 tin.","trust":"Tin tưởng: %.0f/100","uncertain":"? Số liệu có thể nhiễu","ratio_hint":"Ước tính từ số liệu báo cáo; sàn hao hụt 1%.","select":"Chọn tin để kiểm chứng.","unknown":"Không thể thực hiện thao tác.","disclaimer":"Dữ liệu và tên trong game là hư cấu, do mô phỏng sinh ra. Không phải dữ liệu thị trường thật và không phải lời khuyên đầu tư. Một phần nội dung và mã được tạo với hỗ trợ của AI."}
+}

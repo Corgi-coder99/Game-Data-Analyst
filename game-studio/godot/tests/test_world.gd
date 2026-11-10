@@ -324,6 +324,7 @@ func test_score_sweep() -> void:
 		print("score sweep %d days 500/bot: wins=%d losses=%d min_win=%.2f max_loss=%.2f" % [days, wins, losses, min_win, max_loss])
 
 func _init() -> void:
+	test_status_energy()
 	config = Loader.load_json("res://data/world.json")
 	test_public_and_replay()
 	test_public_and_replay(30)
@@ -442,3 +443,24 @@ func test_world_cost_and_correct_chain() -> void:
 		for index in config.ranks.size():
 			game._career.rank = index
 			check(game.status().won == expected_wins[index], "demo/full victory boundary for each rank")
+
+func test_status_energy() -> void:
+	var game := Game.new(104, 10)
+	check(game.status().energy is int and game.status().energy_max is int, "public energy integers")
+	check(game.status().energy == game._sim.state.energy and game.status().energy_max == int(game._sim.config.energy), "public energy values before day")
+	game.begin_day()
+	check(game.status().energy == game.status().energy_max and game.status().energy_max == 3, "energy full at start")
+	var tool: Dictionary = game.tools().filter(func(t): return int(t.energy) > 0)[0]
+	for i in 3:
+		var before: int = game.status().energy
+		var uid: String = game.news_today()[i].uid
+		check(game.verify(uid, tool.id).ok, "energy consuming verify succeeds")
+		check(game.status().energy == before - int(tool.energy), "public energy decreases by advertised cost")
+		check(game.status().energy == game._sim.state.energy, "public energy matches company")
+		check(game.verify(uid, tool.id).ok and game.status().energy == before - int(tool.energy), "cached verify preserves energy")
+	var before: Dictionary = game.status()
+	check(not game.verify(game.news_today()[3].uid, tool.id).ok and game.status() == before, "failed verify preserves energy")
+	check(public_only(game.status()), "status energy adds no secret keys")
+	check(game.submit_report(submission(game)).ok and game.end_day().ok, "energy test closes day")
+	game.begin_day()
+	check(game.status().energy == game.status().energy_max and game.status().energy == 3, "energy resets next day")
