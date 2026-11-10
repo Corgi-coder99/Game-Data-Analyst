@@ -11,7 +11,6 @@ Trạng thái: Backlog -> In progress -> Review -> Done. Bị chặn thì chuy�
 | T-001 (ví dụ) | Viết spec tính năng X | Claude | claude/T-001 | docs/spec-x.md | Spec có mô tả, đầu vào, đầu ra, ví dụ |
 | T-002 (ví dụ) | Cài đặt tính năng X theo spec T-001 | Codex | codex/T-002 | src/x.py, tests/test_x.py | Kiểm thử qua, đúng spec |
 | T-008 | check_web.py: ép stdout UTF-8 để không lỗi UnicodeEncodeError trên console Windows mặc định | Codex | codex/T-008 | media-marketing/web/check_web.py | Chạy `python -I check_web.py` (không cần -X utf8) qua 6 mục |
-| T-014 | Thay ảnh gameplay trên landing page bằng ảnh chụp từ bản mới (kinh tế T-012, gợi ý T-013), rồi chạy check_web.py | Claude | claude/T-014 | media-marketing/web/assets/*, index.html (alt) | check_web.py 6/6, ảnh khớp bản game hiện tại |
 | T-010 | Kịch bản và video quảng cáo 30 giây (làm sau T-012 để cảnh quay không hiện công ty gần hết người dùng) | Claude/Codex | chưa chốt | media-marketing/video/* | Chưa có spec |
 
 ## In progress
@@ -37,6 +36,7 @@ Trạng thái: Backlog -> In progress -> Review -> Done. Bị chặn thì chuy�
 | T-011 | Thẻ xử lý chỉ gỡ sự kiện khi đã lộ nguyên nhân; analyst hơn balanced 11,55 điểm % ở demo; 30 tuần khả thi về thống kê (Codex). Còn nợ kinh tế chuyển sang T-012. Claude đã review, VU duyệt merge vào master | Codex | 2026-11-10 |
 | T-012 | Chữa gốc kinh tế (Codex): Retention 85%, Cash 18.000, người thắng demo giữ khoảng 147% Users khởi điểm; bỏ hệ số chỉnh gượng ván 30 tuần; sửa 1 dòng fixture test_ui.gd (dòng 29) theo spec. GDD đã cập nhật lên 0.2. Claude đã review và chạy check_web.py, VU duyệt merge vào master | Codex | 2026-11-10 |
 | T-013 | Giao diện: gợi ý thẻ xử lý khi nguyên nhân đã lộ (Codex); event_reports() thêm remedies chỉ khi đã lộ, balance_sim giống hệt master. Claude đã review, chụp màn hình và chạy check_web.py; VU duyệt merge vào master | Codex | 2026-11-10 |
+| T-014 | Thay ảnh gameplay trên landing page bằng ảnh chụp từ ván chơi tự nhiên của bản mới (tuần 3/10, có sự kiện đã lộ và gợi ý thẻ xử lý); cập nhật alt. check_web.py 6/6 | Claude | 2026-11-10 |
 
 ## Blocked
 
