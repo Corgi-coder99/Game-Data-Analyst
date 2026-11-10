@@ -724,7 +724,7 @@ Kết quả chạy thật (worktree, Godot 4.7.2 console):
 - Han che: (1) events.json va cards.json (cam sua) van con chu Viet nhung khong bao gio hien o v2 (shocks/root_causes/actions lay tu strings_v2). (2) Sim khong co tien phat bang tien, nen popup "fine" chi xuat hien neu personal_pay giam (hien khong xay ra). (3) Popup/dong nghiep chi o man hop cuoi ngay (review); chua o office hay desktop. (4) Font mac dinh, chua phai font pixel; chu English dai hon nen cac cua so vua khit, da qua render test. (5) v1 (scripts/ui, strings.json, test_ui) giu nguyen tieng Viet, dung theo spec. (6) Tien te hien thi la $ theo spec, du ten tien trong truyen la dong lac. (7) Ten rieng giu khong dau (Luc Chau, Tan Lac, Khoi, Mai, Tu, Hanh).
 
 
-### T-021 | Claude subagent (thay Codex) | 2026-11-10 | In progress
+### T-021 | Claude subagent (thay Codex) | 2026-11-10 | Done
 
 - Feedback playtest của VU: tin tức thuần chữ, không có hướng dẫn, không thấy nút gửi báo cáo, không sửa được bằng chứng. Desktop có icon app, Mail soạn báo cáo (sửa được đến khi Gửi), tin có hình, tutorial. Spec: game-studio/godot/docs/SPEC-T-021.md. Nhánh codex/T-021. Sau đó: T-022 art + palette v3 (cần VU duyệt CLAUDE.md), T-023 báo cáo hạn giờ, T-024 tiêu tiền.
 
