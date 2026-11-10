@@ -1,6 +1,7 @@
 extends "res://scripts/v2/windows/window_base.gd"
 # End-of-day meeting. This is the only v2 script allowed to read the hidden labels,
 # and only from the review record of a day that has already ended.
+const CityArt = preload("res://scripts/v2/city_art.gd")
 const RANK_ORDER := ["thuc_tap", "chuyen_vien", "chuyen_vien_chinh", "truong_nhom", "giam_doc"]
 const TRUTH_ICONS := {"dung":"check", "sai":"cross", "mot_phan":"question", "cu":"clock_old", "khong_lien_quan":"dash"}
 const TRUTH_COLORS := {"dung":24, "sai":26, "mot_phan":28, "cu":6, "khong_lien_quan":6}
@@ -39,6 +40,8 @@ var sweep_time := -1.0
 var title_label: Label
 var stage: Control
 var skipped := false
+# T-024: one extra line under the career step (net worth and mood); empty hides it.
+var life_text := ""
 var built := false
 
 func _ready() -> void:
@@ -52,8 +55,9 @@ func _build() -> void:
 	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	theme = WindowTheme.create()
 	strings = JSON.parse_string(FileAccess.get_file_as_string("res://data/strings_v2.json"))
-	var background := ColorRect.new()
-	background.color = Palette.color(17)
+	var background := TextureRect.new()
+	background.texture = CityArt.backdrop("review")
+	background.set_meta("overlay", true)
 	background.size = size
 	background.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(background)
@@ -313,6 +317,7 @@ func _step_career() -> void:
 		"fired": _text(body, strings.review.fired, Rect2(0, y, 392, 17), 26, 12)
 		"bankrupt": _text(body, strings.review.bankrupt, Rect2(0, y, 392, 17), 26, 12)
 		_: _text(body, strings.review.steady, Rect2(0, y, 392, 12), 7)
+	if life_text != "": _text(body, life_text, Rect2(0, 150, 392, 12), 28)
 	_show_stage(category if category != "" else "steady")
 	var delay := 0.0
 	for event in events:

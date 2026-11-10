@@ -1,112 +1,115 @@
-# GDD v2 (concept): Data Corp, nhân viên phân tích trong cơn khủng hoảng
+# GDD v2 (concept): Data Corp, an analyst in a crisis
 
-Phiên bản 0.1 concept, 2026-11-10. Owner: Claude (thiết kế). Chờ VU duyệt hướng đi trước khi tạo việc lập trình. Giữ nguyên lõi của `docs/GDD.md` v0.2 (chỉ số, thẻ, sự kiện có nguyên nhân gốc ẩn, dữ liệu có thể sai), nhưng đổi cách chơi và bối cảnh.
+Version 0.1 concept, 2026-11-10. Owner: Claude (design). Pending approval from the project owner before programming tasks are created. Keeps the core of `docs/GDD.md` v0.2 (metrics, cards, events with hidden root causes, data that can be wrong) but changes the gameplay and setting.
 
-## 1. Tóm tắt một câu
+## 1. One-sentence summary
 
-Bạn là nhân viên phân tích dữ liệu của một công ty nhỏ trong giai đoạn kinh tế khó khăn. Mỗi ngày bạn ngồi vào bàn làm việc trong văn phòng pixel, đọc "internet" trên màn hình máy tính (tin tài chính thế giới, giá cả, chứng khoán, tin đồn), kiểm chứng tin nào đáng tin, rồi viết báo cáo dự báo và đề xuất hành động cho sếp. Báo cáo đúng thì công ty sống sót, bạn được thưởng và thăng chức; báo cáo sai thì bị phạt, giáng chức, hoặc bị đuổi việc.
+You are a data analyst at a small company during a difficult economic period. Each day you sit at your desk in a pixel-art office, read the "internet" on your computer screen (world financial news, prices, stocks, rumors), check which stories are trustworthy, then write a forecast report with recommended actions for your boss. If the report is right, the company survives and you get a bonus and a promotion; if it is wrong, you are penalized, demoted, or fired.
 
-Thể loại: indie, mô phỏng công sở và phân tích, chơi một mình, 640x360 pixel art. Một ván demo 10 ngày làm việc, bản đầy đủ 30 ngày.
+Genre: indie, office and analysis simulation, single player, 640x360 pixel art. A demo run is 10 working days; the full game is 30 days.
 
-## 2. Giữ gì, đổi gì
+## 2. What stays, what changes
 
-| Lõi hiện có (đã có mã và kiểm thử) | Trong bản v2 |
+| Existing core (already has code and tests) | In v2 |
 |---|---|
-| 7 chỉ số dashboard (Users, Retention, Conversion, CAC, ARPU, LTV/CAC, Data Integrity) | Dashboard của công ty trên màn hình máy tính. "Users" là khách hàng đang hoạt động. Data Integrity trở thành **độ tin cậy của dữ liệu nội bộ** (dữ liệu bẩn thì số trên dashboard nhiễu) |
-| Cash, thắng thua, điểm | Cash là tiền của công ty. Công ty cạn tiền thì công ty phá sản (kết thúc ván) |
-| 8 sự kiện có triệu chứng và nguyên nhân gốc ẩn | **Cú sốc thị trường**: tin tức là triệu chứng, nguyên nhân thật (lãi suất, giá nguyên liệu, tỷ giá, đối thủ, tin giả) ẩn đến khi bạn kiểm chứng |
-| Thẻ phân tích (SQL Deep-Dive, A/B Test, Funnel Report, Clean Data) | **Công cụ phân tích** dùng trên máy tính: truy vấn dữ liệu lịch sử, kiểm định giả thuyết, báo cáo dòng tiền, làm sạch và lọc nguồn nhiễu. Tốn Energy (tập trung) và Budget |
-| Thẻ hành động (Fix Checkout, Onboarding, Ads, Loyalty, SEO, Support, Influencer, Giảm giá) | **Hành động bạn đề xuất cho sếp** trong báo cáo (đổi tên theo ngữ cảnh: siết thu hồi công nợ, giữ chân khách, chi marketing, khuyến mãi, cắt chi phí vận hành, v.v.). Sếp quyết định có làm hay không |
-| Thẻ xử lý chỉ gỡ sự kiện khi nguyên nhân đã lộ (T-011) | Đề xuất hành động đúng chỉ hiệu quả khi bạn đã xác định đúng nguyên nhân của cú sốc |
-| Màn kết thúc "sự thật so với đã thấy" | **Họp đánh giá cuối ngày**: sếp công bố sự thật, đối chiếu với dự báo của bạn |
+| 7 dashboard metrics (Users, Retention, Conversion, CAC, ARPU, LTV/CAC, Data Integrity) | The company dashboard on the computer screen. "Users" are active customers. Data Integrity becomes the **reliability of internal data** (dirty data makes dashboard numbers noisy) |
+| Cash, win/lose, score | Cash is the company's money. When the company runs out of money it goes bankrupt (game over) |
+| 8 events with a symptom and a hidden root cause | **Market shocks**: news is the symptom; the real cause (interest rates, raw-material prices, exchange rate, competitor, fake news) stays hidden until you verify it |
+| Analysis cards (SQL Deep-Dive, A/B Test, Funnel Report, Clean Data) | **Analysis tools** used on the computer: query historical data, test hypotheses, cash-flow report, clean data and filter noisy sources. They cost Energy (focus) and Budget |
+| Action cards (Fix Checkout, Onboarding, Ads, Loyalty, SEO, Support, Influencer, Discount) | **Actions you recommend to the boss** in the report (renamed to fit the context: tighten receivables collection, retain customers, marketing spend, promotions, cut operating costs, etc.). The boss decides whether to act |
+| Remedy cards only remove an event once its cause is revealed (T-011) | A recommended action is only effective if you identified the shock's cause correctly |
+| "Truth versus what you saw" end screen | **End-of-day review meeting**: the boss reveals the truth and compares it with your forecast |
 
-## 3. Vòng chơi mỗi ngày
+## 3. Daily loop
 
-1. **Đến văn phòng (cảnh pixel).** Nhân vật đi vào văn phòng, chào đồng nghiệp, ngồi vào bàn. Sếp (Giám đốc Tài chính) gửi một **câu hỏi trong ngày**, ví dụ: "Giá nguyên liệu có tăng tiếp không? Chúng ta có nên nhập thêm hàng?"
-2. **Màn hình máy tính (khối chính của game).** Cửa sổ trong "internet giả lập":
-   - **Bản tin tài chính thế giới:** tin vĩ mô (lãi suất, lạm phát, tỷ giá), thị trường hàng hóa, chứng khoán.
-   - **Bảng giá:** mã chứng khoán và hàng hóa giả tưởng, biểu đồ giá theo ngày.
-   - **Mạng xã hội và diễn đàn:** tin đồn, ý kiến cá nhân, ảnh chụp "nội bộ".
-   - **Báo cáo chính thức:** thông cáo, số liệu thống kê (đáng tin nhưng thường trễ).
-   - **Dashboard công ty:** các chỉ số hiện có.
-   Mỗi tin có **nguồn**, **giờ đăng**, **độ chắc chắn tự nhận**. Người chơi đọc, ghim bằng chứng, loại tin nhiễu.
-3. **Công cụ phân tích.** Mỗi ngày có 3 Energy. Dùng công cụ để kiểm chứng: truy vấn lịch sử giá, đối chiếu hai nguồn, kiểm định giả thuyết, làm sạch dữ liệu. Kết quả: tin được xác nhận, bác bỏ, hoặc chưa đủ căn cứ.
-4. **Viết báo cáo cho sếp.** Chọn: (a) dự báo cho câu hỏi trong ngày (tăng, giảm, đi ngang), (b) mức tự tin (thấp, vừa, cao), (c) các bằng chứng đã ghim, (d) tối đa 2 hành động đề xuất. Gửi báo cáo.
-5. **Sếp quyết định.** Mức tin tưởng của sếp quyết định bao nhiêu đề xuất được thực hiện. Công ty chạy một tuần mô phỏng theo kinh tế hiện có (T-012), cộng với cú sốc thị trường thật đã được định trước.
-6. **Họp đánh giá cuối ngày.** Sự thật được công bố: tin nào đúng, nguyên nhân thật là gì. Bạn nhận điểm chính xác, thay đổi Tin tưởng, và thưởng hoặc phạt.
+1. **Arrive at the office (pixel scene).** The character walks into the office, greets colleagues, and sits at the desk. The boss (the Chief Financial Officer) sends a **question of the day**, for example: "Will raw-material prices keep rising? Should we order more stock?"
+2. **Computer screen (the main block of the game).** Windows inside a simulated "internet":
+   - **World financial news:** macro news (interest rates, inflation, exchange rates), commodity markets, stocks.
+   - **Price board:** fictional stock and commodity tickers, daily price charts.
+   - **Social media and forums:** rumors, personal opinions, "internal" screenshots.
+   - **Official reports:** press releases, statistics (reliable but often late).
+   - **Company dashboard:** the existing metrics.
 
-## 4. Mô hình thế giới giả lập
+   Each item has a **source**, a **posting time**, and a **self-declared confidence**. The player reads, pins evidence, and discards noise.
+3. **Analysis tools.** Each day has 3 Energy. Use tools to verify: query price history, cross-check two sources, test a hypothesis, clean data. Result: the item is confirmed, refuted, or there is not enough evidence.
+4. **Write the report for the boss.** Choose: (a) a forecast for the question of the day (up, down, flat), (b) a confidence level (low, medium, high), (c) the pinned evidence, (d) up to 2 recommended actions. Submit the report.
+5. **The boss decides.** The boss's trust level determines how many recommendations are carried out. The company runs a simulated week using the existing economy (T-012), plus the real market shock that was predetermined.
+6. **End-of-day review meeting.** The truth is revealed: which news was right and what the real cause was. You get an accuracy score, a change in Trust, and a bonus or penalty.
 
-Mỗi ván tạo ra một **kịch bản thế giới** từ seed (tái lập được):
+## 4. World simulation model
 
-- Một chuỗi **trạng thái thật ẩn** theo ngày: lãi suất, giá nguyên liệu, tỷ giá, tâm lý thị trường, vài mã chứng khoán, và cú sốc đang xảy ra (lấy từ 8 sự kiện hiện có, mở rộng sang bối cảnh vĩ mô).
-- Một **bộ phát sinh tin tức** từ các mẫu trong `data/news.json`. Mỗi tin có: nguồn và mức uy tín, nội dung, hướng tác động, độ lệch thời gian so với sự kiện thật, và **nhãn thật ẩn**: đúng, sai, đúng một phần, hoặc đã cũ.
-- Bản tin nhiễu theo uy tín nguồn: báo chính thống ít sai nhưng trễ, mạng xã hội nhanh nhưng nhiễu, tin "nội bộ" hay là bẫy.
+Each run generates a **world scenario** from a seed (reproducible):
 
-Tất cả công ty, mã chứng khoán, cơ quan, nhân vật và số liệu đều **hư cấu**. Không dùng tên công ty, thương hiệu, sự kiện hay số liệu thật.
+- A sequence of **hidden true states** per day: interest rate, raw-material price, exchange rate, market sentiment, a few stocks, and the shock currently happening (taken from the 8 existing events, extended to the macro setting).
+- A **news generator** that uses the templates in `data/news.json`. Each item has: source and credibility level, content, direction of impact, time offset relative to the real event, and a **hidden truth label**: true, false, partly true, or outdated.
+- News noise depends on source credibility: mainstream press is rarely wrong but late, social media is fast but noisy, "internal" tips are often traps.
 
-## 5. Dữ liệu một tin tức (mẫu)
+All companies, tickers, agencies, characters and figures are **fictional**. No real company names, brands, events or figures are used.
+
+## 5. News item data (sample)
 
 ```
 id, source{id,tier:"chinh_thuc|bao_chi|mang_xa_hoi|noi_bo"}, topic, headline,
-direction("tang|giam|ngang"), claimed_magnitude, published_at (giờ trong ngày),
-truth("dung|sai|mot_phan|cu") [ẩn], verified_by[tool ids], links_to_event
+direction("tang|giam|ngang"), claimed_magnitude, published_at (hour of day),
+truth("dung|sai|mot_phan|cu") [hidden], verified_by[tool ids], links_to_event
 ```
 
-## 6. Báo cáo và chấm điểm
+The identifier values such as `chinh_thuc`, `tang` and `dung` are data keys and are kept as is. Meaning: tier = official, press, social media, internal; direction = up, down, flat; truth = true, false, partly true, outdated.
 
-| Thành phần | Cách tính |
+## 6. Reports and scoring
+
+| Component | How it is computed |
 |---|---|
-| Độ chính xác dự báo | Dự báo đúng hướng và đúng độ lớn mức nào |
-| Hiệu chỉnh tự tin | Tự tin cao mà sai bị phạt nặng; tự tin thấp mà đúng thưởng ít (khuyến khích trung thực về độ bất định) |
-| Chất lượng bằng chứng | Dựa vào nguồn đã kiểm chứng thì cộng, dựa vào tin đồn chưa kiểm chứng thì trừ, kể cả khi dự báo vô tình đúng |
-| Tác động đến công ty | Thay đổi Cash do các đề xuất được sếp thực hiện |
+| Forecast accuracy | How correct the forecast is in direction and in magnitude |
+| Confidence calibration | High confidence and wrong is penalized heavily; low confidence and right is rewarded little (encourages honesty about uncertainty) |
+| Evidence quality | Relying on verified sources adds points; relying on unverified rumors subtracts points, even when the forecast happens to be right |
+| Impact on the company | Change in Cash caused by recommendations the boss carried out |
 
-## 7. Sự nghiệp, thưởng và phạt
+## 7. Career, rewards and penalties
 
-Thang chức: Thực tập, Chuyên viên, Chuyên viên chính, Trưởng nhóm, Giám đốc Phân tích. Chỉ số **Tin tưởng của sếp** 0 đến 100, khởi điểm 50 (giá trị khởi điểm, chỉnh bằng mô phỏng cân bằng).
+Rank ladder: Intern, Analyst, Senior Analyst, Team Lead, Director of Analytics. The **Boss Trust** metric runs from 0 to 100 and starts at 50 (a starting value, to be tuned by balance simulation).
 
-- Báo cáo tốt: Tin tưởng tăng, nhận thưởng tiền. Đủ điều kiện (Tin tưởng cao và vài báo cáo đúng liên tiếp) thì được thăng chức, đổi nhiệm vụ và quyền đề xuất nhiều hành động hơn.
-- Báo cáo sai: Tin tưởng giảm. Sai nặng hoặc sai liên tiếp thì bị cảnh cáo, trừ lương, giáng chức. Tin tưởng chạm 0, hoặc bị giáng chức hai lần, thì **bị đuổi việc** (kết thúc ván).
-- Công ty phá sản (Cash về 0) cũng kết thúc ván, kèm ảnh chụp lại những báo cáo đã dẫn tới nó.
-- Thắng: kết thúc ván với công ty còn sống và chức vụ cao hơn lúc đầu. Điểm tổng hợp từ chức vụ, Tin tưởng, Cash và số cú sốc xử lý đúng.
+- Good report: Trust rises and you receive a cash bonus. When the conditions are met (high Trust and several correct reports in a row) you are promoted, get new duties and the right to recommend more actions.
+- Bad report: Trust drops. A severe or repeated error leads to a warning, a pay cut, or a demotion. If Trust reaches 0, or you are demoted twice, you are **fired** (game over).
+- Company bankruptcy (Cash reaches 0) also ends the run, with a recap of the reports that led to it.
+- Win: the run ends with the company alive and a higher rank than at the start. The total score combines rank, Trust, Cash and the number of shocks handled correctly.
 
-## 8. Mỹ thuật và âm thanh
+## 8. Art and sound
 
-- 640x360, scale nguyên, nearest filter (đã cấu hình). Phong cách pixel art, văn phòng nhìn ngang, bảng màu giới hạn (đề xuất tối đa 32 màu; sẽ khóa trong style bible mới).
-- Cảnh: văn phòng chung, bàn của người chơi, phòng sếp, phòng họp. Chuyển sang màn hình máy tính bằng cách "ngồi vào bàn". Ngày đổi theo ánh sáng cửa sổ.
-- Màn hình máy tính là giao diện có cửa sổ kéo, tab, thanh tác vụ giả lập (nhưng không là hệ điều hành hay trình duyệt thật).
-- Âm thanh: tiếng phím, chuông thông báo, nhạc nền nhẹ. Chỉ dùng âm thanh tự tạo hoặc giấy phép rõ ràng.
+- 640x360, integer scaling, nearest filter (already configured). Pixel-art style, side-view office, limited palette (proposal: at most 32 colors; to be locked in the new style bible).
+- Scenes: open-plan office, the player's desk, the boss's office, the meeting room. Switch to the computer screen by "sitting down at the desk". The day changes with the window light.
+- The computer screen is an interface with draggable windows, tabs, and a simulated taskbar (but not a real operating system or browser).
+- Sound: key clicks, a notification chime, light background music. Only self-made or clearly licensed audio.
 
-## 9. Phạm vi demo (10 ngày)
+## 9. Demo scope (10 days)
 
-3 nguồn tin cơ bản, khoảng 40 mẫu tin, 6 chủ đề thị trường, 8 cú sốc (từ 8 sự kiện hiện có), 3 mức chức vụ, 1 sếp, 3 đồng nghiệp trang trí, 1 bàn làm việc. Chưa có: nhiều công ty, lưu tiến trình, bảng xếp hạng, đa ngôn ngữ.
+3 basic news sources, about 40 news templates, 6 market topics, 8 shocks (from the 8 existing events), 3 rank levels, 1 boss, 3 decorative colleagues, 1 desk. Not included: multiple companies, save progress, leaderboards, multiple languages.
 
-## 10. Kế hoạch tái sử dụng mã
+## 10. Code reuse plan
 
-Giữ nguyên `scripts/sim/` (kinh tế công ty, thẻ, sự kiện, điểm) làm "mô phỏng công ty". Thêm tầng mới `scripts/world/` (trạng thái thế giới ẩn, bộ phát sinh tin tức, báo cáo và chấm điểm, sự nghiệp) gọi vào mô phỏng công ty. Giao diện mới (văn phòng và màn hình máy tính) thay `scenes/game.tscn`; cảnh dashboard hiện tại trở thành một cửa sổ của màn hình máy tính. Toàn bộ kiểm thử hiện có phải tiếp tục qua.
+Keep `scripts/sim/` (company economy, cards, events, score) unchanged as the "company simulation". Add a new layer `scripts/world/` (hidden world state, news generator, reports and scoring, career) that calls into the company simulation. The new UI (office and computer screen) replaces `scenes/game.tscn`; the current dashboard scene becomes one window on the computer screen. All existing tests must keep passing.
 
-## 11. Trung thực và quy định
+## 11. Honesty and compliance
 
-- Mọi tên, số liệu, sự kiện trong game là hư cấu. Hiện rõ trong game và trên trang giới thiệu: "Số liệu trong game là mô phỏng hư cấu, không phải dữ liệu thị trường thật và không phải lời khuyên đầu tư."
-- Không bán hay gợi ý cách giao dịch thật; không có tiền thật trong game.
-- Không dùng thương hiệu, nhân vật, ảnh, âm nhạc có bản quyền. Asset phải có giấy phép rõ ràng hoặc do ta tạo ra.
-- Ghi rõ nội dung do AI hỗ trợ tạo ra khi nền tảng yêu cầu.
-- Landing page hiện tại (T-007) mô tả game cũ: phải viết lại sau khi hướng đi này được duyệt, chỉ nói những gì bản mới thật sự có.
+- All names, figures and events in the game are fictional. State this clearly in the game and on the landing page: "Figures in this game are fictional simulations, not real market data and not investment advice."
+- Do not sell or suggest how to trade for real; there is no real money in the game.
+- Do not use copyrighted brands, characters, images or music. Assets must have a clear license or be created by us.
+- Disclose AI-assisted content when a platform requires it.
+- The current landing page (T-007) describes the old game: it must be rewritten after this direction is approved, and may only say what the new version actually has.
 
-## 12. Lộ trình đề xuất (giai đoạn)
+## 12. Proposed roadmap (phases)
 
-| Giai đoạn | Nội dung | Owner |
+| Phase | Content | Owner |
 |---|---|---|
-| A | Style bible mới và content bible (mẫu tin, nguồn, chủ đề, nhân vật) | Claude |
-| B | Tầng thế giới: kịch bản thế giới, phát sinh tin tức, báo cáo, chấm điểm, sự nghiệp, kèm mô phỏng cân bằng chạy không giao diện | Codex theo spec |
-| C | Giao diện: cảnh văn phòng, màn hình máy tính và các cửa sổ, luồng báo cáo, họp cuối ngày (mỹ thuật tạm) | Codex theo spec |
-| D | Pass mỹ thuật pixel và âm thanh | Cần quyết định nguồn asset (mục 13) |
-| E | QA, playtest, cập nhật landing page và video theo bản mới | Claude |
+| A | New style bible and content bible (news templates, sources, topics, characters) | Claude |
+| B | World layer: world scenario, news generator, reports, scoring, career, with a headless balance simulation | Codex per spec |
+| C | UI: office scene, computer screen and windows, report flow, end-of-day meeting (temporary art) | Codex per spec |
+| D | Pixel art and sound pass | Needs a decision on the asset source (section 13) |
+| E | QA, playtest, update the landing page and video for the new version | Claude |
 
-## 13. Câu hỏi mở
+## 13. Open questions
 
-1. **Nguồn mỹ thuật pixel: ĐÃ CHỐT (VU, 2026-11-10): sprite viết bằng mã.** Sprite đơn giản tạo bằng mã (script sinh ảnh hoặc vẽ trong Godot) với bảng màu giới hạn, bản quyền thuộc dự án. Có thể thay bằng bản vẽ đẹp hơn sau. Style bible (T-016) phải mô tả sprite ở mức đơn giản khả thi bằng mã (nhân vật khoảng 16x24, bàn, máy tính, cửa sổ UI).
-2. **Bản v2 thay thế hay cùng tồn tại với bản dashboard hiện tại?** Mặc định đề xuất: giữ bản hiện tại trên `master` như một mốc (gắn tag), phát triển v2 trên nhánh riêng, chỉ thay khi đạt bản demo. Chưa được VU xác nhận.
-3. **Tên game:** mặc định giữ "Data Corp (tên tạm)", kiểm tra trùng tên trước khi phát hành. Chưa được VU xác nhận.
-4. **Bối cảnh vĩ mô hư cấu:** mặc định dùng một "cuộc khủng hoảng tín dụng" chung chung trong thế giới hư cấu không gắn quốc gia hay sự kiện thật. Chưa được VU xác nhận.
+1. **Pixel art source: DECIDED (owner, 2026-11-10): code-written sprites.** Simple sprites generated by code (an image-generating script or drawn inside Godot) with a limited palette; the project owns the copyright. They can be replaced with nicer hand-drawn art later. The style bible (T-016) must describe sprites at a simple level that is feasible in code (characters about 16x24, desk, computer, UI windows).
+2. **Does v2 replace the current dashboard version or coexist with it?** Default proposal: keep the current version on `master` as a milestone (tagged), develop v2 on a separate branch, and replace only when the demo is reached. Not yet confirmed by the owner.
+3. **Game name:** default is to keep "Data Corp (working title)", with a name-collision check before release. Not yet confirmed by the owner.
+4. **Fictional macro setting:** default is a generic "credit crisis" in a fictional world not tied to any real country or event. Not yet confirmed by the owner.

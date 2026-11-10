@@ -232,6 +232,8 @@ func test_tutorial() -> void:
 	var flow: Node = Flow.new()
 	flow.autostart = false
 	flow.fade_enabled = false
+	flow.evening_enabled = false
+	flow.commute_enabled = false
 	root.add_child(flow)
 	flow.start_with_game(Game.new(104, 10))
 	flow.skip_intro()
