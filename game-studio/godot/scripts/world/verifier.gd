@@ -11,7 +11,7 @@ func verify(item: Dictionary, tool_id: String, sim: RefCounted) -> Dictionary:
 	if not _config.tools.has(tool_id): return {"ok":false,"error":"invalid_tool"}
 	if item.results.has(tool_id):
 		return {"ok":true,"result":item.results[tool_id],"energy_left":sim.state.energy}
-	if not sim.use_tool(_config.tools[tool_id]): return {"ok":false,"error":"insufficient_resources"}
+	if not sim.use_tool(_config.tools[tool_id], float(_config.tool_budget.get(tool_id, -1))): return {"ok":false,"error":"insufficient_resources"}
 	var result := "chua_du_can_cu"
 	if tool_id in item.verify_with:
 		match item.truth:

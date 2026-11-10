@@ -99,6 +99,11 @@ static func median(values: Array) -> float:
 	var size := values.size()
 	return (float(values[(size - 1) / 2]) + float(values[size / 2])) / 2.0
 
+static func percentile(values: Array, fraction: float) -> float:
+	values.sort()
+	var position := (values.size() - 1) * fraction
+	return lerpf(float(values[int(floor(position))]), float(values[int(ceil(position))]), position - floor(position))
+
 func _init() -> void:
 	var config: Dictionary = Loader.load_json("res://data/world.json")
 	var games := int(config.balance.games)
@@ -107,18 +112,25 @@ func _init() -> void:
 		if arg.begins_with("--games="): games = int(arg.trim_prefix("--games="))
 		if arg.begins_with("--days="): days = int(arg.trim_prefix("--days="))
 	assert(games > 0 and days in [10, 30])
-	print("days | bot | games | win % | fired % | bankrupt % | survived % | trust median | rank median | accuracy | ev | all kinds %")
+	if "--trace" in OS.get_cmdline_user_args():
+		trace_reports(config, games)
+		quit()
+		return
+	print("days | bot | games | win % | fired % | bankrupt % | survived % | demoted % | warned % | heavy % | trust p25/p50/p75 | rank median | accuracy | ev | all kinds %")
 	var all_shocks := {}
 	var bots := ["random_reporter", "rumor_follower", "official_only", "verifier", "careful_hedger"]
 	var stats := {}
 	for bot in bots:
-		stats[bot] = {"wins":0,"fired":0,"bankrupt":0,"survived":0,"trusts":[],"ranks":[],"accuracy":0.0,"ev":0.0,"covered":0}
+		stats[bot] = {"wins":0,"fired":0,"bankrupt":0,"survived":0,"demoted":0,"warned":0,"heavy":0,"trusts":[],"ranks":[],"accuracy":0.0,"ev":0.0,"covered":0}
 	for i in games:
 		for bot in bots:
 			var result := run_game(int(config.balance.seed) + i, days, bot)
 			var row: Dictionary = stats[bot]
 			row.wins += int(result.won)
 			row[result.ending] += 1
+			row.demoted += int(result.demotions > 0)
+			row.warned += int(result.warnings > 0)
+			row.heavy += int(result.ending == "fired" or result.demotions > 0)
 			row.trusts.append(result.trust)
 			for rank in config.ranks.size():
 				if config.ranks[rank].id == result.rank: row.ranks.append(rank)
@@ -128,6 +140,34 @@ func _init() -> void:
 			for shock in result.shocks_seen: all_shocks[shock] = true
 	for bot in bots:
 		var row: Dictionary = stats[bot]
-		print("%d | %s | %d | %.2f | %.2f | %.2f | %.2f | %.2f | %.1f | %.4f | %.4f | %.2f" % [days, bot, games, row.wins * 100.0 / games, row.fired * 100.0 / games, row.bankrupt * 100.0 / games, row.survived * 100.0 / games, median(row.trusts), median(row.ranks), row.accuracy / games, row.ev / games, row.covered * 100.0 / games])
+		print("%d | %s | %d | %.2f | %.2f | %.2f | %.2f | %.2f | %.2f | %.2f | %.2f/%.2f/%.2f | %.1f | %.4f | %.4f | %.2f" % [days, bot, games, row.wins * 100.0 / games, row.fired * 100.0 / games, row.bankrupt * 100.0 / games, row.survived * 100.0 / games, row.demoted * 100.0 / games, row.warned * 100.0 / games, row.heavy * 100.0 / games, percentile(row.trusts, 0.25), median(row.trusts), percentile(row.trusts, 0.75), median(row.ranks), row.accuracy / games, row.ev / games, row.covered * 100.0 / games])
 	print("shock coverage: %d/8" % all_shocks.size())
 	quit()
+
+# Offline coefficient screening uses only reports disclosed by review().
+# Career and cash are neutralized here to retain complete report sequences;
+# every candidate still requires an ordinary end-to-end balance run.
+func trace_reports(config: Dictionary, games: int) -> void:
+	var company: Dictionary = Loader.load_json("res://data/config.json").duplicate(true)
+	company.initial.cash = 1000000000
+	var output := {}
+	for days in [10, 30]:
+		var rows := {}
+		for bot in ["random_reporter", "rumor_follower", "official_only", "verifier", "careful_hedger"]: rows[bot] = []
+		for i in games:
+			for bot in rows:
+				var seed_value := int(config.balance.seed) + i
+				var game := Game.new(seed_value, days, {"world":{"grading":{"base":0},"career":{"initial_trust":100}},"simulation":{"config":company}})
+				var rng := RandomNumberGenerator.new()
+				rng.seed = seed_value + 10000
+				var reports := []
+				while not game.status().finished:
+					game.begin_day()
+					var report := propose(game, bot, rng)
+					assert(game.submit_report(report).ok)
+					game.end_day()
+					var result: Dictionary = game.review(game.status().day).result
+					reports.append([result.acc, result.ev, report.confidence])
+				rows[bot].append(reports)
+		output[str(days)] = rows
+	print(JSON.stringify(output))
