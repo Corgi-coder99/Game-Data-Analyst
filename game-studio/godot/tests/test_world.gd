@@ -327,6 +327,7 @@ func test_score_sweep() -> void:
 
 func _init() -> void:
 	test_status_energy()
+	test_max_actions()
 	test_analysis_energy()
 	config = Loader.load_json("res://data/world.json")
 	test_public_and_replay()
@@ -546,3 +547,25 @@ func test_status_energy() -> void:
 	check(game.submit_report(submission(game)).ok and game.end_day().ok, "energy test closes day")
 	game.begin_day()
 	check(game.status().energy == game.status().energy_max and game.status().energy == 3, "energy resets next day")
+
+func test_max_actions() -> void:
+	var ranks_cfg: Array = Game.new(104, 10)._config.ranks
+	var game := Game.new(104, 10)
+	check(game.status().max_actions is int and game.status().max_actions == int(ranks_cfg[0].actions), "max_actions integer at the starting rank")
+	check(public_only(game.status()), "max_actions adds no secret keys")
+	for index in ranks_cfg.size():
+		game._career.rank = index
+		check(game.status().max_actions == int(ranks_cfg[index].actions), "max_actions follows rank " + str(ranks_cfg[index].id))
+	# Promotion and demotion change the value through the real career rules.
+	var promoted := Game.new(104, 10)
+	promoted._career.rank = 0
+	promoted._career.trust = 100.0
+	promoted._career._tenure = 10
+	promoted._career._correct = 5
+	var career_result: Dictionary = promoted._career.update({"acc":1.0,"ev":1.0,"delta":1.0})
+	check(career_result.rank == "chuyen_vien" and promoted.status().max_actions == int(ranks_cfg[1].actions), "max_actions after promotion")
+	var demoted := Game.new(104, 10)
+	demoted._career.rank = 2
+	demoted._career.trust = 20.0
+	demoted._career.update({"acc":0.0,"ev":0.0,"delta":-10.0})
+	check(demoted.status().rank == "chuyen_vien" and demoted.status().max_actions == int(ranks_cfg[1].actions), "max_actions after demotion")

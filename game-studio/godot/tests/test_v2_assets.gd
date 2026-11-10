@@ -37,7 +37,7 @@ func run() -> void:
 	"desk":[48,24,2],"chair":[16,24,1],"plant":[16,24,2],"cabinet":[24,32,1],
 	"window":[32,32,3],"door":[24,40,2],"floor":[16,16,1],"wall":[16,16,1],
 	"baseboard":[16,16,1],"clock":[16,16,1]}
-	for icon in ["arrow_up","arrow_down","arrow_flat","check","cross","question","lock","shield","newspaper","bubble","flag"]:
+	for icon in ["arrow_up","arrow_down","arrow_flat","check","cross","question","lock","shield","newspaper","bubble","flag","dash","clock_old"]:
 		expected[icon] = [8,8,1]
 	check(first.size() == expected.size(),"complete sprite inventory")
 	for id in expected:

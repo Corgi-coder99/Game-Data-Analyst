@@ -172,7 +172,7 @@ func status() -> Dictionary:
 		if _config.ranks[index].id == minimum_rank: eligible = true
 	var won: bool = _ending == "survived" and eligible
 	var score: float = (float(_config.score.win_bonus) if won else 0.0) + _career.trust * float(_config.score.trust) + _career.positive_delta * float(_config.score.positive_delta) - _career.demotions * float(_config.score.demotion) - (float(_config.score.fired) if _ending == "fired" else 0.0)
-	return {"energy":_analysis_energy,"energy_max":int(_config.analysis_energy),"day":_day,"horizon":_horizon,"rank":_config.ranks[_career.rank].id,"trust":_career.trust,"warnings":_career.warnings,"demotions":_career.demotions,"personal_pay":_career.personal_pay,"cash_report":_cash_report,"finished":not _ending.is_empty(),"ending":_ending,"won":won,"score":score}
+	return {"energy":_analysis_energy,"energy_max":int(_config.analysis_energy),"max_actions":int(_config.ranks[_career.rank].actions),"day":_day,"horizon":_horizon,"rank":_config.ranks[_career.rank].id,"trust":_career.trust,"warnings":_career.warnings,"demotions":_career.demotions,"personal_pay":_career.personal_pay,"cash_report":_cash_report,"finished":not _ending.is_empty(),"ending":_ending,"won":won,"score":score}
 
 func report_snapshot() -> Dictionary:
 	return _sim.report().duplicate(true)
