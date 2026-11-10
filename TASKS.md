@@ -12,6 +12,7 @@ Trạng thái: Backlog -> In progress -> Review -> Done. Bị chặn thì chuy�
 | T-002 (ví dụ) | Cài đặt tính năng X theo spec T-001 | Codex | codex/T-002 | src/x.py, tests/test_x.py | Kiểm thử qua, đúng spec |
 | T-008 | check_web.py: ép stdout UTF-8 để không lỗi UnicodeEncodeError trên console Windows mặc định | Codex | codex/T-008 | media-marketing/web/check_web.py | Chạy `python -I check_web.py` (không cần -X utf8) qua 6 mục |
 | T-010 | Kịch bản và video quảng cáo 30 giây (làm sau T-012 để cảnh quay không hiện công ty gần hết người dùng) | Claude/Codex | chưa chốt | media-marketing/video/* | Chưa có spec |
+| T-018c | Khan hiếm kiểm chứng: kho Energy phân tích riêng (3 mỗi ngày), tool_energy trong world.json, mã lỗi no_analysis_energy; cân bằng lại bot. Spec xong, giao sau khi T-019b được merge | Codex | codex/T-018c | game-studio/godot/data/world.json, scripts/world/*, scripts/sim/simulation.gd (chỉ use_tool), scripts/v2/desktop.gd, scripts/v2/windows/tools_window.gd (chỉ Energy), data/strings_v2.json, tests/* | Xem game-studio/godot/docs/SPEC-T-018c.md |
 | T-019c | Giao diện v2 phần c: soạn báo cáo, họp cuối ngày, vòng chơi 10 ngày, màn tiêu đề và kết thúc. Cần spec, sau T-019b | Codex | codex/T-019c | scenes/v2/*, scripts/v2/*, data/strings_v2.json, tests/* | Chưa có spec |
 | T-019d | Giao diện v2 phần d: hiệu ứng, chỉnh theo playtest và ảnh chụp. Sau T-019c | Codex | codex/T-019d | scenes/v2/*, scripts/v2/*, assets/v2/* | Chưa có spec |
 
