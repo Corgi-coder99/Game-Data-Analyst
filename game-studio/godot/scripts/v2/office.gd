@@ -122,8 +122,8 @@ func _build_dialog() -> void:
 	speaker_label.clip_text = true
 	dialog.add_child(speaker_label)
 	dialog_text = RichTextLabel.new()
-	dialog_text.position = Vector2i(12,23)
-	dialog_text.size = Vector2i(568,45)
+	dialog_text.position = Vector2i(12,28)
+	dialog_text.size = Vector2i(568,44)
 	dialog_text.add_theme_font_size_override("normal_font_size",12)
 	dialog_text.add_theme_color_override("default_color",Palette.color(7))
 	dialog_text.bbcode_enabled = false

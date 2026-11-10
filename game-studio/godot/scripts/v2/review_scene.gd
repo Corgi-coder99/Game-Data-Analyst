@@ -157,6 +157,7 @@ func _render_step() -> void:
 	header_label.text = "%d/%d  %s" % [step + 1, STEP_COUNT, strings.review.steps[step]]
 	var last := step == STEP_COUNT - 1
 	continue_button.text = strings.review["continue"] if not last else (strings.review.to_ending if bool(status.finished) else strings.review.next_day)
+	if step >= 1 and step <= 4: _say("", strings.review.say[step])
 	match step:
 		0: _step_reaction()
 		1: _step_answer()

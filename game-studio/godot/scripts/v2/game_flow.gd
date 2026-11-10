@@ -174,6 +174,7 @@ func _on_seated() -> void:
 	boss_shown = true
 	var text := str(game.question_today().get("text", ""))
 	boss_log.append({"category":"question", "text":text})
+	office.set_hint_visible(false)
 	office.play_boss_appears(text)
 
 func _on_dialog_closed() -> void:

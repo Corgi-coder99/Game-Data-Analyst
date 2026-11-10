@@ -47,14 +47,14 @@ func _build() -> void:
 	quit_button.pressed.connect(func(): quit_requested.emit())
 	var strip := ColorRect.new()
 	strip.color = Palette.color(2)
-	strip.position = Vector2(0, 330)
-	strip.size = Vector2(640, 30)
+	strip.position = Vector2(0, 328)
+	strip.size = Vector2(640, 32)
 	strip.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(strip)
-	disclaimer_label = label(strip, strings.ui.disclaimer, Rect2(8, 3, 624, 24), 7)
+	disclaimer_label = label(strip, strings.ui.disclaimer, Rect2(8, 2, 624, 28), 7)
 	disclaimer_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	disclaimer_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	disclaimer_label.size = Vector2(624, 24)
+	disclaimer_label.size = Vector2(624, 28)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if not is_visible_in_tree(): return

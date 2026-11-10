@@ -62,14 +62,14 @@ func show_ending(final_status: Dictionary) -> void:
 	var heading := _text(panel, strings.ending[ending], Rect2(12, 8, 376, 17), 8, 12)
 	boss_category = boss_category_for(status)
 	boss_line = strings.boss_lines[boss_category]
-	var quote := _text(panel, strings.flow.boss + ": " + boss_line, Rect2(12, 30, 376, 36), 7, 12)
+	var quote := _text(panel, strings.flow.boss + ": " + boss_line, Rect2(12, 28, 376, 40), 7, 12)
 	quote.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	quote.max_lines_visible = 2
 	var y := 70
 	if ending == "bankrupt":
-		_text(panel, strings.ending.bankrupt_note, Rect2(12, y, 376, 12), 26)
+		_text(panel, strings.ending.bankrupt_note, Rect2(12, 72, 376, 12), 26)
 	elif ending == "fired":
-		_text(panel, strings.ending.empty_desk, Rect2(12, y, 376, 12), 26)
+		_text(panel, strings.ending.empty_desk, Rect2(12, 72, 376, 12), 26)
 	y = 86
 	var lines := [
 		strings.ending.rank % strings.ranks[status.rank],

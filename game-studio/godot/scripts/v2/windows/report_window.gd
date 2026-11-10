@@ -153,6 +153,7 @@ func render() -> void:
 		y += 15
 	for item in evidence:
 		var headline := label(content, item.headline, Rect2(0, y, 122, 12))
+		headline.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 		headline.tooltip_text = item.headline
 		headline.mouse_filter = Control.MOUSE_FILTER_PASS
 		var status: String = item.verification
@@ -160,7 +161,7 @@ func render() -> void:
 		icon(content, VERIFY_ICONS[status], Vector2(126, y + 2))
 		var status_text: String = strings.report.unverified if status == "chua_kiem_chung" else strings.verification[status]
 		label(content, status_text, Rect2(136, y, 70, 12), VERIFY_COLORS[status])
-		var unpin := button(content, strings.report.unpin, Rect2(208, y - 1, 24, 14))
+		var unpin := button(content, strings.report.unpin, Rect2(208, y, 24, 14))
 		unpin.clip_text = true
 		unpin.tooltip_text = strings.ui.unpin
 		unpin.pressed.connect(func(): if not locked: unpin_requested.emit(item.uid))
