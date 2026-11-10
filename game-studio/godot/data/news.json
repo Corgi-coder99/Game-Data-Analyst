@@ -1,0 +1,731 @@
+{
+ "version": 1,
+ "note": "Toàn bộ nguồn, công ty, mã chứng khoán và số liệu trong file này là HƯ CẤU. Không phải dữ liệu thị trường thật, không phải lời khuyên đầu tư.",
+ "tiers": {
+  "chinh_thuc": "Nguồn chính thức: đáng tin, thường trễ",
+  "bao_chi": "Báo chí: khá đáng tin, hiếm khi sai",
+  "mang_xa_hoi": "Mạng xã hội: nhanh nhưng nhiễu",
+  "noi_bo": "Tin nội bộ: nặc danh thì hay là bẫy, đồng nghiệp thì đáng tin vừa"
+ },
+ "sources": [
+  {
+   "id": "cuc_thong_ke",
+   "name": "Cục Thống kê Tân Lạc",
+   "tier": "chinh_thuc",
+   "reliability": 0.95,
+   "delay_days": 2
+  },
+  {
+   "id": "ngan_hang_tw",
+   "name": "Ngân hàng Trung ương Tân Lạc",
+   "tier": "chinh_thuc",
+   "reliability": 0.97,
+   "delay_days": 0
+  },
+  {
+   "id": "so_giao_dich",
+   "name": "Sở Giao dịch Tân Lạc",
+   "tier": "chinh_thuc",
+   "reliability": 0.97,
+   "delay_days": 0
+  },
+  {
+   "id": "nhat_bao",
+   "name": "Nhật báo Tân Lạc",
+   "tier": "bao_chi",
+   "reliability": 0.82,
+   "delay_days": 1
+  },
+  {
+   "id": "ban_tin_sang",
+   "name": "Bản tin Tài chính Sáng",
+   "tier": "bao_chi",
+   "reliability": 0.8,
+   "delay_days": 0
+  },
+  {
+   "id": "dai_duong",
+   "name": "Hãng tin Đại Dương",
+   "tier": "bao_chi",
+   "reliability": 0.85,
+   "delay_days": 1
+  },
+  {
+   "id": "dien_dan_an_danh",
+   "name": "Diễn đàn Nhà đầu tư Ẩn danh",
+   "tier": "mang_xa_hoi",
+   "reliability": 0.4,
+   "delay_days": 0
+  },
+  {
+   "id": "tam_chuyen",
+   "name": "Mạng Tám Chuyện",
+   "tier": "mang_xa_hoi",
+   "reliability": 0.45,
+   "delay_days": 0
+  },
+  {
+   "id": "noi_bo_nac_danh",
+   "name": "Tin nội bộ (nặc danh)",
+   "tier": "noi_bo",
+   "reliability": 0.35,
+   "delay_days": 0
+  },
+  {
+   "id": "dong_nghiep",
+   "name": "Đồng nghiệp trong công ty",
+   "tier": "noi_bo",
+   "reliability": 0.6,
+   "delay_days": 0
+  }
+ ],
+ "kinds": {
+  "signal": "tin phản ánh đúng trạng thái hoặc cú sốc thật",
+  "trap": "tin sai hoặc phóng đại, dễ gây hiểu lầm",
+  "partial": "đúng một phần, thiếu hoặc sai độ lớn",
+  "stale": "tin đúng nhưng đã cũ so với hiện tại",
+  "noise": "không liên quan đến công ty"
+ },
+ "news": [
+  {
+   "id": "lai_suat_nhtw_tang",
+   "topic": "lai_suat",
+   "source_id": "ngan_hang_tw",
+   "source_tier": "chinh_thuc",
+   "headline": "Ngân hàng Trung ương Tân Lạc nâng lãi suất điều hành thêm {pct} điểm %",
+   "direction": "tang",
+   "kind": "signal",
+   "truth": "dung",
+   "link": "state:lai_suat",
+   "verify_with": [
+    "doi_chieu_nguon",
+    "truy_van_lich_su"
+   ],
+   "magnitude_pct": {
+    "low": 1,
+    "mid": 3,
+    "high": 6
+   }
+  },
+  {
+   "id": "lai_suat_du_bao_tang",
+   "topic": "lai_suat",
+   "source_id": "ban_tin_sang",
+   "source_tier": "bao_chi",
+   "headline": "Giới phân tích: lãi suất vay doanh nghiệp có thể tăng trong tuần tới",
+   "direction": "tang",
+   "kind": "signal",
+   "truth": "dung",
+   "link": "state:lai_suat",
+   "verify_with": [
+    "doi_chieu_nguon",
+    "truy_van_lich_su"
+   ]
+  },
+  {
+   "id": "lai_suat_don_tang_manh",
+   "topic": "lai_suat",
+   "source_id": "tam_chuyen",
+   "source_tier": "mang_xa_hoi",
+   "headline": "Nghe nói ngân hàng sắp tăng lãi suất cực mạnh, ai đang vay trả nợ sớm đi!",
+   "direction": "tang",
+   "kind": "trap",
+   "truth": "sai",
+   "link": "state:lai_suat",
+   "verify_with": [
+    "doi_chieu_nguon",
+    "truy_van_lich_su"
+   ]
+  },
+  {
+   "id": "lai_suat_nhtw_giu",
+   "topic": "lai_suat",
+   "source_id": "ngan_hang_tw",
+   "source_tier": "chinh_thuc",
+   "headline": "Ngân hàng Trung ương giữ nguyên lãi suất điều hành",
+   "direction": "ngang",
+   "kind": "signal",
+   "truth": "dung",
+   "link": "state:lai_suat",
+   "verify_with": [
+    "doi_chieu_nguon",
+    "truy_van_lich_su"
+   ]
+  },
+  {
+   "id": "lai_suat_hai_chuyen_gia",
+   "topic": "lai_suat",
+   "source_id": "dien_dan_an_danh",
+   "source_tier": "mang_xa_hoi",
+   "headline": "Chuyên gia A nói lãi suất sẽ giảm, chuyên gia B nói sẽ tăng",
+   "direction": "ngang",
+   "kind": "noise",
+   "truth": "khong_lien_quan",
+   "link": null,
+   "verify_with": [
+    "doi_chieu_nguon",
+    "truy_van_lich_su"
+   ]
+  },
+  {
+   "id": "ty_gia_mat_gia",
+   "topic": "ty_gia",
+   "source_id": "so_giao_dich",
+   "source_tier": "chinh_thuc",
+   "headline": "Đồng lạc mất giá {pct}% so với đô la quốc tế trong phiên hôm nay",
+   "direction": "giam",
+   "kind": "signal",
+   "truth": "dung",
+   "link": "state:ty_gia",
+   "verify_with": [
+    "doi_chieu_nguon",
+    "truy_van_lich_su"
+   ],
+   "magnitude_pct": {
+    "low": 1,
+    "mid": 2,
+    "high": 5
+   }
+  },
+  {
+   "id": "ty_gia_nhap_khau_dat",
+   "topic": "ty_gia",
+   "source_id": "nhat_bao",
+   "source_tier": "bao_chi",
+   "headline": "Nhập khẩu đắt lên khi tỷ giá tăng, doanh nghiệp phân phối chịu áp lực",
+   "direction": "tang",
+   "kind": "signal",
+   "truth": "dung",
+   "link": "state:ty_gia",
+   "verify_with": [
+    "doi_chieu_nguon",
+    "truy_van_lich_su"
+   ]
+  },
+  {
+   "id": "ty_gia_don_sup",
+   "topic": "ty_gia",
+   "source_id": "tam_chuyen",
+   "source_tier": "mang_xa_hoi",
+   "headline": "Đồng lạc sắp sụp, đổi hết ra ngoại tệ đi!",
+   "direction": "giam",
+   "kind": "trap",
+   "truth": "sai",
+   "link": "state:ty_gia",
+   "verify_with": [
+    "doi_chieu_nguon",
+    "truy_van_lich_su"
+   ]
+  },
+  {
+   "id": "ty_gia_noi_bo_can_thiep",
+   "topic": "ty_gia",
+   "source_id": "noi_bo_nac_danh",
+   "source_tier": "noi_bo",
+   "headline": "Nguồn tin nội bộ ngân hàng: chiều nay sẽ có can thiệp tỷ giá",
+   "direction": "giam",
+   "kind": "trap",
+   "truth": "sai",
+   "link": "state:ty_gia",
+   "verify_with": [
+    "doi_chieu_nguon",
+    "truy_van_lich_su"
+   ]
+  },
+  {
+   "id": "ty_gia_on_dinh",
+   "topic": "ty_gia",
+   "source_id": "ngan_hang_tw",
+   "source_tier": "chinh_thuc",
+   "headline": "Tỷ giá ổn định trong biên độ cho phép",
+   "direction": "ngang",
+   "kind": "signal",
+   "truth": "dung",
+   "link": "state:ty_gia",
+   "verify_with": [
+    "doi_chieu_nguon",
+    "truy_van_lich_su"
+   ]
+  },
+  {
+   "id": "ty_gia_hoi_nghi",
+   "topic": "ty_gia",
+   "source_id": "dai_duong",
+   "source_tier": "bao_chi",
+   "headline": "Hội nghị kinh tế khu vực thảo luận hợp tác thương mại",
+   "direction": "ngang",
+   "kind": "noise",
+   "truth": "khong_lien_quan",
+   "link": null,
+   "verify_with": [
+    "doi_chieu_nguon",
+    "truy_van_lich_su"
+   ]
+  },
+  {
+   "id": "nguyen_lieu_chi_so_tang",
+   "topic": "nguyen_lieu",
+   "source_id": "cuc_thong_ke",
+   "source_tier": "chinh_thuc",
+   "headline": "Chỉ số giá nguyên liệu nhập khẩu của tháng trước tăng {pct}%",
+   "direction": "tang",
+   "kind": "stale",
+   "truth": "cu",
+   "link": "state:nguyen_lieu",
+   "verify_with": [
+    "truy_van_lich_su",
+    "kiem_dinh_gia_thuyet"
+   ],
+   "magnitude_pct": {
+    "low": 1,
+    "mid": 3,
+    "high": 6
+   }
+  },
+  {
+   "id": "nguyen_lieu_nhua_thep_tang",
+   "topic": "nguyen_lieu",
+   "source_id": "ban_tin_sang",
+   "source_tier": "bao_chi",
+   "headline": "Giá nhựa và thép tăng {pct}% do nguồn cung thắt chặt",
+   "direction": "tang",
+   "kind": "signal",
+   "truth": "dung",
+   "link": "state:nguyen_lieu",
+   "verify_with": [
+    "truy_van_lich_su",
+    "kiem_dinh_gia_thuyet"
+   ],
+   "magnitude_pct": {
+    "low": 1,
+    "mid": 3,
+    "high": 6
+   }
+  },
+  {
+   "id": "nguyen_lieu_don_gap_doi",
+   "topic": "nguyen_lieu",
+   "source_id": "dien_dan_an_danh",
+   "source_tier": "mang_xa_hoi",
+   "headline": "Giá nhựa tăng gấp đôi! Tích trữ ngay kẻo hết",
+   "direction": "tang",
+   "kind": "trap",
+   "truth": "sai",
+   "link": "state:nguyen_lieu",
+   "verify_with": [
+    "truy_van_lich_su",
+    "kiem_dinh_gia_thuyet"
+   ]
+  },
+  {
+   "id": "nguyen_lieu_ha_nhiet",
+   "topic": "nguyen_lieu",
+   "source_id": "dai_duong",
+   "source_tier": "bao_chi",
+   "headline": "Giá nguyên liệu hạ nhiệt sau hai tuần tăng liên tục",
+   "direction": "giam",
+   "kind": "signal",
+   "truth": "dung",
+   "link": "state:nguyen_lieu",
+   "verify_with": [
+    "truy_van_lich_su",
+    "kiem_dinh_gia_thuyet"
+   ]
+  },
+  {
+   "id": "nguyen_lieu_nha_cung_cap",
+   "topic": "nguyen_lieu",
+   "source_id": "noi_bo_nac_danh",
+   "source_tier": "noi_bo",
+   "headline": "Nhà cung cấp ngầm báo sẽ tăng giá lô hàng sau",
+   "direction": "tang",
+   "kind": "partial",
+   "truth": "mot_phan",
+   "link": "state:nguyen_lieu",
+   "verify_with": [
+    "truy_van_lich_su",
+    "kiem_dinh_gia_thuyet"
+   ]
+  },
+  {
+   "id": "nguyen_lieu_cho_dia_phuong",
+   "topic": "nguyen_lieu",
+   "source_id": "tam_chuyen",
+   "source_tier": "mang_xa_hoi",
+   "headline": "Giá cà phê ở một chợ địa phương tăng nhẹ",
+   "direction": "tang",
+   "kind": "noise",
+   "truth": "khong_lien_quan",
+   "link": null,
+   "verify_with": [
+    "truy_van_lich_su",
+    "kiem_dinh_gia_thuyet"
+   ]
+  },
+  {
+   "id": "suc_mua_ban_le_giam",
+   "topic": "suc_mua",
+   "source_id": "cuc_thong_ke",
+   "source_tier": "chinh_thuc",
+   "headline": "Doanh số bán lẻ quý trước giảm {pct}% so với cùng kỳ",
+   "direction": "giam",
+   "kind": "stale",
+   "truth": "cu",
+   "link": "state:suc_mua",
+   "verify_with": [
+    "truy_van_lich_su",
+    "kiem_dinh_gia_thuyet"
+   ],
+   "magnitude_pct": {
+    "low": 1,
+    "mid": 3,
+    "high": 6
+   }
+  },
+  {
+   "id": "suc_mua_thiet_yeu",
+   "topic": "suc_mua",
+   "source_id": "nhat_bao",
+   "source_tier": "bao_chi",
+   "headline": "Người tiêu dùng chuyển sang mua hàng thiết yếu, hàng gia dụng kém hút khách",
+   "direction": "giam",
+   "kind": "signal",
+   "truth": "dung",
+   "link": "event:trend_shift",
+   "verify_with": [
+    "truy_van_lich_su",
+    "kiem_dinh_gia_thuyet"
+   ]
+  },
+  {
+   "id": "suc_mua_pho_vang",
+   "topic": "suc_mua",
+   "source_id": "tam_chuyen",
+   "source_tier": "mang_xa_hoi",
+   "headline": "Cả phố vắng khách, hàng gia dụng ế ẩm",
+   "direction": "giam",
+   "kind": "partial",
+   "truth": "mot_phan",
+   "link": "state:suc_mua",
+   "verify_with": [
+    "truy_van_lich_su",
+    "kiem_dinh_gia_thuyet"
+   ]
+  },
+  {
+   "id": "suc_mua_mua_le",
+   "topic": "suc_mua",
+   "source_id": "dai_duong",
+   "source_tier": "bao_chi",
+   "headline": "Mùa lễ kéo sức mua tăng nhẹ tại các thành phố lớn",
+   "direction": "tang",
+   "kind": "signal",
+   "truth": "dung",
+   "link": "state:suc_mua",
+   "verify_with": [
+    "truy_van_lich_su",
+    "kiem_dinh_gia_thuyet"
+   ]
+  },
+  {
+   "id": "suc_mua_doi_thu_giam_gia",
+   "topic": "suc_mua",
+   "source_id": "ban_tin_sang",
+   "source_tier": "bao_chi",
+   "headline": "Đối thủ lớn tung đợt giảm giá mạnh dịp cuối năm",
+   "direction": "giam",
+   "kind": "signal",
+   "truth": "dung",
+   "link": "event:competitor_discount",
+   "verify_with": [
+    "truy_van_lich_su",
+    "kiem_dinh_gia_thuyet"
+   ]
+  },
+  {
+   "id": "suc_mua_giam_gia_quang_cao",
+   "topic": "suc_mua",
+   "source_id": "tam_chuyen",
+   "source_tier": "mang_xa_hoi",
+   "headline": "Đối thủ giảm giá 70%? Hóa ra chỉ là quảng cáo câu khách",
+   "direction": "ngang",
+   "kind": "partial",
+   "truth": "mot_phan",
+   "link": "event:competitor_discount",
+   "verify_with": [
+    "truy_van_lich_su",
+    "kiem_dinh_gia_thuyet"
+   ]
+  },
+  {
+   "id": "suc_mua_khach_phan_nan_gia",
+   "topic": "suc_mua",
+   "source_id": "tam_chuyen",
+   "source_tier": "mang_xa_hoi",
+   "headline": "Khách phàn nàn giá hàng gia dụng tăng quá nhiều",
+   "direction": "giam",
+   "kind": "signal",
+   "truth": "dung",
+   "link": "event:price_fatigue",
+   "verify_with": [
+    "truy_van_lich_su",
+    "kiem_dinh_gia_thuyet"
+   ]
+  },
+  {
+   "id": "suc_mua_dong_nghiep_dong",
+   "topic": "suc_mua",
+   "source_id": "dong_nghiep",
+   "source_tier": "noi_bo",
+   "headline": "Đồng nghiệp bên kinh doanh đồn khách mua nhiều hơn mọi năm",
+   "direction": "tang",
+   "kind": "partial",
+   "truth": "mot_phan",
+   "link": "state:suc_mua",
+   "verify_with": [
+    "truy_van_lich_su",
+    "kiem_dinh_gia_thuyet"
+   ]
+  },
+  {
+   "id": "suc_mua_chi_so_niem_tin",
+   "topic": "suc_mua",
+   "source_id": "cuc_thong_ke",
+   "source_tier": "chinh_thuc",
+   "headline": "Chỉ số niềm tin người tiêu dùng của quý trước vừa được cập nhật",
+   "direction": "ngang",
+   "kind": "stale",
+   "truth": "cu",
+   "link": "state:suc_mua",
+   "verify_with": [
+    "truy_van_lich_su",
+    "kiem_dinh_gia_thuyet"
+   ]
+  },
+  {
+   "id": "chung_khoan_tlx_giam",
+   "topic": "chung_khoan",
+   "source_id": "so_giao_dich",
+   "source_tier": "chinh_thuc",
+   "headline": "Chỉ số TLX-30 đóng cửa giảm {pct}%",
+   "direction": "giam",
+   "kind": "signal",
+   "truth": "dung",
+   "link": "state:chung_khoan",
+   "verify_with": [
+    "doi_chieu_nguon",
+    "truy_van_lich_su"
+   ],
+   "magnitude_pct": {
+    "low": 1,
+    "mid": 3,
+    "high": 6
+   }
+  },
+  {
+   "id": "chung_khoan_phan_phoi_ban_thao",
+   "topic": "chung_khoan",
+   "source_id": "ban_tin_sang",
+   "source_tier": "bao_chi",
+   "headline": "Cổ phiếu ngành phân phối bị bán tháo vì lo ngại chi phí vốn",
+   "direction": "giam",
+   "kind": "signal",
+   "truth": "dung",
+   "link": "state:chung_khoan",
+   "verify_with": [
+    "doi_chieu_nguon",
+    "truy_van_lich_su"
+   ]
+  },
+  {
+   "id": "chung_khoan_don_bay_50",
+   "topic": "chung_khoan",
+   "source_id": "dien_dan_an_danh",
+   "source_tier": "mang_xa_hoi",
+   "headline": "Cổ phiếu LCD sắp tăng 50%, mua ngay kẻo lỡ!",
+   "direction": "tang",
+   "kind": "trap",
+   "truth": "sai",
+   "link": "state:chung_khoan",
+   "verify_with": [
+    "doi_chieu_nguon",
+    "truy_van_lich_su"
+   ]
+  },
+  {
+   "id": "chung_khoan_quy_gom",
+   "topic": "chung_khoan",
+   "source_id": "noi_bo_nac_danh",
+   "source_tier": "noi_bo",
+   "headline": "Một quỹ lớn đang âm thầm gom cổ phiếu ngành phân phối",
+   "direction": "tang",
+   "kind": "trap",
+   "truth": "sai",
+   "link": "state:chung_khoan",
+   "verify_with": [
+    "doi_chieu_nguon",
+    "truy_van_lich_su"
+   ]
+  },
+  {
+   "id": "chung_khoan_cong_nghe",
+   "topic": "chung_khoan",
+   "source_id": "dai_duong",
+   "source_tier": "bao_chi",
+   "headline": "Một công ty công nghệ không liên quan công bố sản phẩm mới",
+   "direction": "tang",
+   "kind": "noise",
+   "truth": "khong_lien_quan",
+   "link": null,
+   "verify_with": [
+    "doi_chieu_nguon",
+    "truy_van_lich_su"
+   ]
+  },
+  {
+   "id": "chung_khoan_so_may_man",
+   "topic": "chung_khoan",
+   "source_id": "tam_chuyen",
+   "source_tier": "mang_xa_hoi",
+   "headline": "Đoán số may mắn cho chỉ số ngày mai",
+   "direction": "ngang",
+   "kind": "noise",
+   "truth": "khong_lien_quan",
+   "link": null,
+   "verify_with": [
+    "doi_chieu_nguon",
+    "truy_van_lich_su"
+   ]
+  },
+  {
+   "id": "tin_dung_siet_cho_vay",
+   "topic": "tin_dung",
+   "source_id": "nhat_bao",
+   "source_tier": "bao_chi",
+   "headline": "Ngân hàng siết điều kiện cho vay doanh nghiệp vừa và nhỏ",
+   "direction": "giam",
+   "kind": "signal",
+   "truth": "dung",
+   "link": "state:tin_dung",
+   "verify_with": [
+    "doi_chieu_nguon"
+   ]
+  },
+  {
+   "id": "tin_dung_no_xau",
+   "topic": "tin_dung",
+   "source_id": "cuc_thong_ke",
+   "source_tier": "chinh_thuc",
+   "headline": "Nợ xấu toàn ngành ngân hàng quý trước tăng nhẹ",
+   "direction": "tang",
+   "kind": "stale",
+   "truth": "cu",
+   "link": "state:tin_dung",
+   "verify_with": [
+    "doi_chieu_nguon"
+   ]
+  },
+  {
+   "id": "tin_dung_don_pha_san",
+   "topic": "tin_dung",
+   "source_id": "tam_chuyen",
+   "source_tier": "mang_xa_hoi",
+   "headline": "Một ngân hàng sắp phá sản, rút tiền gấp!",
+   "direction": "giam",
+   "kind": "trap",
+   "truth": "sai",
+   "link": "state:tin_dung",
+   "verify_with": [
+    "doi_chieu_nguon"
+   ]
+  },
+  {
+   "id": "tin_dung_bao_tri_thanh_toan",
+   "topic": "tin_dung",
+   "source_id": "ban_tin_sang",
+   "source_tier": "bao_chi",
+   "headline": "Đối tác thanh toán bảo trì hệ thống, giao dịch có thể chậm",
+   "direction": "ngang",
+   "kind": "signal",
+   "truth": "dung",
+   "link": "event:checkout_outage",
+   "verify_with": [
+    "doi_chieu_nguon"
+   ]
+  },
+  {
+   "id": "tin_dung_thong_bao_bao_tri",
+   "topic": "tin_dung",
+   "source_id": "cuc_thong_ke",
+   "source_tier": "chinh_thuc",
+   "headline": "Thông báo bảo trì cổng thông tin của cơ quan quản lý",
+   "direction": "ngang",
+   "kind": "noise",
+   "truth": "khong_lien_quan",
+   "link": null,
+   "verify_with": [
+    "doi_chieu_nguon"
+   ]
+  },
+  {
+   "id": "noi_bo_cong_dat_hang_loi",
+   "topic": "noi_bo",
+   "source_id": "dong_nghiep",
+   "source_tier": "noi_bo",
+   "headline": "Đại lý than phiền cổng đặt hàng báo lỗi khi mở lần đầu",
+   "direction": "giam",
+   "kind": "signal",
+   "truth": "dung",
+   "link": "event:app_bug",
+   "verify_with": [
+    "lam_sach_du_lieu",
+    "truy_van_lich_su"
+   ]
+  },
+  {
+   "id": "noi_bo_kho_cham",
+   "topic": "noi_bo",
+   "source_id": "dong_nghiep",
+   "source_tier": "noi_bo",
+   "headline": "Kho báo hệ thống chậm vào giờ cao điểm",
+   "direction": "giam",
+   "kind": "signal",
+   "truth": "dung",
+   "link": "event:server_outage",
+   "verify_with": [
+    "lam_sach_du_lieu",
+    "truy_van_lich_su"
+   ]
+  },
+  {
+   "id": "noi_bo_bang_so_trung",
+   "topic": "noi_bo",
+   "source_id": "dong_nghiep",
+   "source_tier": "noi_bo",
+   "headline": "Bảng số liệu báo cáo tuần có nhiều dòng trùng lặp",
+   "direction": "giam",
+   "kind": "signal",
+   "truth": "dung",
+   "link": "event:logging_error",
+   "verify_with": [
+    "lam_sach_du_lieu",
+    "truy_van_lich_su"
+   ]
+  },
+  {
+   "id": "noi_bo_quang_cao_it_don",
+   "topic": "noi_bo",
+   "source_id": "dong_nghiep",
+   "source_tier": "noi_bo",
+   "headline": "Chiến dịch quảng cáo mới kéo nhiều lượt xem nhưng ít đơn",
+   "direction": "giam",
+   "kind": "signal",
+   "truth": "dung",
+   "link": "event:bad_traffic",
+   "verify_with": [
+    "lam_sach_du_lieu",
+    "truy_van_lich_su"
+   ]
+  }
+ ]
+}

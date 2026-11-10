@@ -12,8 +12,6 @@ Trạng thái: Backlog -> In progress -> Review -> Done. Bị chặn thì chuy�
 | T-002 (ví dụ) | Cài đặt tính năng X theo spec T-001 | Codex | codex/T-002 | src/x.py, tests/test_x.py | Kiểm thử qua, đúng spec |
 | T-008 | check_web.py: ép stdout UTF-8 để không lỗi UnicodeEncodeError trên console Windows mặc định | Codex | codex/T-008 | media-marketing/web/check_web.py | Chạy `python -I check_web.py` (không cần -X utf8) qua 6 mục |
 | T-010 | Kịch bản và video quảng cáo 30 giây (làm sau T-012 để cảnh quay không hiện công ty gần hết người dùng) | Claude/Codex | chưa chốt | media-marketing/video/* | Chưa có spec |
-| T-016 | Style bible pixel art mới (bảng màu tối đa 32 màu, quy tắc sprite, văn phòng, UI màn hình máy tính) trong shared/style-bible. Chờ VU duyệt hướng v2 | Claude | claude/T-016 | shared/style-bible/* | Chưa có spec |
-| T-017 | Content bible: nguồn tin, mẫu tin (khoảng 40), chủ đề thị trường, nhân vật, sếp, cú sốc hư cấu (data/news.json). Chờ VU duyệt hướng v2 | Claude | claude/T-017 | game-studio/godot/docs/*, data/news.json (bản nháp) | Chưa có spec |
 | T-018 | Tầng thế giới: kịch bản thế giới, phát sinh tin tức, báo cáo, chấm điểm, sự nghiệp (scripts/world/) và mô phỏng cân bằng. Chờ T-017 và VU duyệt | Codex | codex/T-018 | scripts/world/*, data/*.json, tests/* | Chưa có spec |
 | T-019 | Giao diện v2: cảnh văn phòng, màn hình máy tính và các cửa sổ, luồng báo cáo, họp cuối ngày. Chờ T-016, T-018 | Codex | codex/T-019 | scenes/*, scripts/ui/*, assets/* | Chưa có spec |
 
@@ -25,7 +23,6 @@ Trạng thái: Backlog -> In progress -> Review -> Done. Bị chặn thì chuy�
 
 | ID | Việc | Owner | Nhánh | File được sửa | Tiêu chí hoàn thành |
 |---|---|---|---|---|---|
-| T-015 | Concept GDD v2: nhân viên phân tích trong văn phòng pixel, tin tài chính giả lập, báo cáo cho sếp, thưởng và phạt (game-studio/godot/docs/GDD-v2-concept.md). Chờ VU duyệt hướng | Claude | master | game-studio/godot/docs/GDD-v2-concept.md | VU duyệt hướng đi và trả lời các câu hỏi mở mục 13 |
 
 ## Done
 
@@ -43,6 +40,7 @@ Trạng thái: Backlog -> In progress -> Review -> Done. Bị chặn thì chuy�
 | T-012 | Chữa gốc kinh tế (Codex): Retention 85%, Cash 18.000, người thắng demo giữ khoảng 147% Users khởi điểm; bỏ hệ số chỉnh gượng ván 30 tuần; sửa 1 dòng fixture test_ui.gd (dòng 29) theo spec. GDD đã cập nhật lên 0.2. Claude đã review và chạy check_web.py, VU duyệt merge vào master | Codex | 2026-11-10 |
 | T-013 | Giao diện: gợi ý thẻ xử lý khi nguyên nhân đã lộ (Codex); event_reports() thêm remedies chỉ khi đã lộ, balance_sim giống hệt master. Claude đã review, chụp màn hình và chạy check_web.py; VU duyệt merge vào master | Codex | 2026-11-10 |
 | T-014 | Thay ảnh gameplay trên landing page bằng ảnh chụp từ ván chơi tự nhiên của bản mới (tuần 3/10, có sự kiện đã lộ và gợi ý thẻ xử lý); cập nhật alt. check_web.py 6/6 | Claude | 2026-11-10 |
+| T-015 | Concept GDD v2 (game-studio/godot/docs/GDD-v2-concept.md). VU duyệt hướng v2; nguồn pixel art chốt: sprite viết bằng mã; bản v1 gắn tag demo-dashboard-v1, v2 phát triển trên nhánh v2 | Claude | 2026-11-10 |
 
 ## Blocked
 
