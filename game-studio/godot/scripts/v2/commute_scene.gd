@@ -155,12 +155,12 @@ func _build_prompt() -> void:
 	toast_label.clip_text = false
 	toast_label.max_lines_visible = 2
 	tooltip_panel = Panel.new()
-	tooltip_panel.size = Vector2(176, 40)
+	tooltip_panel.size = Vector2(176, 52)
 	tooltip_panel.add_theme_stylebox_override("panel", WindowTheme.box(2))
 	tooltip_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	tooltip_panel.hide()
 	ui.add_child(tooltip_panel)
-	tooltip_label = _prompt_text(tooltip_panel, Rect2(6, 3, 164, 34))
+	tooltip_label = _prompt_text(tooltip_panel, Rect2(6, 3, 164, 46))
 	tooltip_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	tooltip_label.clip_text = false
 	tooltip_label.max_lines_visible = 4
@@ -217,7 +217,7 @@ func _update_tooltip() -> void:
 		return
 	tooltip_label.text = shop_label(index)
 	var rect := shop_rect(index)
-	tooltip_panel.position = Vector2(clampf(rect.position.x + 4.0, 4.0, W - 180.0), 70)
+	tooltip_panel.position = Vector2(clampf(rect.position.x + 4.0, 4.0, W - 180.0), 62)
 	tooltip_panel.show()
 
 # Click a storefront (or confirm a keyboard selection): walk to its door, then open the shop panel.
@@ -1172,12 +1172,14 @@ func _draw_highlight(p: Pen) -> void:
 		var rect := shop_rect(index)
 		var x := int(rect.position.x)
 		p.frame(x, SHOP_TOP, 84, SIDEWALK_Y - SHOP_TOP, pulse)
-		p.frame(x + 1, SHOP_TOP + 1, 82, SIDEWALK_Y - SHOP_TOP - 2, 52)
+		p.frame(x + 1, SHOP_TOP + 1, 82, SIDEWALK_Y - SHOP_TOP - 2, pulse)
+		p.frame(x + 2, SHOP_TOP + 2, 80, SIDEWALK_Y - SHOP_TOP - 4, 53)
 		# Sign glow around the plate.
-		p.frame(x + 2, SHOP_TOP + 36, 80, 19, pulse)
-		p.frame(x + 3, SHOP_TOP + 37, 78, 17, 53)
+		p.frame(x + 3, SHOP_TOP + 35, 78, 21, pulse)
+		p.frame(x + 4, SHOP_TOP + 36, 76, 19, 52)
 	if street_active() and selected_index < 0 and go_button != null:
 		p.frame(197, 331, 146, 26, pulse)
+		p.frame(198, 332, 144, 24, 53)
 
 func _draw_overlay(p: Pen) -> void:
 	if interactive:

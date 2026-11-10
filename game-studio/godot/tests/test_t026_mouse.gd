@@ -1,7 +1,7 @@
 extends SceneTree
 # T-026 real-mouse test (run WITHOUT --headless): real InputEventMouse events click through one whole
 # life day: breakfast, transport, a shop, the red light, the desk (report by API), overtime, the
-# evening and the next morning. Add `-- --capture` to save screenshots to docs/screenshots-T-026.
+# evening and the next morning. Add `-- --capture` to save screenshots to docs/screenshots-T-027.
 const Game = preload("res://scripts/world/world_game.gd")
 const Flow = preload("res://scripts/v2/game_flow.gd")
 const SCREEN := Rect2(0, 0, 640, 360)
@@ -27,7 +27,7 @@ func shot(name: String) -> void:
 	if not capture: return
 	await settle(4)
 	await RenderingServer.frame_post_draw
-	var folder := ProjectSettings.globalize_path("res://docs/screenshots-T-026")
+	var folder := ProjectSettings.globalize_path("res://docs/screenshots-T-027")
 	DirAccess.make_dir_recursive_absolute(folder)
 	root.get_texture().get_image().save_png(folder.path_join("T-026-mouse-" + name + ".png"))
 
@@ -58,6 +58,20 @@ func click(target: Control, label: String) -> void:
 	await send_mouse(point, true)
 	await send_mouse(point, false)
 	await settle(2)
+
+func click_point(point: Vector2, label: String) -> void:
+	await send_mouse(point, false, true)
+	await send_mouse(point, true)
+	await send_mouse(point, false)
+	await settle(2)
+
+func walk_until_shop(limit: int = 3000) -> void:
+	var guard := 0
+	while flow.state == "COMMUTE" and flow.commute.phase == "to_shop" and guard < limit:
+		guard += 1
+		flow.commute.advance(0.05)
+		if guard % 20 == 0: await process_frame
+	await settle(3)
 
 # Lets the street run (stepped by hand for speed) until the commute pauses for a prompt.
 func walk_until_prompt(limit: int = 3000) -> void:
@@ -102,40 +116,34 @@ func run() -> void:
 	check(flow.state == "TRANSPORT" and flow.life.wallet == 56, "breakfast clicked: -$4, TRANSPORT")
 	await click(morning.buttons.walk, "Walk")
 	check(flow.state == "COMMUTE" and flow.life.vitals.transport == "walk", "Walk clicked: COMMUTE")
-	# Cafe: enter by mouse, buy a coffee, leave.
-	await walk_until_prompt()
+	# Cafe: click the storefront (T-027), buy a coffee, leave.
+	await settle(3)
 	var commute: Node2D = flow.commute
-	check(commute.paused == "shop" and commute.prompt_panel.visible and commute.current_stop.id == "cafe", "the cafe prompt opened")
-	await shot("shop-prompt")
-	await click(commute.prompt_primary, "Enter (cafe)")
-	check(flow.state == "SHOP", "clicking Enter opens the shop: " + flow.state)
+	check(commute.phase == "street" and not commute.prompt_panel.visible, "the street waits for a choice")
+	await click_point(commute.shop_rect(0).get_center(), "storefront MOONBEAN CAFE")
+	await walk_until_shop()
+	check(flow.state == "SHOP", "clicking the cafe opens the shop: " + flow.state)
 	var wallet: int = flow.life.wallet
 	await click(flow.shop_view.rows.coffee, "Buy coffee")
 	check(flow.life.wallet == wallet - 4, "the coffee was paid exactly: " + str(flow.life.wallet))
 	flow.shop_view.stage.advance(0.4)
 	await shot("shop-bought")
 	await click(flow.shop_view.get_children().filter(func(c): return c is Button and c.text == "Leave")[0], "Leave")
-	check(flow.state == "COMMUTE" and commute.paused == "", "Leave resumes the street")
-	# Skip shops by mouse until the red light.
-	var guard := 0
-	while flow.state == "COMMUTE" and commute.paused != "light" and guard < 12:
-		guard += 1
-		await walk_until_prompt()
-		if commute.paused == "shop": await click(commute.prompt_secondary, "Skip shop " + str(commute.current_stop.id))
+	check(flow.state == "COMMUTE" and commute.phase == "street", "Leave returns to the street")
+	# Go to work by the button; the seeded red light stops the player.
+	await click(commute.go_button, "Go to work")
 	check(commute.paused == "light" and commute.light_state() == "red", "the light turned red and the player stopped")
 	await shot("red-light")
 	var minutes: int = flow.life.vitals.extra_minutes
 	await click(commute.prompt_primary, "Wait for green")
 	check(flow.life.vitals.extra_minutes == minutes + 4, "waiting cost 4 minutes")
-	guard = 0
-	while flow.state == "COMMUTE" and guard < 40:
+	var guard := 0
+	while flow.state == "COMMUTE" and guard < 400:
 		guard += 1
-		await walk_until_prompt()
-		if flow.state != "COMMUTE" or not is_instance_valid(commute): break
-		if commute.paused == "shop": await click(commute.prompt_secondary, "Skip shop " + str(commute.current_stop.id))
-		elif commute.paused == "waiting":
-			for i in 40: commute.advance(0.05)
-	check(flow.state == "DAY_START" and flow.late_minutes == 10 + 4, "arrived 14 minutes late (walk + shop stop + wait): " + str(flow.late_minutes))
+		commute.advance(0.05)
+		if guard % 20 == 0: await process_frame
+	await settle(3)
+	check(flow.state == "DAY_START" and flow.late_minutes == 5 + 4, "arrived 9 minutes late (walk + one visit + wait): " + str(flow.late_minutes))
 	flow.skip_intro()
 	check(flow.state == "WORK" and flow.hud.show_focus, "work starts with the Focus line")
 	await shot("desktop")
