@@ -11,19 +11,17 @@ Trạng thái: Backlog -> In progress -> Review -> Done. Bị chặn thì chuy�
 | T-001 (ví dụ) | Viết spec tính năng X | Claude | claude/T-001 | docs/spec-x.md | Spec có mô tả, đầu vào, đầu ra, ví dụ |
 | T-002 (ví dụ) | Cài đặt tính năng X theo spec T-001 | Codex | codex/T-002 | src/x.py, tests/test_x.py | Kiểm thử qua, đúng spec |
 | T-008 | check_web.py: ép stdout UTF-8 để không lỗi UnicodeEncodeError trên console Windows mặc định | Codex | codex/T-008 | media-marketing/web/check_web.py | Chạy `python -I check_web.py` (không cần -X utf8) qua 6 mục |
-| T-010 | Kịch bản và video quảng cáo 30 giây (làm sau T-011 để quảng cáo đúng với cơ chế cuối) | Claude/Codex | chưa chốt | media-marketing/video/* | Chưa có spec |
+| T-010 | Kịch bản và video quảng cáo 30 giây (làm sau T-012 để cảnh quay không hiện công ty gần hết người dùng) | Claude/Codex | chưa chốt | media-marketing/video/* | Chưa có spec |
+| T-012 | Chữa gốc kinh tế: người thắng demo còn khoảng 24/1.000 người dùng (chiến lược chỉ tối ưu còn khoảng 5), điều kiện thắng min_users 0,1 vô nghĩa; ván 30 tuần đang dùng hệ số chi phí nhân 0,1/0,05 từ tuần 11 và xác suất sự kiện 0,2 trái GDD mục 8. Cần spec của Claude trước | Codex | codex/T-012 | scripts/sim/*, data/*.json, tests/balance_sim.gd, tests/test_sim.gd (sẽ chốt trong spec) | Chưa có spec |
+| T-013 | Giao diện: khi nguyên nhân sự kiện đã lộ, hiện thẻ nào xử lý được (để người chơi học cơ chế). Cần spec của Claude trước | Codex | codex/T-013 | scripts/ui/*, data/strings.json, tests/test_ui.gd (sẽ chốt trong spec) | Chưa có spec |
 
 ## In progress
 
-| ID | Việc | Owner | Nhánh | File được sửa | Tiêu chí hoàn thành |
-|---|---|---|---|---|---|
 (chưa có)
 
 ## Review
 
-| ID | Việc | Owner | Nhánh | File được sửa | Tiêu chí hoàn thành |
-|---|---|---|---|---|---|
-| T-011 | Phân tích phải có lợi (thẻ xử lý chỉ gỡ sự kiện khi nguyên nhân đã lộ) và sửa ván 30 tuần. VU đã duyệt spec | Codex | codex/T-011 | game-studio/godot/scripts/sim/*, data/cards.json, events.json, config.json, tests/balance_sim.gd, tests/test_sim.gd | Xem game-studio/godot/docs/SPEC-T-011.md |
+(chưa có)
 
 ## Done
 
@@ -37,6 +35,7 @@ Trạng thái: Backlog -> In progress -> Review -> Done. Bị chặn thì chuy�
 | T-006 | Sửa công thức điểm: giới hạn LTV/CAC, ván thua tối đa 900 điểm (Codex). Claude đã review, VU duyệt merge vào master | Codex | 2026-11-10 |
 | T-007 | Landing page trung thực (media-marketing/web). Claude đã chạy check_web.py (6/6 PASS khi dùng UTF-8) và kiểm tra trình duyệt 360px/1280px; VU duyệt merge vào master | Codex | 2026-11-10 |
 | T-009 | Cân bằng lại bản demo 10 tuần (Codex). Đạt 4/5 mục tiêu demo; chưa đạt: analyst không hơn balanced, 30 tuần quá khó (chuyển sang T-011). Claude đã review, VU duyệt merge vào master | Codex | 2026-11-10 |
+| T-011 | Thẻ xử lý chỉ gỡ sự kiện khi đã lộ nguyên nhân; analyst hơn balanced 11,55 điểm % ở demo; 30 tuần khả thi về thống kê (Codex). Còn nợ kinh tế chuyển sang T-012. Claude đã review, VU duyệt merge vào master | Codex | 2026-11-10 |
 
 ## Blocked
 
