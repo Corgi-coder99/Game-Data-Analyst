@@ -19,12 +19,12 @@ Trạng thái: Backlog -> In progress -> Review -> Done. Bị chặn thì chuy�
 
 | ID | Việc | Owner | Nhánh | File được sửa | Tiêu chí hoàn thành |
 |---|---|---|---|---|---|
-| T-018c | Khan hiếm kiểm chứng: kho Energy phân tích riêng (3 mỗi ngày), tool_energy trong world.json, mã lỗi no_analysis_energy; cân bằng lại bot. Codex hết hạn mức đến 15/11/2026 nên Claude giao cho một Claude subagent làm thay (VU ủy quyền toàn quyền); Claude điều phối tự review và merge | Claude subagent (thay Codex) | codex/T-018c | game-studio/godot/data/world.json, scripts/world/*, scripts/sim/simulation.gd (chỉ use_tool), scripts/v2/desktop.gd, scripts/v2/windows/tools_window.gd (chỉ Energy), data/strings_v2.json, tests/test_world.gd, tests/balance_world.gd, tests/test_sim.gd (chỉ use_tool), tests/test_v2_desktop.gd, tests/test_v2_layout_render.gd | Xem game-studio/godot/docs/SPEC-T-018c.md |
 
 ## Review
 
 | ID | Việc | Owner | Nhánh | File được sửa | Tiêu chí hoàn thành |
 |---|---|---|---|---|---|
+| T-018c | Khan hiếm kiểm chứng: kho Energy phân tích riêng (3 mỗi ngày), tool_energy trong world.json, mã lỗi no_analysis_energy; cân bằng lại bot. Codex hết hạn mức đến 15/11/2026 nên Claude giao cho một Claude subagent làm thay (VU ủy quyền toàn quyền); Claude điều phối tự review và merge | Claude subagent (thay Codex) | codex/T-018c | game-studio/godot/data/world.json, scripts/world/*, scripts/sim/simulation.gd (chỉ use_tool), scripts/v2/desktop.gd, scripts/v2/windows/tools_window.gd (chỉ Energy), data/strings_v2.json, tests/test_world.gd, tests/balance_world.gd, tests/test_sim.gd (chỉ use_tool), tests/test_v2_desktop.gd, tests/test_v2_layout_render.gd | Xem game-studio/godot/docs/SPEC-T-018c.md Chờ Claude review; xem ghi chú bàn giao T-018c. |
 | T-016 | Style bible pixel mới: bảng màu 32 màu, kích thước sprite, ánh sáng, giao diện máy tính, hoạt ảnh, kiểm tra tự động. Chờ VU xem | Claude | v2 | shared/style-bible/pixel-office-v2.md, palette-v2.json | VU duyệt style bible; quyết định có sửa CLAUDE.md mục 4 không |
 | T-017 | Content bible v2 (thế giới hư cấu Tân Lạc, công ty Lục Châu, nhân vật, 10 nguồn tin, ánh xạ 8 cú sốc) và data/news.json (41 mẫu tin, đã kiểm hợp lệ). Chờ VU xem | Claude | v2 | game-studio/godot/docs/CONTENT-BIBLE-v2.md, data/news.json | VU duyệt nội dung |
 
@@ -657,3 +657,45 @@ world.json cuối đầy đủ:
 - Số đo global sau layout/render: taskbar (0,344) 640x16; ba nút (4/116/228,345) 108x14, kết thúc y359, font cao 12px + margin dọc 2px. Thanh Tin tưởng (513,52) 117x7, kết thúc y59; Cash (400,64) cao 12px, cách thanh 5px. Nhãn Năng lượng (400,204) 230x14; kết quả Chưa đủ căn cứ (400,314) 232x22, kết thúc y336. Tiêu đề cửa sổ cao 12px, nút ghim đầu (342,60) 20x20. Đã xem ảnh render thật TEMP hệ thống/T-019b-desktop.png và T-019b-desktop-long.png: chữ tác vụ, Cash, kết quả công cụ, Năng lượng, tiêu đề và ghim đều nằm trọn, không chồng.
 - Kiểm thử còn lại: test_v2_assets 2.255/0, test_sim 2.630/0, test_ui 134/0, test_world 32.438/0; gen_sprites exit 0, check_palette PASS 26 PNG; balance_sim trước/sau giống hệt 47 dòng khi bỏ elapsed_seconds. Giữ cảnh báo môi trường user://logs, kho chứng chỉ và cache shader; không có lỗi script ở lượt cuối. git diff --check qua.
 - Git đợt sửa: git add bị Permission denied khi tạo D:/Dev/ai-company/.git/worktrees/ai-company-codex/index.lock; file sửa chưa stage/commit. Không vượt sandbox, không push, không merge.
+
+### T-018c | Claude subagent (thay Codex) | 2026-11-10 | Review
+
+- Nhánh codex/T-018c (từ v2), commit mã 0fbeb12. Không push, không merge, không tải mạng.
+- Làm: kho Energy phân tích riêng của tầng thế giới (WorldGame._analysis_energy, đặt lại ở begin_day). world.json thêm analysis_energy và tool_energy. status().energy/energy_max là kho này; tools().energy là tool_energy. verify trừ kho này, hết thì trả {ok:false,error:"no_analysis_energy"} (không trừ Budget, không đổi trạng thái); kiểm chứng lặp vẫn miễn phí; lỗi invalid_uid/invalid_tool vẫn được ưu tiên hơn lỗi hết Energy. Simulation.use_tool thêm tham số tùy chọn spend_energy (mặc định true, hành vi cũ giữ nguyên); Verifier gọi với false nên Energy công ty không bị đụng. UI v2: chỉ thêm chuỗi errors.no_analysis_energy trong strings_v2.json (desktop.gd và tools_window.gd tự đúng vì đọc status()/tools(); không phải sửa).
+- Bot (balance_world.gd): verifier và careful_hedger chỉ kiểm chứng tin liên quan câu hỏi của đúng ngày hiện tại, theo thứ tự tin trong danh sách công khai, dừng khi gặp no_analysis_energy. Thêm 2 cột in ra: kiểm chứng/ngày và % tin liên quan được kiểm chứng.
+- Chỉnh số: không cần vòng chỉnh nào. Giá trị khởi điểm của spec (analysis_energy 3, mọi tool_energy 1) đạt toàn bộ mục tiêu A và B ngay vòng đầu. Không đổi grading, career, tool_budget.
+
+Bảng cân bằng (2.000 ván/bot, seed 104+). Trước = v2 gốc, Sau = T-018c. KC/ngày = số lần kiểm chứng trung bình mỗi ngày (chỉ đo ở bản Sau).
+
+| Ngày | Bot | Thắng trước/sau | Đuổi trước/sau | Phá sản trước/sau | Phạt nặng trước/sau | Tin tưởng p50 trước/sau | KC/ngày |
+|---|---|---|---|---|---|---|---|
+| 10 | random_reporter | 7,10 / 7,10 | 51,40 / 51,40 | 0 / 0 | 51,60 / 51,60 | 0 / 0 | 0 |
+| 10 | rumor_follower | 8,25 / 8,25 | 76,45 / 76,45 | 0 / 0 | 76,95 / 76,95 | 0 / 0 | 0 |
+| 10 | official_only | 35,70 / 35,70 | 3,45 / 3,45 | 0 / 0 | 3,45 / 3,45 | 58,95 / 58,95 | 0 |
+| 10 | verifier | 66,20 / 64,75 | 0,25 / 0,30 | 0 / 0 | 0,25 / 0,30 | 92,80 / 92,40 | 1,015 |
+| 10 | careful_hedger | 52,90 / 51,65 | 0 / 0 | 0 / 0 | 0 / 0 | 73,40 / 72,80 | 1,015 |
+| 30 | random_reporter | 0,55 / 0,55 | 90,35 / 90,35 | 0,05 / 0,05 | 92,30 / 92,30 | 0 / 0 | 0 |
+| 30 | rumor_follower | 0,40 / 0,40 | 97,60 / 97,60 | 0 / 0 | 98,45 / 98,45 | 0 / 0 | 0 |
+| 30 | official_only | 30,55 / 30,55 | 10,60 / 10,60 | 0,05 / 0,05 | 11,75 / 11,75 | 78,45 / 78,45 | 0 |
+| 30 | verifier | 66,15 / 63,50 | 1,05 / 1,10 | 0,50 / 0,35 | 1,05 / 1,10 | 96,20 / 96,20 | 1,182 |
+| 30 | careful_hedger | 57,10 / 54,10 | 0 / 0,05 | 0 / 0 | 0 / 0,05 | 96,20 / 96,20 | 1,182 |
+
+- Tỷ lệ tin liên quan câu hỏi (của ngày đó) được kiểm chứng: verifier và careful_hedger 96,3% (10 ngày), 95,1% (30 ngày).
+- Mục tiêu A (10 ngày) và B (30 ngày) đều ĐẠT: verifier hơn official_only 29,05 điểm % (10 ngày, cần 15) và 32,95 điểm % (30 ngày, cần 10); mọi bot khác nằm trong khoảng yêu cầu. Không có mục tiêu nào chưa đạt, không có mâu thuẫn giữa A và B.
+- Phát hiện cần Claude cân nhắc: khan hiếm gần như không cắn bot. Mỗi ngày chỉ có khoảng 1 tin liên quan câu hỏi nên bot dùng ~1 lần kiểm chứng/ngày (spec kỳ vọng "gần giới hạn" 3). Người chơi thật thấy cả 6-7 tin nên có thể muốn kiểm chứng nhiều hơn. Nếu muốn áp lực rõ hơn: giảm analysis_energy xuống 2, hoặc tăng tool_energy của kiem_dinh_gia_thuyet/lam_sach_du_lieu lên 2, hoặc thêm bot "kiểm chứng rộng". Chưa thử vì mục tiêu đã đạt và spec nêu khởi điểm 3 và 1.
+
+world.json cuối: file đầy đủ ở game-studio/godot/data/world.json. Phần thêm mới so với v2: "analysis_energy":3, "tool_energy":{"truy_van_lich_su":1,"kiem_dinh_gia_thuyet":1,"doi_chieu_nguon":1,"lam_sach_du_lieu":1}, đặt ngay trước "tool_budget":{"truy_van_lich_su":60,"kiem_dinh_gia_thuyet":80,"doi_chieu_nguon":40,"lam_sach_du_lieu":100}. Mọi khóa khác không đổi (grading base 10, adjacent 0,4, adjacent_effect -0,55, wrong_factor 2,3, evidence_factor 0,4; career initial_trust 46, warning 35, demote 16; win demo chuyen_vien, full truong_nhom; news_per_day 6/7).
+
+Kiểm tra đã đổi (không xóa kiểm tra nào):
+- test_world / test_verification, "energy refusal atomic" (cấp Verifier): Verifier không còn kiểm tra hay trừ Energy công ty, nên đổi thành "verifier ignores company energy"; việc từ chối khi hết Energy chuyển lên WorldGame và được kiểm trong test mới.
+- test_world / test_status_energy: "public energy values before day" so với kho phân tích (analysis_energy) thay vì Energy sim; "public energy matches company" đổi thành "company energy untouched by verification"; thêm kiểm mã lỗi no_analysis_energy chính xác.
+- Thêm test_analysis_energy (mới): tools() trả tool_energy và budget thế giới; trừ đúng chi phí; hết kho thì từ chối no_analysis_energy, không đổi status/news/cash_report; invalid_tool và invalid_uid được ưu tiên; kiểm chứng lặp miễn phí khi hết kho; kho đặt lại mỗi ngày; Energy công ty không bị trừ và hành động đề xuất vẫn thực thi ở end_day khi kho phân tích đã cạn; không lộ khóa ẩn.
+- test_sim / test_use_tool: thêm 4 kiểm tra cho spend_energy (mặc định vẫn đòi và trừ Energy; false không đòi, không trừ, vẫn trừ Budget, không vượt rào danh mục).
+- test_v2_desktop: thêm 4 kiểm tra (thông báo no_analysis_energy ở cửa sổ công cụ; chấm Energy theo kho phân tích; chuỗi có mặt). Các kiểm tra Energy cũ giữ nguyên và qua.
+
+Kết quả chạy thật (worktree, Godot 4.7.2 console):
+- test_sim: 2.634 kiểm tra, 0 lỗi. test_ui: 134, 0 lỗi.
+- test_world (đầy đủ, gồm quét 500 ván/bot): 32.502, 0 lỗi. Quét điểm: 10 ngày min_win 8.464,50 > max_loss 1.914,00; 30 ngày min_win 9.538,00 > max_loss 3.519,00.
+- test_v2_assets: 2.255, 0 lỗi. test_v2_desktop: 2.336, 0 lỗi. test_v2_layout_render (không headless): 2.614, 0 lỗi.
+- balance_sim: trước/sau giống hệt từng dòng (43 dòng, bỏ elapsed_seconds).
+- balance_world 2.000 ván, 10 và 30 ngày: như bảng trên. Số "Trước" lấy từ chạy bản gốc v2 trong phiên này.
