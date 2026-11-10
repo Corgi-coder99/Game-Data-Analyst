@@ -16,6 +16,12 @@ const MorningScene = preload("res://scripts/life/morning_scene.gd")
 const ShopPanel = preload("res://scripts/life/shop_panel.gd")
 const OvertimeScene = preload("res://scripts/life/overtime_scene.gd")
 const Hud = preload("res://scripts/life/hud.gd")
+const Meta = preload("res://scripts/meta/meta.gd")
+const LetterScene = preload("res://scripts/v2/letter_scene.gd")
+const WallScene = preload("res://scripts/v2/wall_scene.gd")
+const SettingsScene = preload("res://scripts/v2/settings_scene.gd")
+const LeaveScene = preload("res://scripts/v2/leave_scene.gd")
+const Toast = preload("res://scripts/v2/toast.gd")
 const HUD_STATES := ["MORNING", "TRANSPORT", "COMMUTE", "SHOP", "DAY_START", "WORK", "OVERTIME", "EVENING"]
 const HORIZON := 10
 const FADE_STEP := 0.035
@@ -50,6 +56,16 @@ var morning_view: Control
 var shop_view: Control
 var overtime_view: Control
 var late_minutes := 0
+# T-030: the local meta layer (profile, attendance, Daily Shift, wall of fame). It is created only for the
+# real game (autostart); tests inject their own with a temporary profile path and a fixed clock.
+var meta: RefCounted
+var meta_enabled := true
+var run_mode := "run"
+var pre_run_queue: Array = []
+var meta_view: Control
+var toast_layer: CanvasLayer
+var toast_view: Control
+var toast_log: Array = []
 var focus_info: Dictionary = {"bonus": 0, "reason": "neutral"}
 var submission: Dictionary = {}
 var before_status: Dictionary = {}
@@ -80,7 +96,17 @@ func _ready() -> void:
 	add_child(hud_layer)
 	hud = Hud.new()
 	hud_layer.add_child(hud)
+	toast_layer = CanvasLayer.new()
+	toast_layer.layer = 8
+	add_child(toast_layer)
+	toast_view = Toast.new()
+	toast_layer.add_child(toast_view)
+	if autostart and meta_enabled and meta == null: meta = Meta.new()
 	if autostart: start_title()
+
+func toast(text: String) -> void:
+	toast_log.append(text)
+	if toast_view != null: toast_view.push(text)
 
 func daily_active() -> bool:
 	return daily_enabled and commute_enabled
@@ -176,8 +202,52 @@ func start_title() -> void:
 	_show(func():
 		title_view = TitleScene.instantiate()
 		_swap(title_view)
-		title_view.play_requested.connect(new_game.bind(-1, {}))
+		title_view.set_profile(meta)
+		title_view.play_requested.connect(begin_run.bind("run"))
+		title_view.daily_requested.connect(begin_run.bind("daily"))
+		title_view.wall_requested.connect(open_meta_view.bind("WALL"))
+		title_view.settings_requested.connect(open_meta_view.bind("SETTINGS"))
+		title_view.leave_requested.connect(open_meta_view.bind("LEAVE"))
 		title_view.quit_requested.connect(func(): get_tree().quit()))
+
+# ---- T-030: meta screens and the run entry ---------------------------------------------------------
+
+# Play or Daily Shift from the title: first-run explanation and attendance letter first, then the run.
+func begin_run(mode: String) -> void:
+	run_mode = mode
+	if meta == null:
+		new_game(-1, {})
+		return
+	pre_run_queue = meta.pre_run_screens()
+	_next_pre_run()
+
+func _next_pre_run() -> void:
+	if pre_run_queue.is_empty():
+		new_game(meta.daily_seed() if run_mode == "daily" else -1, {})
+		return
+	var screen: Dictionary = pre_run_queue.pop_front()
+	_set_state("INTRO" if screen.type == "intro" else "LETTER")
+	_show(func():
+		meta_view = LetterScene.new()
+		_swap(meta_view)
+		meta_view.open(screen)
+		meta_view.finished.connect(_next_pre_run, CONNECT_ONE_SHOT))
+
+func open_meta_view(which: String) -> void:
+	if meta == null: return
+	_set_state(which)
+	_show(func():
+		match which:
+			"WALL": meta_view = WallScene.new()
+			"SETTINGS": meta_view = SettingsScene.new()
+			_: meta_view = LeaveScene.new()
+		_swap(meta_view)
+		meta_view.open(meta)
+		meta_view.back_requested.connect(start_title, CONNECT_ONE_SHOT))
+
+func _replay() -> void:
+	run_mode = "run"
+	new_game(-1, {})
 
 func new_game(seed_value: int = -1, overrides: Dictionary = {}) -> void:
 	var chosen := seed_value
@@ -198,6 +268,7 @@ func start_with_game(value: RefCounted) -> void:
 	focus_info = {"bonus": 0, "reason": "neutral"}
 	if daily_active():
 		life.enable_daily()
+		if meta != null: meta.begin_run(life)
 		hud.bind(life)
 	else:
 		hud.bind(null)
@@ -438,10 +509,19 @@ func continue_review() -> void:
 
 func _after_review() -> void:
 	if state != "REVIEW": return
+	_record_day()
 	if bool(game.status().finished): _enter_ending()
 	elif daily_active() and overtime_enabled: _enter_overtime()
 	elif evening_enabled: _enter_evening()
 	else: _close_day()
+
+# T-030: the finished day goes to the ScoreSink (public parts only); achievements appear as toasts.
+func _record_day() -> void:
+	if meta == null or game == null: return
+	var after: Dictionary = game.status()
+	var context := {"focus_bonus": int(focus_info.bonus), "late_minutes": late_minutes}
+	var outcome: Dictionary = meta.finish_day(game, int(after.day), submission, before_status, after, context, run_mode, seed_used)
+	for text in outcome.get("toasts", []): toast(str(text))
 
 # T-026: stay late or go home. The day's wage arrives here.
 func _enter_overtime() -> void:
@@ -485,13 +565,15 @@ func _enter_ending() -> void:
 	_set_state("ENDING")
 	var final_status: Dictionary = game.status()
 	life.settle_for_ending(final_status)
+	if meta != null:
+		for text in meta.finish_run(final_status).get("toasts", []): toast(str(text))
 	_show(func(): _build_ending(final_status))
 	_set_state("END_SCREEN")
 
 func _build_ending(final_status: Dictionary) -> void:
 	ending_view = EndingScene.instantiate()
 	_swap(ending_view)
-	ending_view.replay_requested.connect(new_game.bind(-1, {}))
+	ending_view.replay_requested.connect(_replay)
 	ending_view.title_requested.connect(start_title)
 	ending_view.life_lines = [strings.life.ending_net % life.net_worth(), strings.life.ending_mood % [life.mood, strings.life.mood_names[life.mood_band()]], strings.life.ending_flavor[life.mood_band()]]
 	if life.vitals != null:
