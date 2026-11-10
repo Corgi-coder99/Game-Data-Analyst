@@ -15,13 +15,19 @@ static func validate_image(img: Image, path: String, report: bool = true) -> boo
 					printerr("FAIL ",path," pixel (",x,",",y,") ",pixel)
 				return false
 	return true
+# Compare as text so Windows CRLF checkouts do not cause false failures.
+static func _text(path: String) -> String:
+	return FileAccess.get_file_as_string(path).replace("
+", "
+")
+
 static func validate() -> bool:
 	var shared := ProjectSettings.globalize_path("res://../../shared/style-bible/palette-v3.json")
-	if FileAccess.get_file_as_bytes(shared) != FileAccess.get_file_as_bytes("res://data/palette_v3.json"):
+	if _text(shared) != _text("res://data/palette_v3.json"):
 		printerr("FAIL palette v3 copy differs")
 		return false
 	var shared_v2 := ProjectSettings.globalize_path("res://../../shared/style-bible/palette-v2.json")
-	if FileAccess.get_file_as_bytes(shared_v2) != FileAccess.get_file_as_bytes("res://data/palette_v2.json"):
+	if _text(shared_v2) != _text("res://data/palette_v2.json"):
 		printerr("FAIL palette v2 copy differs")
 		return false
 	if Palette.colors().size() != 64:
