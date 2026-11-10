@@ -12,7 +12,6 @@ Trạng thái: Backlog -> In progress -> Review -> Done. Bị chặn thì chuy�
 | T-002 (ví dụ) | Cài đặt tính năng X theo spec T-001 | Codex | codex/T-002 | src/x.py, tests/test_x.py | Kiểm thử qua, đúng spec |
 | T-008 | check_web.py: ép stdout UTF-8 để không lỗi UnicodeEncodeError trên console Windows mặc định | Codex | codex/T-008 | media-marketing/web/check_web.py | Chạy `python -I check_web.py` (không cần -X utf8) qua 6 mục |
 | T-010 | Kịch bản và video quảng cáo 30 giây (làm sau T-012 để cảnh quay không hiện công ty gần hết người dùng) | Claude/Codex | chưa chốt | media-marketing/video/* | Chưa có spec |
-| T-018b | Siết thưởng phạt (báo cáo bừa phải bị phạt, đuổi, giáng chức) và sửa ván 30 ngày (chi phí kiểm chứng, điều kiện thắng). Spec xong, chờ VU duyệt để giao | Codex | codex/T-018b | game-studio/godot/data/world.json, scripts/world/*, scripts/sim/simulation.gd (chỉ use_tool), tests/test_world.gd, tests/balance_world.gd, tests/test_sim.gd | Xem game-studio/godot/docs/SPEC-T-018b.md |
 | T-019 | Giao diện v2: cảnh văn phòng, màn hình máy tính và các cửa sổ, luồng báo cáo, họp cuối ngày. Chờ T-016, T-018 | Codex | codex/T-019 | scenes/*, scripts/ui/*, assets/* | Chưa có spec |
 
 ## In progress
