@@ -25,6 +25,7 @@ func _initialize() -> void:
 func new_flow() -> Node:
 	var node: Node = Flow.new()
 	node.autostart = false
+	node.commute_enabled = false
 	node.fade_enabled = false
 	# T-024: the old flow checks cover work and review only; the evening has its own test_life.
 	node.evening_enabled = false
@@ -420,6 +421,7 @@ func scripted_submit_minimal() -> void:
 func test_fade() -> void:
 	var node: Node = Flow.new()
 	node.autostart = false
+	node.commute_enabled = false
 	node.fade_enabled = true
 	root.add_child(node)
 	node.start_title()

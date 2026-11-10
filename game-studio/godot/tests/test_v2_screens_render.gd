@@ -20,7 +20,7 @@ var captures := "--capture" in OS.get_cmdline_user_args()
 var fault := "--fault" in OS.get_cmdline_user_args()
 var screens := 0
 var capture_dir := ""
-var capture_prefix := "T-021-"
+var capture_prefix := "T-022-"
 var measured := 0
 
 func check(ok: bool, description: String) -> void:
@@ -171,6 +171,21 @@ func run() -> void:
 	# 2. Day start with the boss question, then work.
 	flow.start_with_game(Game.new(104, 10))
 	await settle()
+	for i in 60: flow.commute.advance(0.05)
+	await inspect("commute-day1")
+	var late: Node2D = load("res://scenes/v2/commute.tscn").instantiate()
+	late.day = 9
+	flow.add_child(late)
+	for i in 70: late.advance(0.05)
+	await inspect("commute-day9")
+	late.queue_free()
+	flow.skip_commute()
+	await settle()
+	for room in ["data", "finance", "marketing", "executive", "reception", "sales", "meeting", "server", "break"]:
+		flow.office.show_room(room)
+		flow.office.advance(0.5)
+		await inspect("office-" + room)
+	flow.office.show_room("data")
 	flow.office.advance(5.0)
 	await inspect("day-start-boss")
 	flow.skip_intro()
