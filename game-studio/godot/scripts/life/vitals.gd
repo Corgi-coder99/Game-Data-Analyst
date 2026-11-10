@@ -184,7 +184,7 @@ func compute_arrival() -> int:
 # One stop at a shop door costs minutes whether or not the player buys anything.
 func enter_shop() -> void:
 	stops += 1
-	extra_minutes += int(cfg.day.stop_minutes)
+	extra_minutes += int(cfg.day.shop_visit_minutes)
 
 # red light: "wait" loses minutes, no risk; "run" saves them with a seeded chance of a fine or an accident.
 # The same three draws are consumed whichever choice is made, so the outcome is a function of the seed.

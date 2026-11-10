@@ -100,12 +100,11 @@ func red_seed() -> int:
 		if red: return seed_number
 	return 1
 
-func walk_to(commute: Node2D, wanted_type: String, wanted_id: String, limit: int = 6000) -> void:
+func visit(commute: Node2D, shop_id: String, limit: int = 6000) -> void:
+	commute.visit_shop(shop_id)
 	var guard := 0
-	while guard < limit and not (commute.paused == wanted_type and str(commute.current_stop.id) == wanted_id):
+	while guard < limit and commute.phase == "to_shop":
 		guard += 1
-		if commute.paused != "" and not (commute.paused == wanted_type and str(commute.current_stop.id) == wanted_id):
-			commute.default_answer()
 		commute.advance(0.03)
 
 func run() -> void:
@@ -113,7 +112,7 @@ func run() -> void:
 		printerr("test_t026_render requires a real display; omit --headless")
 		quit(2)
 		return
-	folder = ProjectSettings.globalize_path("res://docs/screenshots-T-026")
+	folder = ProjectSettings.globalize_path("res://docs/screenshots-T-027")
 	var seed_number := red_seed()
 	flow = new_flow(seed_number)
 	await inspect("morning-breakfast")
@@ -122,32 +121,25 @@ func run() -> void:
 	flow.morning_view.choose_transport("walk")
 	flow.commute.advance(1.0)
 	await inspect("commute-walking")
-	walk_to(flow.commute, "shop", "cafe")
-	await inspect("commute-shop-prompt")
-	check(flow.commute.prompt_panel.visible, "prompt visible")
-	flow.commute.answer_prompt("enter")
+	check(flow.commute.go_button.visible and flow.commute.phase == "street", "street idle with the Go to work button")
+	flow.commute.set_hover(0)
+	await inspect("commute-shop-hover")
+	check(flow.commute.tooltip_panel.visible, "tooltip visible on hover")
+	visit(flow.commute, "cafe")
 	await inspect("shop-cafe")
 	flow.shop_view.buy("coffee")
 	flow.shop_view.stage.advance(0.4)
 	await inspect("shop-cafe-bought")
 	flow.shop_view.leave_shop()
-	walk_to(flow.commute, "shop", "mart")
-	flow.commute.answer_prompt("enter")
+	visit(flow.commute, "mart")
 	await inspect("shop-mart")
 	flow.shop_view.select_shop("pharmacy")
 	await inspect("shop-pharmacy")
 	flow.shop_view.leave_shop()
-	walk_to(flow.commute, "light", "light")
-	await inspect("commute-red-light")
-	flow.commute.answer_prompt("run")
-	flow.commute.advance(0.1)
-	await inspect("commute-light-result")
-	walk_to(flow.commute, "shop", "bank")
-	flow.commute.answer_prompt("enter")
+	visit(flow.commute, "bank")
 	await inspect("shop-bank")
 	flow.shop_view.leave_shop()
-	walk_to(flow.commute, "shop", "books")
-	flow.commute.answer_prompt("enter")
+	visit(flow.commute, "books")
 	flow.shop_view.select_shop("clothing")
 	await inspect("shop-clothing")
 	flow.life.earn(100, "pay", "test")
@@ -159,6 +151,11 @@ func run() -> void:
 	flow.shop_view.render()
 	await inspect("shop-no-money")
 	flow.shop_view.leave_shop()
+	flow.commute.go_to_work()
+	await inspect("commute-red-light")
+	flow.commute.answer_prompt("run")
+	flow.commute.advance(0.1)
+	await inspect("commute-light-result")
 	flow.commute.hurry()
 	var guard := 0
 	while flow.state == "COMMUTE" and guard < 4000:
