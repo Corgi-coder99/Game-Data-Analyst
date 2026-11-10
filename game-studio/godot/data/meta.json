@@ -1,0 +1,142 @@
+{
+ "version": 1,
+ "profile": {"default_name": "Analyst", "name_max": 16, "history_cap": 3650},
+ "scoring": {"accuracy": 100, "trust": 5, "bonus_flag": 10, "late": -5, "missed": -25, "reputation_divisor": 10},
+ "monthly": {"best_n": 10},
+ "attendance": {
+  "leave_allowance_per_month": 3,
+  "leave_max_days": 3,
+  "leave_lookahead_days": 14,
+  "start_wallet": 60,
+  "fine_total_cap": 20,
+  "freeze_cap": 2,
+  "freeze_streak": 7,
+  "steps": [
+   {"missed": 1, "id": "reminder", "rep_pct": 0, "rep_flat": 0, "fine_pct": 0, "bonus": 0},
+   {"missed": 2, "id": "warning", "rep_pct": 0, "rep_flat": 2, "fine_pct": 0, "bonus": 0},
+   {"missed": 3, "id": "fine", "rep_pct": 5, "rep_flat": 0, "fine_pct": 10, "bonus": 5},
+   {"missed": 5, "id": "formal", "rep_pct": 10, "rep_flat": 0, "fine_pct": 15, "bonus": 5},
+   {"missed": 7, "id": "termination", "rep_pct": 20, "rep_flat": 0, "fine_pct": 20, "bonus": 8},
+   {"missed": 8, "id": "rehire", "rep_pct": 30, "rep_flat": 0, "fine_pct": 20, "bonus": 10}
+  ]
+ },
+ "awards_rules": {
+  "honest_min_days": 3, "honest_min_rate": 0.75, "honest_confidence": "cao",
+  "never_late_days": 10
+ },
+ "text": {
+  "intro_title": "Welcome to the team!",
+  "intro_lines": [
+   "This game remembers the days you work. Finish a day and it goes on your profile, in a file on this computer only.",
+   "If you skip several days, your fictional boss writes you an increasingly dramatic letter. It costs a little in-game reputation and starting cash. Nothing real, ever.",
+   "You get 3 leave days per month, and you can request leave in advance from the title screen. You can switch the attendance letters off in Settings at any time."
+  ],
+  "intro_hint": "No account, no network, no notifications. Your profile can be reset in Settings.",
+  "leave_hint": "Next time, request leave on the title screen.",
+  "welcome_back": "Welcome back bonus: +$%d on your starting wallet.",
+  "penalty_rep": "Reputation: -%d",
+  "penalty_fine": "Fine: -$%d from your next starting wallet",
+  "penalty_none": "No penalty this time.",
+  "rehired_note": "History kept. You restart as an Intern.",
+  "missed_line": "Days missed: %d",
+  "from_hr": "From: HR Department",
+  "from_boss": "From: Ms. Hanh, Boss",
+  "from_khoi": "From: Khoi, Desk Neighbor"
+ },
+ "letters": {
+  "reminder": {
+   "from": "from_khoi", "subject": "Where were you?",
+   "lines": [
+    "Your chair is feeling lonely. It asked me to ask you where you are.",
+    "I watered your desk plant. It says thanks and also that you are late.",
+    "The coffee machine asked about you. I said you were doing something important.",
+    "Nobody touched your stapler. It has been standing guard since yesterday.",
+    "Quick note: the office cat sat on your keyboard all morning. No data was harmed.",
+    "No pressure! Just a friendly knock on your virtual door."
+   ]
+  },
+  "warning": {
+   "from": "from_khoi", "subject": "Verbal warning (very verbal)",
+   "lines": [
+    "I covered your desk plant again. It says it is not my coworker, it is your responsibility.",
+    "Ms. Hanh asked where you were. I said you were in a meeting with a very tall spreadsheet.",
+    "This is a gentle verbal warning. It is mostly my voice, and I am not very scary.",
+    "Your inbox is building a small mountain. It has named the peak after you.",
+    "The team lunch ordered your usual and had to eat it for you. It was a sacrifice.",
+    "Come back soon, or I will have to start answering your emails in your style."
+   ]
+  },
+  "fine": {
+   "from": "from_hr", "subject": "Notice of small fine",
+   "lines": [
+    "You have been absent for several days. A fine has been deducted. The coffee machine misses you more than the bank does.",
+    "HR has reviewed your attendance and found it creatively absent.",
+    "Please note that the fine is small, fictional and tax-free in all known universes.",
+    "Your name tag has started gathering dust. We dusted it. That cost money. Hence the fine.",
+    "Attendance is like a houseplant: skip it long enough and it files a complaint.",
+    "This letter was printed on very serious paper. The paper is a bit embarrassed about it."
+   ]
+  },
+  "formal": {
+   "from": "from_boss", "subject": "Official warning",
+   "lines": [
+    "Official warning. Your market forecast this week was 'I do not know' by not submitting. Bold choice.",
+    "I have seen better attendance from the office ghost, and we do not have an office ghost.",
+    "Your rank is at risk. Your desk is at risk. The sandwich in your drawer is definitely at risk.",
+    "I am not angry. I am disappointed, and also slightly angry, and mostly hungry.",
+    "Please report to your desk. Bring a forecast, a valid reason, or a funny hat.",
+    "This warning will be filed in the cabinet marked 'Dramatic Things'."
+   ]
+  },
+  "termination": {
+   "from": "from_hr", "subject": "Termination notice (draft)",
+   "lines": [
+    "Dear employee, this is a termination notice. Unless you have a valid reason, like a cat on the keyboard. Cat on keyboard counts.",
+    "We have prepared a farewell cake. It is already being eaten. Hurry back.",
+    "Your badge will stop opening doors at the end of the week. The doors are sad about it.",
+    "Per policy section 12, paragraph 'Please Come Back', this letter is mandatory and very dramatic.",
+    "Your colleagues have started telling stories about you in the past tense. Do something about it.",
+    "This is the point where a sad violin plays. We hired one. It is also an intern."
+   ]
+  },
+  "rehire": {
+   "from": "from_hr", "subject": "You have been rehired",
+   "lines": [
+    "Good news: we lost your termination paperwork and found your resume. You are rehired, as an Intern.",
+    "Your history is kept in a golden folder. Your title is kept in a smaller, less golden folder.",
+    "Welcome back! Khoi says you owe him a coffee for the cover story.",
+    "The Intern badge has your photo on it. We used the one where you look mysterious.",
+    "Everyone starts somewhere, and you start again here. The plant forgives you.",
+    "A fresh desk, a fresh mug and a fresh start. The old mug has retired to the shelf."
+   ]
+  }
+ },
+ "leave_reasons": [
+  {"id": "cat", "text": "A cat sat on my keyboard"},
+  {"id": "tooth", "text": "Dentist visit (the tooth won)"},
+  {"id": "plant", "text": "My houseplant needs emotional support"},
+  {"id": "pigeon", "text": "Bus driven by a confident pigeon"},
+  {"id": "coffee", "text": "Urgent coffee research trip"},
+  {"id": "nap", "text": "Scheduled power nap"},
+  {"id": "kite", "text": "Kite festival, mandatory"},
+  {"id": "sick", "text": "Feeling under the weather"}
+ ],
+ "avatars": ["player", "khoi", "mai", "vy", "tu", "rin", "sam", "pat", "mei", "ngoc"],
+ "awards": [
+  {"id": "streak", "name": "Longest Streak", "empty": "Work two days in a row"},
+  {"id": "rank", "name": "Highest Rank", "empty": "Finish a day first"},
+  {"id": "best_day", "name": "Best Single Day", "empty": "Finish a day first"},
+  {"id": "honest", "name": "Most Honest Analyst", "empty": "Be right 3 times with high confidence"},
+  {"id": "never_late", "name": "Never Late", "empty": "10 days in a row on time"}
+ ],
+ "achievements": [
+  {"id": "first_report", "name": "First Report", "desc": "Finish your first day", "rule": "days_total", "value": 1},
+  {"id": "perfect_day", "name": "Perfect Day", "desc": "Right call, confirmed evidence, on time", "rule": "perfect_day", "value": 0},
+  {"id": "verified", "name": "Verified Before Reporting", "desc": "Report with solid evidence", "rule": "verified", "value": 0},
+  {"id": "survived_10", "name": "Survived 10 Days", "desc": "Finish a full run", "rule": "run_survived", "value": 0},
+  {"id": "senior", "name": "Promoted to Senior", "desc": "Reach Senior Analyst", "rule": "rank_index", "value": 2},
+  {"id": "zero_late_week", "name": "Zero Late Week", "desc": "7 days in a row on time", "rule": "best_ontime", "value": 7},
+  {"id": "streak_7", "name": "7-Day Streak", "desc": "Work 7 calendar days in a row", "rule": "best_streak", "value": 7}
+ ],
+ "ranks": {"thuc_tap": "Intern", "chuyen_vien": "Analyst", "chuyen_vien_chinh": "Senior Analyst", "truong_nhom": "Team Lead", "giam_doc": "Analytics Director"}
+}
