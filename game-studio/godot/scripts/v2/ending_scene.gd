@@ -47,6 +47,7 @@ func show_ending(final_status: Dictionary) -> void:
 	add_child(office)
 	office.set_hint_visible(false)
 	office.desk_button.hide()
+	office.minimap.hide()
 	office.set_process_unhandled_input(false)
 	office.seat_now()
 	office.set_phase("sang" if ending == "survived" else "chieu")

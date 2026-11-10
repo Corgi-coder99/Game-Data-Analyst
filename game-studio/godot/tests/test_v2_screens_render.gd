@@ -102,7 +102,7 @@ func inspect(screen: String) -> void:
 	print("render ", screen, ": ", measured - before, " controls measured, window=", root.size, " viewport=", root.get_visible_rect())
 	if captures:
 		var image := root.get_texture().get_image()
-		image.save_png(OS.get_environment("TEMP").path_join("T-021-" + screen + ".png"))
+		image.save_png(OS.get_environment("TEMP").path_join("T-022-" + screen + ".png"))
 
 func fixture(world_patch: Dictionary = {}, extra: Dictionary = {}) -> Dictionary:
 	var config: Dictionary = Loader.load_json("res://data/world.json").duplicate(true)
@@ -163,6 +163,21 @@ func run() -> void:
 	# 2. Day start with the boss question, then work.
 	flow.start_with_game(Game.new(104, 10))
 	await settle()
+	for i in 60: flow.commute.advance(0.05)
+	await inspect("commute-day1")
+	var late: Node2D = load("res://scenes/v2/commute.tscn").instantiate()
+	late.day = 9
+	flow.add_child(late)
+	for i in 70: late.advance(0.05)
+	await inspect("commute-day9")
+	late.queue_free()
+	flow.skip_commute()
+	await settle()
+	for room in ["data", "finance", "marketing", "executive", "reception", "sales", "meeting", "server", "break"]:
+		flow.office.show_room(room)
+		flow.office.advance(0.5)
+		await inspect("office-" + room)
+	flow.office.show_room("data")
 	flow.office.advance(5.0)
 	await inspect("day-start-boss")
 	flow.skip_intro()
