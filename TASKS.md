@@ -18,9 +18,7 @@ Trạng thái: Backlog -> In progress -> Review -> Done. Bị chặn thì chuy�
 
 ## In progress
 
-| ID | Việc | Owner | Nhánh | File được sửa | Tiêu chí hoàn thành |
-|---|---|---|---|---|---|
-| T-019b | Giao diện v2 phần b: màn hình máy tính (thanh tác vụ, cửa sổ Tin tức, Công ty, Công cụ kiểm chứng, ghim bằng chứng). Claude tự quyết giao (VU ủy quyền) | Codex | codex/T-019b | game-studio/godot/scenes/v2/desktop.tscn, scripts/v2/desktop.gd, scripts/v2/windows/*, scripts/v2/theme_v2.gd, data/strings_v2.json, tools/sprites/icons.gd, assets/v2/*, scripts/world/world_game.gd (chỉ status: energy), tests/test_world.gd (chỉ energy), tests/test_v2_desktop.gd, tests/test_v2_layout_render.gd | Xem game-studio/godot/docs/SPEC-T-019b.md |
+(chưa có)
 
 ## Review
 
