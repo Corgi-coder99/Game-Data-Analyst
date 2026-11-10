@@ -45,8 +45,6 @@ Trạng thái: Backlog -> In progress -> Review -> Done. Bị chặn thì chuy�
 | T-014 | Thay ảnh gameplay trên landing page bằng ảnh chụp từ ván chơi tự nhiên của bản mới (tuần 3/10, có sự kiện đã lộ và gợi ý thẻ xử lý); cập nhật alt. check_web.py 6/6 | Claude | 2026-11-10 |
 | T-015 | Concept GDD v2 (game-studio/godot/docs/GDD-v2-concept.md). VU duyệt hướng v2; nguồn pixel art chốt: sprite viết bằng mã; bản v1 gắn tag demo-dashboard-v1, v2 phát triển trên nhánh v2 | Claude | 2026-11-10 |
 | T-018 | Tầng thế giới v2 (scripts/world/): kịch bản ẩn, tin đúng/sai/cũ/nhiễu, kiểm chứng, báo cáo chấm điểm, sự nghiệp, bot cân bằng (Codex). Đạt 5/5 mục tiêu demo, không lộ dữ liệu ẩn (Claude quét 450 kết quả API). Còn nợ: thưởng phạt quá nhẹ, bản 30 ngày chưa dùng được (chuyển sang T-018b). Claude đã review; VU duyệt merge vào v2 | Codex | 2026-11-10 |
-| T-015 | Concept GDD v2 (game-studio/godot/docs/GDD-v2-concept.md). VU duyệt hướng v2; nguồn pixel art chốt: sprite viết bằng mã; bản v1 gắn tag demo-dashboard-v1, v2 phát triển trên nhánh v2 | Claude | 2026-11-10 |
-| T-018 | Tầng thế giới v2 (scripts/world/): kịch bản ẩn, tin đúng/sai/cũ/nhiễu, kiểm chứng, báo cáo chấm điểm, sự nghiệp, bot cân bằng (Codex). Đạt 5/5 mục tiêu demo, không lộ dữ liệu ẩn (Claude quét 450 kết quả API). Còn nợ: thưởng phạt quá nhẹ, bản 30 ngày chưa dùng được (chuyển sang T-018b). Claude đã review; VU duyệt merge vào v2 | Codex | 2026-11-10 |
 
 ## Blocked
 
