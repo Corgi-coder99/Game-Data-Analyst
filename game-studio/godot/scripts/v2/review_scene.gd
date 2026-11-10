@@ -40,6 +40,8 @@ var sweep_time := -1.0
 var title_label: Label
 var stage: Control
 var skipped := false
+# T-024: one extra line under the career step (net worth and mood); empty hides it.
+var life_text := ""
 var built := false
 
 func _ready() -> void:
@@ -307,6 +309,7 @@ func _step_career() -> void:
 		"fired": _text(body, strings.review.fired, Rect2(0, y, 392, 17), 26, 12)
 		"bankrupt": _text(body, strings.review.bankrupt, Rect2(0, y, 392, 17), 26, 12)
 		_: _text(body, strings.review.steady, Rect2(0, y, 392, 12), 7)
+	if life_text != "": _text(body, life_text, Rect2(0, 150, 392, 12), 28)
 	_show_stage(category if category != "" else "steady")
 	var delay := 0.0
 	for event in events:

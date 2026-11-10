@@ -8,6 +8,8 @@ extends SceneTree
 const Flow = preload("res://scripts/v2/game_flow.gd")
 const Game = preload("res://scripts/world/world_game.gd")
 const Loader = preload("res://scripts/data.gd")
+const Life = preload("res://scripts/life/life_game.gd")
+const EveningScene = preload("res://scripts/life/evening_scene.gd")
 const SCREEN := Rect2(0, 0, 640, 360)
 const TOLERANCE := 0.51
 var checks := 0
@@ -17,6 +19,8 @@ var strings: Dictionary
 var captures := "--capture" in OS.get_cmdline_user_args()
 var fault := "--fault" in OS.get_cmdline_user_args()
 var screens := 0
+var capture_dir := ""
+var capture_prefix := "T-022-"
 var measured := 0
 
 func check(ok: bool, description: String) -> void:
@@ -102,7 +106,9 @@ func inspect(screen: String) -> void:
 	print("render ", screen, ": ", measured - before, " controls measured, window=", root.size, " viewport=", root.get_visible_rect())
 	if captures:
 		var image := root.get_texture().get_image()
-		image.save_png(OS.get_environment("TEMP").path_join("T-022-" + screen + ".png"))
+		var folder := capture_dir if capture_dir != "" else OS.get_environment("TEMP")
+		DirAccess.make_dir_recursive_absolute(folder)
+		image.save_png(folder.path_join(capture_prefix + screen + ".png"))
 
 func fixture(world_patch: Dictionary = {}, extra: Dictionary = {}) -> Dictionary:
 	var config: Dictionary = Loader.load_json("res://data/world.json").duplicate(true)
@@ -153,6 +159,8 @@ func run() -> void:
 	flow = Flow.new()
 	flow.autostart = false
 	flow.fade_enabled = false
+	# T-024: the evening is rendered in its own section at the end.
+	flow.evening_enabled = false
 	root.add_child(flow)
 	# 1. Title.
 	flow.start_title()
@@ -275,5 +283,79 @@ func run() -> void:
 		submit("tang", "thap")
 		while flow.state == "REVIEW": flow.continue_review()
 	await inspect("ending-survived-lost")
+	await evening_section()
 	print("test_v2_screens_render: %d checks, %d failures, %d screens, %d controls" % [checks, failures, screens, measured])
 	quit(1 if failures else 0)
+
+# ---- T-024: the Evening scene, the review line and the ending with life lines ----
+
+func evening_section() -> void:
+	capture_dir = ProjectSettings.globalize_path("res://docs/screenshots-T-024")
+	capture_prefix = "T-024-"
+	flow.evening_enabled = true
+	flow.start_with_game(Game.new(104, 10, fixture({"grading":{"base":30}, "career":{"minimum_days":2, "correct_streak":2}})))
+	flow.skip_intro()
+	submit("tang", "cao")
+	flow.review_view.set_process(false)
+	for step in 5: flow.continue_review()
+	await inspect("review-networth")
+	check(flow.review_view.life_text != "" and flow.review_view.body.get_children().any(func(c): return c is Label and c.text == flow.review_view.life_text), "review career step shows the net worth line")
+	flow.continue_review()
+	check(flow.state == "EVENING", "the evening follows the review")
+	await inspect("evening-first")
+	var scene: Control = flow.evening_view
+	for tab in scene.TABS:
+		scene.select_tab(tab)
+		await inspect("evening-tab-" + tab)
+	scene.select_tab("food")
+	scene.buy_food("noodle_cart")
+	scene.advance(0.4)
+	await inspect("evening-food-bought")
+	scene.go_home()
+	check(flow.state == "DAY_START", "Go home starts the next day")
+	# Rich evenings: every owned state, a loss event and a gain event.
+	var rich := Life.new(11, {"events": {"none": 0.0, "lost_wallet": 1.0, "gold_crash": 0.0, "vendor_hike": 0.0, "found_cash": 0.0, "street_fine": 0.0}})
+	var view: Control = EveningScene.new()
+	root.add_child(view)
+	view.open(rich, {"day": 5, "horizon": 10, "personal_pay": 4000.0, "trust": 60.0, "cash_report": 1000.0})
+	view.stage.advance(0.5)
+	await inspect_view(view, "evening-loss-popup")
+	view.buy_property("land")
+	view.buy_property("house")
+	view.buy_gold(3)
+	view.deposit(500)
+	view.stage.skip()
+	for tab in view.TABS:
+		view.select_tab(tab)
+		await inspect_view(view, "evening-owned-" + tab)
+	view.select_tab("property")
+	view.sell_property("land")
+	await inspect_view(view, "evening-sold-land")
+	view.queue_free()
+	var cheer: Life = Life.new(12, {"events": {"none": 0.0, "lost_wallet": 0.0, "gold_crash": 0.0, "vendor_hike": 0.0, "found_cash": 1.0, "street_fine": 0.0}})
+	var happy: Control = EveningScene.new()
+	root.add_child(happy)
+	happy.open(cheer, {"day": 3, "horizon": 10, "personal_pay": 450.0, "trust": 50.0, "cash_report": 1000.0})
+	happy.stage.advance(0.5)
+	await inspect_view(happy, "evening-gain-popup")
+	happy.queue_free()
+	# The ending with the extra life lines.
+	var guard := 0
+	while flow.state != "END_SCREEN" and guard < 12:
+		guard += 1
+		flow.skip_intro()
+		submit("tang", "cao")
+		while flow.state == "REVIEW": flow.continue_review()
+		if flow.state == "EVENING": flow.evening_view.skip()
+	check(flow.state == "END_SCREEN" and flow.ending_view.life_lines.size() == 3, "ending carries the life lines")
+	await inspect("ending-life")
+
+func inspect_view(view: Control, screen: String) -> void:
+	await settle()
+	screens += 1
+	var before := measured
+	measure(view, screen)
+	print("render ", screen, ": ", measured - before, " controls measured")
+	if captures:
+		DirAccess.make_dir_recursive_absolute(capture_dir)
+		root.get_texture().get_image().save_png(capture_dir.path_join(capture_prefix + screen + ".png"))

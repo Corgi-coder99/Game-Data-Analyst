@@ -176,6 +176,7 @@ func test_commute() -> void:
 func test_commute_flow() -> void:
 	var flow: Node = Flow.new()
 	flow.autostart = false
+	flow.evening_enabled = false
 	flow.fade_enabled = false
 	root.add_child(flow)
 	flow.start_with_game(Game.new(104, 10))
