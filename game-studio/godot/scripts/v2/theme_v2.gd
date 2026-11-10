@@ -6,6 +6,10 @@ static func box(background: int, border: int = 5) -> StyleBoxFlat:
 	style.bg_color = Palette.color(background)
 	style.border_color = Palette.color(border)
 	style.set_border_width_all(1)
+	style.content_margin_left = 1
+	style.content_margin_right = 1
+	style.content_margin_top = 1
+	style.content_margin_bottom = 1
 	return style
 
 static func create() -> Theme:

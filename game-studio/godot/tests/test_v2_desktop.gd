@@ -56,6 +56,79 @@ func check_bounds(node: Node, clip: Rect2 = Rect2(0, 0, 640, 360)) -> void:
 		if node.clip_contents: next_clip = clip.intersection(rect)
 	for child in node.get_children(): check_bounds(child, next_clip)
 
+# Read settled global geometry and intrinsic minimums: forcing size alone can hide overflow.
+func measured_rect(control: Control) -> Rect2:
+	var rect := control.get_global_rect()
+	rect.size = rect.size.max(control.get_combined_minimum_size())
+	return rect
+
+func check_global_controls(node: Node, scroll_clip: Rect2 = Rect2()) -> void:
+	if node is Control and node.is_visible_in_tree():
+		var actual: Rect2 = node.get_global_rect()
+		var measured := measured_rect(node)
+		check(actual.size.x >= measured.size.x and actual.size.y >= measured.size.y, "actual size accommodates minimum: " + str(node.get_path()) + " actual=" + str(actual) + " minimum=" + str(measured.size))
+		# Only scrolling content may extend offscreen. Test its viewport separately.
+		if scroll_clip.has_area():
+			if measured.intersects(scroll_clip):
+				check(Rect2(0, 0, 640, 360).encloses(measured.intersection(scroll_clip)), "scrolled drawing inside screen")
+		else:
+			check(Rect2(0, 0, 640, 360).encloses(actual), "global control inside screen: " + str(node.get_path()) + str(actual))
+		if node is ScrollContainer: scroll_clip = actual
+	for child in node.get_children(): check_global_controls(child, scroll_clip)
+
+func check_siblings(parent: Control) -> void:
+	var controls: Array = []
+	for child in parent.get_children():
+		if child is Control and child.is_visible_in_tree() and not child is Panel and not child is ColorRect:
+			controls.append(child)
+	for i in controls.size():
+		for j in range(i + 1, controls.size()):
+			check(not measured_rect(controls[i]).intersects(measured_rect(controls[j])), "sibling rows disjoint: " + str(controls[i].get_path()) + " / " + str(controls[j].get_path()))
+
+func check_layout(desktop: Control) -> void:
+	await process_frame
+	await process_frame
+	if DisplayServer.get_name() != "headless": await RenderingServer.frame_post_draw
+	check_global_controls(desktop)
+	for window in desktop.windows.values():
+		check_siblings(window)
+		check_siblings(window.content)
+	var rows: Array = desktop.news_window.rows.values()
+	for i in rows.size():
+		for j in range(i + 1, rows.size()):
+			check(not measured_rect(rows[i]).intersects(measured_rect(rows[j])), "news rows disjoint after layout")
+	for row in desktop.news_window.rows.values(): check_siblings(row)
+	var task_area := Rect2(0, 344, 640, 16)
+	for button in desktop.task_buttons.values():
+		var rect: Rect2 = button.get_global_rect()
+		var minimum: Vector2 = button.get_combined_minimum_size()
+		check(task_area.encloses(rect) and task_area.encloses(measured_rect(button)), "task button entirely in y344..360")
+		check(rect.size.y <= 14 and minimum.y <= 14, "task button actual and minimum height <=14")
+		var font: Font = button.get_theme_font("font")
+		var font_height: float = font.get_height(button.get_theme_font_size("font_size"))
+		for state in ["normal", "pressed", "hover", "disabled", "focus"]:
+			var style: StyleBox = button.get_theme_stylebox(state)
+			check(font_height + style.get_content_margin(SIDE_TOP) + style.get_content_margin(SIDE_BOTTOM) <= 14, "task button text and margins fit " + state)
+		print("layout task ", button.text, ": ", rect, " minimum=", minimum, " font_height=", font_height)
+	for child in desktop.get_children():
+		if child is ColorRect and child.position.y == 344:
+			check(child.get_global_rect() == task_area, "taskbar exactly 640x16 at y344")
+	for child in desktop.tools_window.content.get_children():
+		if child is Label and (child == desktop.tools_window.result_label or child.text.begins_with(desktop.strings.ui.energy)):
+			print("layout tools ", child.text, ": ", child.get_global_rect())
+	for window in desktop.windows.values():
+		for child in window.get_children():
+			if child is Label: print("layout title ", child.text, ": ", child.get_global_rect())
+	for row in desktop.news_window.rows.values():
+		for child in row.get_children():
+			if child is Button:
+				print("layout pin: ", child.get_global_rect())
+		break
+	var company: Control = desktop.company_window.content
+	for child in company.get_children():
+		if child is ProgressBar or (child is Label and child.text == desktop.strings.metrics.cash):
+			print("layout company ", child.get_class(), ": ", child.get_global_rect(), " minimum=", child.get_combined_minimum_size())
+
 func run() -> void:
 	root.content_scale_size = Vector2i(640, 360)
 	root.size = Vector2i(640, 360)
@@ -108,6 +181,7 @@ func run() -> void:
 		desktop.toggle_window(id)
 		check(desktop.windows[id].visible and desktop.windows[id].get_rect() == rect, "window restored in place")
 	check(toggles.size() == 6, "window signals")
+	await check_layout(desktop)
 	scan("res://scripts/v2")
 	if "--capture" in OS.get_cmdline_user_args():
 		desktop.toggle_pin(uid)
@@ -136,6 +210,7 @@ func run() -> void:
 				check(tooltip.size.x <= 320 and tooltip.size.y <= 320, "tooltip contained")
 				tooltip.free()
 	check_bounds(desktop)
+	await check_layout(desktop)
 	for a in desktop.windows:
 		check(Rect2(0, 14, 640, 330).encloses(desktop.windows[a].get_rect()), "window bounds")
 		for b in desktop.windows:

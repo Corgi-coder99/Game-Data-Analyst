@@ -20,9 +20,9 @@ func display(available: Array, state: Dictionary, selected: Dictionary, message:
 	label(content, strings.ui.energy + " " + dots(state), Rect2(0, 0, 230, 14), 28)
 	for i in available.size():
 		var tool: Dictionary = available[i]
-		var y := 16 + i * 23
+		var y := 14 + i * 24
 		label(content, strings.tools[tool.id], Rect2(0, y, 180, 12))
-		label(content, strings.ui.cost % [tool.energy, tool.budget], Rect2(0, y + 10, 180, 12), 7)
+		label(content, strings.ui.cost % [tool.energy, tool.budget], Rect2(0, y + 12, 180, 12), 7)
 		var use := button(content, strings.ui.use, Rect2(187, y + 2, 43, 18))
 		var cached: bool = tool.id in selected.get("verified_by", [])
 		use.disabled = selected.is_empty() or bool(state.finished) or (not cached and (int(state.energy) < int(tool.energy) or float(state.cash_report) < float(tool.budget)))

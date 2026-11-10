@@ -28,10 +28,10 @@ signal window_toggled(window_id: String, visible: bool)
 
 func _ready() -> void:
 	_build()
-	if game != null: refresh()
+	if game != null: setup(game)
 
 func _build() -> void:
-	if built: return
+	if built or not is_inside_tree(): return
 	built = true
 	size = Vector2(640, 360)
 	clip_contents = true
@@ -67,34 +67,40 @@ func _build() -> void:
 	taskbar.color = Palette.color(2)
 	taskbar.position = Vector2(0, 344)
 	taskbar.size = Vector2(640, 16)
+	taskbar.clip_contents = true
 	taskbar.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(taskbar)
 	var i := 0
 	for id in windows:
 		var task := Button.new()
+		task.theme = theme
+		task.custom_minimum_size = Vector2(108, 14)
+		task.clip_contents = true
 		task.add_theme_font_size_override("font_size", 8)
 		task.text = strings.windows[id]
-		task.position = Vector2(4 + i * 112, 345)
+		task.position = Vector2(4 + i * 112, 1)
 		task.size = Vector2(108, 14)
 		task.toggle_mode = true
 		task.button_pressed = true
 		task.pressed.connect(toggle_window.bind(id))
-		add_child(task)
+		taskbar.add_child(task)
 		task.size = Vector2(108, 14)
 		task_buttons[id] = task
 		i += 1
 	clock = TooltipLabel.new()
 	clock.add_theme_font_size_override("font_size", 8)
-	clock.position = Vector2(348, 344)
+	clock.position = Vector2(348, 0)
 	clock.size = Vector2(288, 16)
 	clock.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	clock.tooltip_text = strings.ui.disclaimer
-	add_child(clock)
+	taskbar.add_child(clock)
 	clock.size = Vector2(288, 16)
 
 func setup(value: RefCounted) -> void:
-	_build()
 	game = value
+	# Theme minimums are valid only inside the scene tree; _ready completes early setup.
+	if not is_inside_tree(): return
+	_build()
 	company_window.reset_history()
 	selected = ""
 	clear_pins()
@@ -102,7 +108,7 @@ func setup(value: RefCounted) -> void:
 	refresh()
 
 func refresh() -> void:
-	if game == null: return
+	if game == null or not is_inside_tree(): return
 	_build()
 	entries.clear()
 	for item in game.news_today():

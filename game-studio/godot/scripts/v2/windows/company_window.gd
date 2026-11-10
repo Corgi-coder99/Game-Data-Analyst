@@ -26,11 +26,14 @@ func display(snapshot: Dictionary, state: Dictionary) -> void:
 	label(content, strings.ui.day % [state.day, state.horizon] + " · " + strings.ranks[state.rank], Rect2(0, 0, 232, 13))
 	label(content, strings.ui.trust % state.trust, Rect2(0, 13, 110, 13))
 	var trust := ProgressBar.new()
+	trust.theme = theme
+	trust.show_percentage = false
+	trust.custom_minimum_size = Vector2(117, 7)
 	trust.position = Vector2(113, 16)
 	trust.size = Vector2(117, 7)
 	trust.value = clampf(float(state.trust), 0, 100)
-	trust.show_percentage = false
 	content.add_child(trust)
+	trust.size = Vector2(117, 7)
 	for i in METRICS.size():
 		var metric: String = METRICS[i]
 		var value: float = current[metric]
