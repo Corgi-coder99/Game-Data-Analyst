@@ -96,19 +96,22 @@ func _card(item: Dictionary, is_pinned: bool) -> void:
 	var tier_label := label(row, strings.tiers[tier], Rect2(59, 2, 70, 14))
 	tier_label.tooltip_text = strings.glossary.get("tier_" + tier, "")
 	tier_label.mouse_filter = Control.MOUSE_FILTER_PASS
-	var source := label(row, item.source_name, Rect2(134, 2, 124, 14), 7)
+	var source := label(row, item.source_name, Rect2(134, 2, 116, 14), 7)
 	source.tooltip_text = item.source_name
 	source.mouse_filter = Control.MOUSE_FILTER_PASS
 	# What the headline claims, not whether it is right.
 	var claimed := Claim.direction(item.headline)
 	var figure := Claim.figure(item.headline)
 	if claimed != "":
-		var arrow := icon(row, DIRECTION_ICONS[claimed], Vector2(262, 5))
+		var arrow := icon(row, DIRECTION_ICONS[claimed], Vector2(254, 0))
+		arrow.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		arrow.stretch_mode = TextureRect.STRETCH_SCALE
+		arrow.size = Vector2(16, 16)
 		arrow.tooltip_text = strings.news_ui["claim_" + DIRECTION_WORDS[claimed]]
 		arrow.mouse_filter = Control.MOUSE_FILTER_PASS
 	if figure != "":
 		var badge := Panel.new()
-		badge.position = Vector2(274, 1)
+		badge.position = Vector2(272, 1)
 		badge.size = Vector2(58, 15)
 		badge.add_theme_stylebox_override("panel", WindowTheme.box(3, 28))
 		badge.mouse_filter = Control.MOUSE_FILTER_IGNORE

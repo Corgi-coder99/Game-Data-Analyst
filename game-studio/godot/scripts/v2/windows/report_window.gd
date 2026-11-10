@@ -173,7 +173,7 @@ func render() -> void:
 	open_browser_buttons.clear()
 	checklist_labels.clear()
 	label(content, strings.report.to, Rect2(0, 0, 210, 12), 7)
-	var subject_label := label(content, strings.report.subject % subject, Rect2(0, 12, 210, 24))
+	var subject_label := label(content, strings.report.subject % subject, Rect2(0, 12, 210, 28))
 	subject_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	subject_label.max_lines_visible = 2
 	subject_label.tooltip_text = subject

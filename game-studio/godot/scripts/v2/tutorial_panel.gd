@@ -202,8 +202,15 @@ func flag_done(index: int) -> bool:
 # Records a real player action; the current step advances when it matches.
 func note(flag: String) -> void:
 	flags[flag] = true
-	if active and flag_done(step):
-		step += 1
+	if not active:
+		layout()
+		return
+	# Jump past the latest step the player has already completed.
+	var latest := -1
+	for index in range(step, steps.size()):
+		if flag_done(index): latest = index
+	if latest >= 0:
+		step = latest + 1
 		_after_step()
 	else:
 		layout()

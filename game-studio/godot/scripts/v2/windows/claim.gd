@@ -1,18 +1,23 @@
 extends RefCounted
 # What a headline says, read from its visible text only: a direction and an optional figure.
 # This is the claim of the source, not a verdict: it can be wrong, stale or exaggerated.
-const UP_WORDS := ["rise", "rose", "raises", "raised", "hike", "jump", "climb", "doubled", "lifts", "gain", "pricier", "higher", "tick up", "prices up", " up ", "buying more", "recover", "increase", "soar"]
-const DOWN_WORDS := ["fall", "fell", "lose", "drop", "down", "cut ", "collapse", "lower", "slump", "sold off", "decline", "struggle", "tighten", "empty", "go bust", "slide"]
-const FLAT_WORDS := ["steady", "holds", "unchanged", "flat", "stable"]
+const UP_PATTERN := "\\b(?:rise|rose|raise|hike|jump|climb|doubl|lift|gain|pricier|higher|buying more|recover|increase|soar)|\\bup\\b"
+const DOWN_PATTERN := "\\b(?:fall|fell|lose|drop|collapse|lower|slump|sold off|decline|struggle|tighten|empty|go bust|slide)|\\b(?:down|cut|cuts)\\b"
+const FLAT_PATTERN := "\\b(?:steady|holds|unchanged|flat|stable)"
+
+static func _matches(pattern: String, text: String) -> bool:
+	var regex := RegEx.new()
+	regex.compile(pattern)
+	return regex.search(text) != null
 
 static func direction(headline: String) -> String:
-	var text := " " + headline.to_lower() + " "
-	var up := UP_WORDS.any(func(word): return word in text)
-	var down := DOWN_WORDS.any(func(word): return word in text)
+	var text := headline.to_lower()
+	var up := _matches(UP_PATTERN, text)
+	var down := _matches(DOWN_PATTERN, text)
 	if up and down: return ""
 	if up: return "tang"
 	if down: return "giam"
-	if FLAT_WORDS.any(func(word): return word in text): return "ngang"
+	if _matches(FLAT_PATTERN, text): return "ngang"
 	return ""
 
 # The first figure stated in the headline ("3%", "1.5 points"), with a sign from the claimed direction.

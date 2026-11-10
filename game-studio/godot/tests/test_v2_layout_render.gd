@@ -26,7 +26,7 @@ func bounds(node: Node) -> void:
 func siblings(parent: Control) -> void:
 	var controls: Array = []
 	for child in parent.get_children():
-		if child is Control and child.is_visible_in_tree() and not child is ColorRect and not child is Panel:
+		if child is Control and child.is_visible_in_tree() and not child is ColorRect and not child is Panel and not child.has_meta("overlay"):
 			controls.append(child)
 	for i in controls.size():
 		for j in range(i + 1, controls.size()):
@@ -78,10 +78,20 @@ func exercise(early_setup: bool) -> void:
 	desktop.select_news(desktop.entries[0].uid)
 	desktop.use_tool(game.tools()[0].id)
 	desktop.toggle_pin(desktop.entries[0].uid)
+	# Every app is measured as the front window; Mail must keep Send fully on screen.
 	for id in desktop.windows:
-		desktop.toggle_window(id)
-		desktop.toggle_window(id)
-	await settle()
+		desktop.open_window(id)
+		await settle()
+		inspect(desktop, "window " + id)
+		check(desktop.windows[id].is_visible_in_tree() and SCREEN.encloses(desktop.windows[id].get_global_rect()), "window on screen: " + id)
+		if id == "news":
+			check(desktop.news_window.thumbs.size() == desktop.entries.size() and desktop.news_window.thumbs.values().all(func(t): return t.is_visible_in_tree() and t.size == Vector2(32, 32) and t.texture != null), "every card shows a 32x32 thumbnail")
+		if id == "report":
+			var send: Button = desktop.report_window.submit_button
+			check(send.is_visible_in_tree() and SCREEN.encloses(send.get_global_rect()) and send.get_global_rect().size.x >= 100 and send.get_global_rect().size.y >= 30, "Send is visible, big and inside 640x360: " + str(send.get_global_rect()))
+			check(desktop.windows[id].get_global_rect().encloses(send.get_global_rect()), "Send inside the Mail window")
+	for button in desktop.icon_buttons.values():
+		check(button.is_visible_in_tree() and SCREEN.encloses(button.get_global_rect()), "desktop icon on screen")
 	inspect(desktop, "refresh and toggle")
 	if "--capture" in OS.get_cmdline_user_args():
 		root.get_texture().get_image().save_png(OS.get_environment("TEMP").path_join("T-019b-layout-render-early.png" if early_setup else "T-019b-layout-render-ready.png"))
