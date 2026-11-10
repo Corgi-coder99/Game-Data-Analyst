@@ -20,7 +20,9 @@ func scan(directory: String) -> void:
 	for filename in DirAccess.get_files_at(directory):
 		if not filename.ends_with(".gd"): continue
 		var source := FileAccess.get_file_as_string(directory.path_join(filename))
-		for identifier in ["truth", "kind", "link", "state_direction", "exaggerates", "scenario", "_scenario", "_news", "_reviews", "template_id", "verify_with", "reliability"]:
+		for identifier in ["truth", "kind", "link", "state_direction", "exaggerates", "scenario", "_scenario", "_news", "_reviews", "template_id", "verify_with", "reliability", "root_cause", "states"]:
+			# T-019c: review_scene.gd alone may read the end-of-day truth fields, from review(day) of an ended day.
+			if filename == "review_scene.gd" and identifier in ["truth", "kind", "root_cause", "states"]: continue
 			var pattern := RegEx.new()
 			pattern.compile("\\b" + identifier + "\\b")
 			check(pattern.search(source) == null, filename + " excludes " + identifier)
@@ -184,6 +186,15 @@ func run() -> void:
 		desktop.toggle_window(id)
 		check(desktop.windows[id].visible and desktop.windows[id].get_rect() == rect, "window restored in place")
 	check(toggles.size() == 6, "window signals")
+	# T-019c: the report tab shares the right column and takes its action limit from status().
+	check(desktop.report_window != null and not desktop.report_window.visible and desktop.task_buttons.has("report"), "report window hidden by default with a taskbar tab")
+	check(desktop.report_window.max_actions == game.status().max_actions and game.status().max_actions == 1, "report window shows the rank action limit")
+	desktop.toggle_window("report")
+	check(desktop.report_window.visible and not desktop.company_window.visible and not desktop.tools_window.visible and desktop.task_buttons.report.button_pressed, "report tab replaces company and tools")
+	check(desktop.report_window.get_rect() == Rect2(396, 20, 240, 320), "report window fills the right column")
+	desktop.toggle_window("company")
+	check(not desktop.report_window.visible and desktop.company_window.visible and desktop.tools_window.visible and not desktop.task_buttons.report.button_pressed, "company tab brings the column back")
+	check(desktop.clock_minutes == 8 * 60 + 30 or desktop.clock_minutes > 8 * 60 + 30, "clock tracks tool use")
 	await check_layout(desktop)
 	scan("res://scripts/v2")
 	if "--capture" in OS.get_cmdline_user_args():
