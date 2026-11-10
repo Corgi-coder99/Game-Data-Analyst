@@ -1,5 +1,52 @@
+# Python
 .venv/
 __pycache__/
 *.pyc
+
+# Only the Godot project under game-studio/ is part of the repository
 game-studio/*
 !game-studio/godot/
+
+# Godot 4 editor cache and generated import data (regenerated on first open
+# or with: godot --headless --import --path game-studio/godot)
+.godot/
+*.import
+.import/
+.mono/
+data_*/
+
+# Godot exports and build output
+export/
+exports/
+build/
+dist/
+*.exe
+*.pck
+*.apk
+*.aab
+*.ipa
+*.zip
+export_presets.cfg
+export_credentials.cfg
+
+# Logs, user data and scratch (Godot user:// data is stored outside the project)
+*.log
+logs/
+scratch/
+tmp/
+*.tmp
+*.bak
+
+# Local environment and secrets
+.env
+.env.*
+*.key
+*.pem
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp
