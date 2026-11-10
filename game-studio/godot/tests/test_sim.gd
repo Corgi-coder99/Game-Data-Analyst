@@ -21,17 +21,17 @@ func _init() -> void:
 			ui_fixture.play(id)
 		ui_fixture.finish_week()
 	print("UI fixture: cash=%.2f users=%.2f ratio=%.2f" % [ui_fixture.state.base.cash, ui_fixture.state.base.users, ui_fixture.state.ratio(ui_fixture.config)])
-	check(ui_fixture.state.won, "original UI policy seed 105 wins demo")
+	check(ui_fixture.state.won, "current UI fixture policy seed 105 wins demo")
 	var sim := Sim.new(42)
 	sim.begin_week(false)
 	sim.state.base.ad_spend = 1000.0
 	sim.state.base.cash -= 1000.0
 	var result := sim.finish_week()
-	near(result.new_users, 66.0066006601, "effective CAC = 15.15")
-	near(result.churned, 600.0, "churn")
-	near(sim.state.base.users, 466.0066006601, "users")
-	near(result.revenue, 233.0033003300, "revenue")
-	near(result.cash, 8159.7029702970, "cash including variable server cost")
+	near(result.new_users, 12.3762376238, "effective CAC = 80.8")
+	near(result.churned, 150.0, "churn")
+	near(sim.state.base.users, 862.3762376238, "users")
+	near(result.revenue, 206.9702970297, "revenue")
+	near(result.cash, 16963.8514851485, "cash including variable server cost")
 	var a := Sim.new(789)
 	var b := Sim.new(789)
 	while not a.state.lost and not a.state.won:
@@ -55,23 +55,23 @@ func _init() -> void:
 	check(event_sim.event_reports()[0].has("root_cause"), "analysis reveals root cause")
 	check(event_sim.play("onboarding_redesign"), "resolution playable")
 	check(event_sim.active_events.is_empty() and event_sim.state.resolved == 1, "resolved once")
-	near(event_sim.state.value("retention", event_sim.config), 0.55, "remove event modifier")
+	near(event_sim.state.value("retention", event_sim.config), 0.93, "remove event modifier")
 	check(not event_sim.play("onboarding_redesign"), "cannot replay consumed card")
 	var timed := Sim.new(1)
 	timed.begin_week(false)
 	timed.hand = [timed.cards[9], timed.cards[10]]
 	timed.play("loyalty_program")
 	timed.play("seo_content")
-	near(timed.state.value("retention", timed.config), 0.48, "temporary loyalty")
-	near(timed.state.value("cac", timed.config), 15, "SEO delayed")
+	near(timed.state.value("retention", timed.config), 0.89, "temporary loyalty")
+	near(timed.state.value("cac", timed.config), 80, "SEO delayed")
 	for i in 2:
 		timed.finish_week()
 		timed.begin_week(false)
-	near(timed.state.value("cac", timed.config), 14.2, "SEO starts after two weeks")
+	near(timed.state.value("cac", timed.config), 73.6, "SEO starts after two weeks")
 	for i in 2:
 		timed.finish_week()
 		timed.begin_week(false)
-	near(timed.state.value("retention", timed.config), 0.4, "loyalty expires")
+	near(timed.state.value("retention", timed.config), 0.85, "loyalty expires")
 	var poor := Sim.new()
 	poor.begin_week(false)
 	poor.state.base.cash = 0
@@ -110,11 +110,11 @@ func _init() -> void:
 	boundaries.state.base.cash = 10000
 	boundaries.play("ads_campaign")
 	var charged := boundaries.finish_week()
-	near(charged.cash, 10000 - 300 + charged.revenue - charged.fixed_cost, "campaign charged once")
+	near(charged.cash, 10000 - 1000 + charged.revenue - charged.fixed_cost, "campaign charged once")
 	check(boundaries.finish_week().is_empty(), "cannot settle twice")
 	var clean := Sim.new(19)
 	clean.state.base.integrity = 100
-	near(clean.report().retention, 0.4, "perfect integrity has no noise")
+	near(clean.report().retention, 0.85, "perfect integrity has no noise")
 	var untouched := Sim.new(19)
 	for i in 10:
 		clean.report()
@@ -124,7 +124,7 @@ func _init() -> void:
 	var logging := Sim.new(1)
 	logging.begin_week(false)
 	logging.apply_event(logging.events[2])
-	near(logging.state.value("retention", logging.config), 0.4, "logging error changes observation only")
+	near(logging.state.value("retention", logging.config), 0.85, "logging error changes observation only")
 	var clamped := Sim.new(1)
 	clamped.begin_week(false)
 	clamped.state.base.users = 1
@@ -134,13 +134,13 @@ func _init() -> void:
 	influencer.begin_week(false)
 	influencer.hand = [influencer.cards[8]]
 	influencer.play("influencer_campaign")
-	near(influencer.state.value("retention", influencer.config), 0.28, "influencer penalty before onboarding")
+	near(influencer.state.value("retention", influencer.config), 0.35, "influencer penalty before onboarding")
 	var onboarded := Sim.new(1)
 	onboarded.begin_week(false)
 	onboarded.state.flags.onboarding = true
 	onboarded.hand = [onboarded.cards[8]]
 	onboarded.play("influencer_campaign")
-	near(onboarded.state.value("retention", onboarded.config), 0.4, "onboarding prevents influencer penalty")
+	near(onboarded.state.value("retention", onboarded.config), 0.85, "onboarding prevents influencer penalty")
 	var full := Sim.new(1)
 	full.state.base.cash = 1000000
 	full.config = full.config.duplicate(true)
@@ -154,12 +154,12 @@ func _init() -> void:
 	noisy.state.base.integrity = 0
 	var before_state: Dictionary = noisy.state.base.duplicate(true)
 	var noisy_report := noisy.report()
-	check(noisy_report.retention >= 0.2 and noisy_report.retention <= 0.6, "noise bounded by integrity")
+	check(noisy_report.retention >= 0.425 and noisy_report.retention <= 1.275, "noise bounded by integrity")
 	check(noisy.state.base == before_state, "observation does not change true state")
 	noisy.hand = [noisy.cards[1], noisy.cards[3]]
 	noisy.play("ab_test")
 	var preview := noisy.report()
-	check(absf(preview.retention - 0.4) <= 0.02, "A/B improves next action preview")
+	check(absf(preview.retention - 0.85) <= 0.0425, "A/B improves next action preview")
 	noisy.play("clean_data")
 	near(noisy.state.base.integrity, 25, "clean data restores integrity")
 	near(noisy.prediction_multiplier, 1, "A/B consumed by next action")
@@ -167,6 +167,7 @@ func _init() -> void:
 	test_balance_rules()
 	test_revealed_resolution()
 	test_full_rules()
+	test_economy_scale()
 	test_scores()
 	print("test_sim: %d checks, %d failures" % [checks, failures])
 	quit(0 if failures == 0 else 1)
@@ -176,6 +177,33 @@ func card_by_id(sim: RefCounted, id: String) -> Dictionary:
 		if card.id == id:
 			return card
 	return {}
+
+func test_economy_scale() -> void:
+	var sim := Sim.new(42, {}, 10)
+	check(sim.config.initial.retention >= 0.75 and sim.config.initial.retention <= 0.85, "weekly initial retention range")
+	check(sim.config.limits.retention[1] >= 0.92 and sim.config.limits.retention[1] <= 0.95, "weekly retention cap range")
+	check(sim.config.win.demo.min_users >= 0.7 * sim.config.initial.users and sim.config.win.demo.min_users <= 0.8 * sim.config.initial.users, "absolute meaningful demo user gate")
+	check(not sim.config.economy.has("full_cost_multiplier") and not sim.config.economy.has("full_card_cost_multiplier"), "no phase cost subsidies")
+	var previous_chance := -1.0
+	var previous_count := 0
+	for phase in sim.config.phases:
+		check(phase.event_chance > previous_chance and phase.event_count >= previous_count, "incident pressure increases by phase")
+		previous_chance = phase.event_chance
+		previous_count = phase.event_count
+	sim.begin_week(false)
+	var result := sim.finish_week()
+	check(result.revenue < result.fixed_cost and result.fixed_cost - result.revenue < 0.01 * sim.config.initial.cash, "initial company loses slightly without action")
+	check(sim.state.base.users >= 0.75 * sim.config.initial.users and sim.state.base.users < sim.config.initial.users, "initial company shrinks slowly")
+	var ceiling := Sim.new(42, {}, 10)
+	ceiling.state.base.cash = 1000000
+	ceiling.state.base.retention = 1.0
+	for week in 10:
+		ceiling.begin_week(false)
+		ceiling.finish_week()
+	near(ceiling.state.base.users, 1000 * pow(0.95, 10), "retention alone cannot create users even at cap")
+	check(ceiling.state.lost and not ceiling.state.won, "survival without enough users cannot win")
+	var campaign := card_by_id(sim, "ads_campaign")
+	near(campaign.budget, campaign.effects[0].add, "advertising spend equals its real budget")
 
 func test_revealed_resolution() -> void:
 	for index in 8:
@@ -192,7 +220,7 @@ func test_revealed_resolution() -> void:
 			check(sim.active_events.size() == 1 and sim.state.resolved == 0, "hidden remedy cannot resolve or score")
 			check(sim.upgrade_plays.get(remedy, 0) == 1, "hidden remedy applies and counts normal card play")
 			if remedy == "onboarding_redesign":
-				near(sim.state.base.retention, 0.55, "hidden remedy retains its own upgrade")
+				near(sim.state.base.retention, 0.93, "hidden remedy retains its own upgrade")
 			sim.state.energy = 3
 			sim.hand = [card_by_id(sim, analysis)]
 			check(sim.play(analysis), "analysis after blind remedy")
@@ -237,10 +265,10 @@ func test_full_rules() -> void:
 	full.hand = [full.cards[7]]
 	var cash_before: float = full.state.base.cash
 	check(full.play("ads_campaign"), "full campaign playable")
-	near(cash_before - full.state.base.cash, full.cards[7].budget * full.config.economy.full_card_cost_multiplier, "full card cost multiplier charged once")
+	near(cash_before - full.state.base.cash, full.cards[7].budget, "full card pays same budget as demo")
 	var settlement := full.finish_week()
-	near(settlement.fixed_cost, (full.state.value("fixed_cost", full.config) + full.config.economy.cost_per_user * full.state.base.users) * full.config.economy.full_cost_multiplier, "full operating cost multiplier")
-	near(settlement.cash, cash_before - full.cards[7].budget * full.config.economy.full_card_cost_multiplier + settlement.revenue - settlement.fixed_cost, "full campaign not charged again during settlement")
+	near(settlement.fixed_cost, full.state.value("fixed_cost", full.config) + full.config.economy.cost_per_user * full.state.base.users, "full operating costs use common economy")
+	near(settlement.cash, cash_before - full.cards[7].budget + settlement.revenue - settlement.fixed_cost, "full campaign not charged again during settlement")
 
 func test_balance_rules() -> void:
 	var sim := Sim.new(42)
@@ -281,8 +309,8 @@ func test_balance_rules() -> void:
 		demo.config = demo.config.duplicate(true)
 		demo.state.week = 9
 		demo.state.base.cash = 1000000
-		demo.state.base.users = 1000
-		demo.state.base.retention = 0.75
+		demo.state.base.users = 2000
+		demo.state.base.retention = 0.95
 		if failed_gate != "none":
 			demo.config.win.demo[failed_gate] = 1000000000
 		demo.begin_week(false)

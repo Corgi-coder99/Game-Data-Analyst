@@ -26,7 +26,7 @@ func run() -> void:
 	check(not game.play_card("missing"), "reject unknown card")
 	check(game.simulation.hand == original_hand, "rejection preserves hand")
 	check(not game.get_node("Layout/Status").text.is_empty(), "rejection explained")
-	var priority := ["onboarding_redesign", "fix_checkout_bug", "ads_campaign", "support_automation", "seo_content", "loyalty_program", "clean_data", "sql_deep_dive", "funnel_report", "ab_test", "discount", "influencer_campaign"]
+	var priority: Array = game.simulation.config.balance.priorities.balanced
 	var weeks := 0
 	while not game.ended and weeks < 10:
 		for id in priority:
