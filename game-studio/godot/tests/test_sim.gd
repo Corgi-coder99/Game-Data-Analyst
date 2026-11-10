@@ -169,6 +169,7 @@ func _init() -> void:
 	test_full_rules()
 	test_economy_scale()
 	test_scores()
+	test_remedy_reports()
 	print("test_sim: %d checks, %d failures" % [checks, failures])
 	quit(0 if failures == 0 else 1)
 
@@ -177,6 +178,32 @@ func card_by_id(sim: RefCounted, id: String) -> Dictionary:
 		if card.id == id:
 			return card
 	return {}
+
+func test_remedy_reports() -> void:
+	var source := Sim.new(130)
+	for definition in source.events:
+		var a := Sim.new(130)
+		var b := Sim.new(130)
+		for sim in [a, b]:
+			sim.begin_week(false)
+			sim.apply_event(definition)
+			var hidden: Dictionary = sim.event_reports()[0]
+			check(hidden.symptom == definition.symptom, "hidden symptom: " + definition.id)
+			check(not hidden.has("root_cause") and not hidden.has("remedies"), "hidden report omits cause and remedies: " + definition.id)
+			sim.hand = [card_by_id(sim, definition.revealed_by[0])]
+			check(sim.play(definition.revealed_by[0]), "reveal accepted: " + definition.id)
+			var revealed: Dictionary = sim.event_reports()[0]
+			check(revealed.root_cause == definition.root_cause, "revealed cause: " + definition.id)
+			check(revealed.remedies == definition.resolved_by, "remedies preserve data order: " + definition.id)
+			# A caller must not be able to mutate event data through its report.
+			revealed.remedies.clear()
+			check(sim.event_reports()[0].remedies == definition.resolved_by, "remedies are a snapshot: " + definition.id)
+		check(a.event_reports() == b.event_reports(), "same seed revealed reports: " + definition.id)
+		for week in 7:
+			check(a.finish_week() == b.finish_week(), "same seed settlement after reveal")
+			a.begin_week()
+			b.begin_week()
+			check(a.hand == b.hand and a.event_reports() == b.event_reports(), "same seed progression after reveal")
 
 func test_economy_scale() -> void:
 	var sim := Sim.new(42, {}, 10)

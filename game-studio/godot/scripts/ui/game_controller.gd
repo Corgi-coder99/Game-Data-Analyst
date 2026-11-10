@@ -134,11 +134,24 @@ func refresh() -> void:
 		var scaled := value * 100.0 if metric in ["retention", "conversion"] else value
 		dashboard.get_node("Metrics").get_child(i).text = strings.metric_tile % [strings.metric_names[metric], format_string % scaled, arrow, strings.uncertain if uncertain else ""]
 	select_metric(selected_metric)
+	var event_reports: Array = simulation.event_reports()
+	var hand_ids := PackedStringArray()
+	for card in simulation.hand:
+		hand_ids.append(card.id)
+	var card_causes := {}
 	var event_lines := PackedStringArray()
-	for event in simulation.event_reports():
+	for event in event_reports:
 		event_lines.append(strings.symptom % event.symptom)
 		if event.has("root_cause"):
 			event_lines.append(strings.root_cause % event.root_cause)
+			var remedies := PackedStringArray()
+			for id in event.remedies:
+				var card_name: String = strings.cards[id]
+				remedies.append(strings.remedy_in_hand % card_name if id in hand_ids else card_name)
+				if not card_causes.has(id):
+					card_causes[id] = []
+				card_causes[id].append(event.root_cause)
+			event_lines.append(strings.event_remedies % ", ".join(remedies))
 	details.get_node("EventScroll/Events").text = strings.no_events if event_lines.is_empty() else "\n".join(event_lines)
 	for child in $Layout/Hand.get_children():
 		$Layout/Hand.remove_child(child)
@@ -147,18 +160,35 @@ func refresh() -> void:
 	for card in simulation.hand:
 		index += 1
 		var button := Button.new()
-		button.custom_minimum_size = Vector2(0, 75)
+		button.custom_minimum_size = Vector2(0, 110)
 		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		button.size_flags_stretch_ratio = 1.0
+		button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		button.clip_text = true
 		button.add_theme_font_size_override("font_size", 11)
 		button.text = strings.dashboard_card % [index, strings.cards[card.id], strings.categories[card.category], card.budget, card.energy, strings.card_short[card.id]]
 		button.tooltip_text = strings.card_detail % [strings.cards[card.id], card.budget, card.energy, strings.card_details[card.id]]
+		var causes: Array = card_causes.get(card.id, [])
+		button.set_meta("remedy_causes", causes)
+		if not causes.is_empty():
+			var cause: String = causes[0]
+			if causes.size() > 1:
+				cause = strings.remedy_more % [cause, causes.size() - 1]
+			button.text += "\n" + strings.card_remedy % cause
+			button.tooltip_text += "\n" + strings.card_remedy % ", ".join(causes)
 		var style := StyleBoxFlat.new()
 		style.bg_color = Palette.ACCENT
 		style.border_color = Palette.CATEGORIES[card.category]
 		style.set_border_width_all(2)
+		if not causes.is_empty():
+			style.bg_color = Palette.ACCENT.lightened(0.2)
+			style.border_color = Palette.SELECTED
+			style.set_border_width_all(3)
 		button.add_theme_stylebox_override("normal", style)
 		button.add_theme_stylebox_override("disabled", style)
+		if not causes.is_empty():
+			button.add_theme_stylebox_override("hover", style)
+			button.add_theme_stylebox_override("pressed", style)
 		button.disabled = r.cash < card.budget or simulation.state.energy < card.energy
 		button.modulate.a = 0.4 if button.disabled else 1.0
 		button.pressed.connect(play_card.bind(str(card.id)))

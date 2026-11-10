@@ -121,6 +121,7 @@ func event_reports() -> Array:
 		var visible := {"symptom":event.definition.symptom}
 		if event.revealed:
 			visible.root_cause = event.definition.root_cause
+			visible.remedies = event.definition.resolved_by.duplicate()
 		result.append(visible)
 	return result
 

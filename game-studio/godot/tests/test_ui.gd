@@ -126,5 +126,73 @@ func run() -> void:
 		current_scene.queue_free()
 	game.queue_free()
 	await process_frame
+	await test_remedy_ui()
 	print("test_ui: %d checks, %d failures" % [checks, failures])
 	quit(1 if failures else 0)
+
+func fixture_card(game, id: String) -> Dictionary:
+	for card in game.simulation.cards:
+		if card.id == id:
+			return card
+	return {}
+
+func test_remedy_ui() -> void:
+	var game = load("res://scenes/game.tscn").instantiate()
+	root.add_child(game)
+	game.start_game(130)
+	game.simulation.active_events.clear()
+	var definition: Dictionary = game.simulation.events[0]
+	game.simulation.apply_event(definition)
+	game.simulation.hand = [fixture_card(game, "sql_deep_dive"), fixture_card(game, "onboarding_redesign"), fixture_card(game, "ads_campaign")]
+	game.refresh()
+	var label = game.get_node("Layout/Body/Details/EventScroll/Events")
+	var hand = game.get_node("Layout/Hand")
+	check(not label.text.contains("Cách xử lý"), "hidden event has no remedy text")
+	for button in hand.get_children():
+		check(button.get_meta("remedy_causes").is_empty() and not button.text.contains("Xử lý:"), "hidden event has no marked card")
+	check(game.play_card("sql_deep_dive"), "UI remedy fixture reveals cause")
+	check(label.text.contains("Cách xử lý: " + game.strings.cards.onboarding_redesign + " (trong tay)"), "revealed list names remedy and hand availability")
+	var marked = hand.get_child(0)
+	check(marked.text.contains("Xử lý: " + definition.root_cause), "matching card names cause")
+	check(marked.get_theme_stylebox("normal").border_width_left == 3, "matching card has distinct border")
+	check(hand.get_child(1).get_meta("remedy_causes").is_empty() and not hand.get_child(1).text.contains("Xử lý:"), "unrelated card stays unmarked")
+	game.simulation.apply_effect({"stat": "cash", "add": -100000}, 0)
+	game.refresh()
+	check(hand.get_child(0).disabled and is_equal_approx(hand.get_child(0).modulate.a, 0.4), "marked unaffordable card remains dimmed")
+	game.simulation.apply_effect({"stat": "cash", "add": 100000}, 0)
+	check(game.play_card("onboarding_redesign"), "UI remedy accepted")
+	check(game.simulation.event_reports().is_empty() and not label.text.contains("Cách xử lý"), "resolved event removes list hint")
+	for button in hand.get_children():
+		check(button.get_meta("remedy_causes").is_empty(), "resolved event removes card hint")
+	# Three revealed events, including one card that handles two causes.
+	game.start_game(130)
+	game.simulation.active_events.clear()
+	for index in [0, 1, 6]:
+		game.simulation.apply_event(game.simulation.events[index])
+	game.simulation.hand = [fixture_card(game, "sql_deep_dive"), fixture_card(game, "onboarding_redesign"), fixture_card(game, "loyalty_program"), fixture_card(game, "discount")]
+	game.play_card("sql_deep_dive")
+	check(hand.get_child(0).text.contains(" +1"), "multiple causes use first cause and count")
+	check(label.text.contains(game.strings.cards.loyalty_program) and label.text.contains(game.strings.cards.discount), "all remedy names retained in data order")
+	await process_frame
+	await process_frame
+	check(game.get_node("Layout").size.x <= 640 and game.get_node("Layout").size.y <= 360, "three revealed events fit viewport")
+	for path in ["Layout/Body/Details/EventScroll", "Layout/Body/Dashboard", "Layout/Hand"]:
+		var control: Control = game.get_node(path)
+		check(Rect2(Vector2.ZERO, Vector2(640, 360)).encloses(control.get_global_rect()), "visible region fits viewport: " + path)
+	for button in hand.get_children():
+		check(Rect2(Vector2.ZERO, Vector2(640, 360)).encloses(button.get_global_rect()), "marked card fits viewport")
+		var style: StyleBox = button.get_theme_stylebox("normal")
+		var available: Vector2 = button.size - style.get_minimum_size()
+		var text_size: Vector2 = button.get_theme_font("font").get_multiline_string_size(button.text, HORIZONTAL_ALIGNMENT_CENTER, available.x, button.get_theme_font_size("font_size"))
+		check(text_size.y <= available.y, "full card hint fits height without clipping")
+	check(label.size.x <= game.get_node("Layout/Body/Details/EventScroll").size.x, "event text wraps within scrolling region")
+	# Expiry through normal weekly progression removes all remedy hints.
+	for week in 6:
+		game.simulation.finish_week()
+		game.simulation.begin_week(false)
+	game.simulation.hand = [fixture_card(game, "onboarding_redesign")]
+	game.refresh()
+	check(game.simulation.event_reports().is_empty() and not label.text.contains("Cách xử lý"), "expiry removes list hints")
+	check(hand.get_child(0).get_meta("remedy_causes").is_empty(), "expiry removes hand hints")
+	game.queue_free()
+	await process_frame
