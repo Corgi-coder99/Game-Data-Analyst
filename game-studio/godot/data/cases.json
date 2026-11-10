@@ -1,0 +1,1442 @@
+{
+ "version": 1,
+ "note": "All data, names and figures are FICTIONAL. Not real market data, not investment advice.",
+ "skills": [
+  "data_cleaning",
+  "charts",
+  "statistics",
+  "causality",
+  "communication"
+ ],
+ "cases": [
+  {
+   "id": "case_duplicate_export",
+   "title": "The double export",
+   "skill": "data_cleaning",
+   "method": "data-quality-audit",
+   "dataset_type": "sales_export",
+   "boss_question": "Did unit sales in {region} rise, fall or stay flat compared with the previous week?",
+   "forecast_directions": [
+    "up",
+    "down",
+    "flat"
+   ],
+   "trap_id": "duplicates",
+   "trap": "The export was run twice, so some rows appear two times and inflate the total.",
+   "dirt": [
+    "duplicates"
+   ],
+   "reference_steps": [
+    "Count rows and compare with distinct order IDs",
+    "Remove duplicates using order_id plus date as the key",
+    "Check the row count dropped by the number of copies",
+    "Group by day and compare with the previous week"
+   ],
+   "truth_statement_templates": [
+    "After removing {n_dupes} duplicate rows, units in {region} changed {pct_change} versus the previous 7 days.",
+    "The raw total overstated sales by {n_dupes_units} units because of the double export."
+   ],
+   "wrong_paths": [
+    {
+     "path": "Sum the raw column",
+     "why": "Copies are counted twice so the week looks stronger than it was."
+    },
+    {
+     "path": "Delete every row that looks similar",
+     "why": "Two genuine orders with the same product and size are not duplicates; only the full key matters."
+    }
+   ],
+   "difficulty": 1,
+   "unlock_day": 1,
+   "handbook_card_ids": [
+    "hb_duplicates",
+    "hb_audit_first",
+    "hb_double_counting"
+   ]
+  },
+  {
+   "id": "case_missing_as_zero",
+   "title": "The silent zeros",
+   "skill": "data_cleaning",
+   "method": "data-quality-audit",
+   "dataset_type": "sales_export",
+   "boss_question": "Are daily sales in {region} falling, recovering or flat this week?",
+   "forecast_directions": [
+    "up",
+    "down",
+    "flat"
+   ],
+   "trap_id": "missing_as_zero",
+   "trap": "A store whose till was offline exported 0 units instead of a blank, dragging the average down.",
+   "dirt": [
+    "zero_as_null"
+   ],
+   "reference_steps": [
+    "Sort units ascending and list the zeros",
+    "Check whether the zeros match store outage days or other sources",
+    "Treat confirmed outage zeros as missing",
+    "Compute the daily average over the days with data"
+   ],
+   "truth_statement_templates": [
+    "Daily average units were {avg_clean}, not {avg_raw}; {n_zero_days} zero days were outages, not real sales.",
+    "Sales in {region} are {direction} once outage days are excluded."
+   ],
+   "wrong_paths": [
+    {
+     "path": "Average the column as is",
+     "why": "The fake zeros pull the mean down and invent a decline."
+    },
+    {
+     "path": "Fill zeros with the overall mean",
+     "why": "That invents sales on days nothing was recorded and hides the gap."
+    }
+   ],
+   "difficulty": 1,
+   "unlock_day": 2,
+   "handbook_card_ids": [
+    "hb_zero_vs_null",
+    "hb_missing_values",
+    "hb_assumptions_log"
+   ]
+  },
+  {
+   "id": "case_mixed_currency",
+   "title": "Dollars and dong in one column",
+   "skill": "data_cleaning",
+   "method": "data-quality-audit",
+   "dataset_type": "sales_export",
+   "boss_question": "Is average revenue per order in {region} rising, falling or flat?",
+   "forecast_directions": [
+    "up",
+    "down",
+    "flat"
+   ],
+   "trap_id": "mixed_units_currency",
+   "trap": "Revenue is recorded in two currencies and in thousands in some rows, so rows are not comparable.",
+   "dirt": [
+    "mixed_currency",
+    "mixed_units"
+   ],
+   "reference_steps": [
+    "Group by the currency column to see all values",
+    "Convert amounts to one currency using the stated fixed rate",
+    "Convert 'k' values to plain units",
+    "Recompute the average per order"
+   ],
+   "truth_statement_templates": [
+    "After converting to one currency, average revenue per order was {avg_clean} per order, {pct_change} versus last week.",
+    "{n_rows_converted} rows were in the second currency or in thousands."
+   ],
+   "wrong_paths": [
+    {
+     "path": "Average the amount column",
+     "why": "Small numbers in dollars and large numbers in local money are mixed, so the average means nothing."
+    },
+    {
+     "path": "Convert only the currency, not the thousands",
+     "why": "Rows marked k are still 1000 times too small."
+    }
+   ],
+   "difficulty": 2,
+   "unlock_day": 4,
+   "handbook_card_ids": [
+    "hb_units_currency",
+    "hb_percent_points",
+    "hb_audit_first"
+   ]
+  },
+  {
+   "id": "case_date_timezone",
+   "title": "Midnight in two time zones",
+   "skill": "data_cleaning",
+   "method": "data-quality-audit",
+   "dataset_type": "web_funnel",
+   "boss_question": "Did sign-ups jump on {date} or was it a data artefact?",
+   "forecast_directions": [
+    "up",
+    "flat"
+   ],
+   "trap_id": "date_timezone",
+   "trap": "Dates arrive in mixed formats and one source uses UTC while the other uses local time, moving late-evening events to the next day.",
+   "dirt": [
+    "mixed_dates",
+    "timezone_shift"
+   ],
+   "reference_steps": [
+    "Inspect date formats and the source column",
+    "Parse each source with the right format",
+    "Convert both sources to one time zone",
+    "Re-aggregate by day and compare"
+   ],
+   "truth_statement_templates": [
+    "After aligning time zones, sign-ups on {date} were {n_clean}, not {n_raw}; the apparent jump was a day boundary shift.",
+    "Dates in {n_formats} formats were parsed before grouping."
+   ],
+   "wrong_paths": [
+    {
+     "path": "Group by the raw date text",
+     "why": "Sorting text puts 10 Mar before 2 Mar and splits days."
+    },
+    {
+     "path": "Assume all rows use the same time zone",
+     "why": "Evening events slip into the next day and create a fake spike."
+    }
+   ],
+   "difficulty": 3,
+   "unlock_day": 7,
+   "handbook_card_ids": [
+    "hb_dates_timezones",
+    "hb_late_data",
+    "hb_audit_first"
+   ]
+  },
+  {
+   "id": "case_category_typos",
+   "title": "Hanoi, Ha Noi and hanoi",
+   "skill": "data_cleaning",
+   "method": "data-quality-audit",
+   "dataset_type": "sales_export",
+   "boss_question": "Which region sold the most units this week?",
+   "forecast_directions": [],
+   "trap_id": "category_typos",
+   "trap": "The same region is spelled several ways, so a group-by splits it and hides the real leader.",
+   "dirt": [
+    "category_typos"
+   ],
+   "reference_steps": [
+    "Group by region and read the list of names",
+    "Standardise case, spaces and spelling variants",
+    "Re-group and sort",
+    "Chart as a sorted bar with units"
+   ],
+   "truth_statement_templates": [
+    "{region_top} was the top region with {units_top} units after merging spelling variants.",
+    "{n_variants} spelling variants of {region_top} were merged."
+   ],
+   "wrong_paths": [
+    {
+     "path": "Pick the largest group in the raw list",
+     "why": "A region split across three spellings can rank below a smaller, cleanly spelled one."
+    },
+    {
+     "path": "Merge regions that merely sound alike",
+     "why": "Only merge names that really are the same place."
+    }
+   ],
+   "difficulty": 1,
+   "unlock_day": 3,
+   "handbook_card_ids": [
+    "hb_text_standardize",
+    "hb_choose_chart",
+    "hb_sort_label"
+   ]
+  },
+  {
+   "id": "case_entry_error_vs_spike",
+   "title": "One extra zero",
+   "skill": "data_cleaning",
+   "method": "programmatic-eda",
+   "dataset_type": "market_prices",
+   "boss_question": "Will {commodity} prices rise, fall or stay flat this week?",
+   "forecast_directions": [
+    "up",
+    "down",
+    "flat"
+   ],
+   "trap_id": "outlier_entry_error",
+   "trap": "One price is ten times its neighbours (an extra zero), while a separate, smaller jump is a genuine market move.",
+   "dirt": [
+    "entry_outliers"
+   ],
+   "reference_steps": [
+    "Plot the series as a line",
+    "Flag outliers with the IQR rule",
+    "Check the flagged points against neighbours and a second source",
+    "Fix the typo and keep the persistent real move",
+    "Read the trend from the cleaned series"
+   ],
+   "truth_statement_templates": [
+    "The {date_bad} value was an entry error (about 10x the neighbours) and was corrected.",
+    "The rise from {level_before} to {level_after} persisted for {n_days} days and is real."
+   ],
+   "wrong_paths": [
+    {
+     "path": "Delete every flagged point",
+     "why": "The persistent rise is real information and is removed with the typo."
+    },
+    {
+     "path": "Keep all points",
+     "why": "A single wrong value makes the average and the chart useless."
+    }
+   ],
+   "difficulty": 2,
+   "unlock_day": 5,
+   "handbook_card_ids": [
+    "hb_entry_error_vs_spike",
+    "hb_outliers_iqr",
+    "hb_line_time"
+   ]
+  },
+  {
+   "id": "case_seasonality",
+   "title": "December is not a trend",
+   "skill": "statistics",
+   "method": "time-series-analysis",
+   "dataset_type": "sales_export",
+   "boss_question": "Is demand in {region} really recovering, or is it just the usual seasonal pattern?",
+   "forecast_directions": [
+    "up",
+    "down",
+    "flat"
+   ],
+   "trap_id": "seasonality_vs_trend",
+   "trap": "A repeating seasonal peak looks like growth when compared with the preceding off-season period.",
+   "dirt": [],
+   "reference_steps": [
+    "Chart at least two years on the same axis",
+    "Compare with the same period last year",
+    "Estimate the typical seasonal swing",
+    "Report the year-on-year change as the trend"
+   ],
+   "truth_statement_templates": [
+    "Sales are {pct_mom} versus last month but {pct_yoy} versus the same month last year.",
+    "About {pct_season} of the rise matches the normal seasonal swing."
+   ],
+   "wrong_paths": [
+    {
+     "path": "Compare to last month",
+     "why": "The previous month is seasonally low, so any month looks like growth."
+    },
+    {
+     "path": "Fit a straight line to the whole series",
+     "why": "The line ignores the repeating pattern and misleads about direction."
+    }
+   ],
+   "difficulty": 3,
+   "unlock_day": 9,
+   "handbook_card_ids": [
+    "hb_seasonality",
+    "hb_line_time",
+    "hb_moving_average"
+   ]
+  },
+  {
+   "id": "case_simpson",
+   "title": "Winner by group, loser overall",
+   "skill": "causality",
+   "method": "segmentation-analysis",
+   "dataset_type": "ab_test_log",
+   "boss_question": "Which checkout version converts better, A or B?",
+   "forecast_directions": [],
+   "trap_id": "simpsons_paradox",
+   "trap": "Variant B converts better inside both device groups but looks worse overall because it received mostly mobile traffic.",
+   "dirt": [],
+   "reference_steps": [
+    "Compute conversion by variant",
+    "Split by device and recompute",
+    "Compare variants inside each device",
+    "Report the like-for-like result and the traffic mix difference"
+   ],
+   "truth_statement_templates": [
+    "B converts better than A on desktop ({a_desktop} vs {b_desktop}) and on mobile ({a_mobile} vs {b_mobile}).",
+    "The overall gap is reversed because the device mix differs between variants."
+   ],
+   "wrong_paths": [
+    {
+     "path": "Declare the overall winner",
+     "why": "The overall rate reflects a different mix of devices, not the quality of the page."
+    },
+    {
+     "path": "Always trust the subgroups",
+     "why": "Check why the mix differs; if assignment was not random, neither view is final."
+    }
+   ],
+   "difficulty": 4,
+   "unlock_day": 14,
+   "handbook_card_ids": [
+    "hb_simpson",
+    "hb_confounder",
+    "hb_segmentation"
+   ]
+  },
+  {
+   "id": "case_small_sample",
+   "title": "Three customers is not a trend",
+   "skill": "statistics",
+   "method": "programmatic-eda",
+   "dataset_type": "support_tickets",
+   "boss_question": "Is satisfaction in {category} better or worse than last month?",
+   "forecast_directions": [
+    "up",
+    "down",
+    "flat"
+   ],
+   "trap_id": "small_sample_noise",
+   "trap": "A category with very few responses swings wildly and looks like a big change.",
+   "dirt": [],
+   "reference_steps": [
+    "Count responses per category",
+    "Mark groups below a minimum count",
+    "Compare the large groups only, or pool several months",
+    "Report counts with each rate"
+   ],
+   "truth_statement_templates": [
+    "{category} had only {n} responses, so a change of {pct_change} is within normal noise.",
+    "Categories with at least {n_min} responses were stable."
+   ],
+   "wrong_paths": [
+    {
+     "path": "Rank categories by satisfaction rate",
+     "why": "Tiny groups sit at the top and bottom of any ranking by chance."
+    },
+    {
+     "path": "Ignore the small group entirely",
+     "why": "Say it is uncertain instead of hiding it."
+    }
+   ],
+   "difficulty": 2,
+   "unlock_day": 11,
+   "handbook_card_ids": [
+    "hb_noise_sample",
+    "hb_confidence_interval",
+    "hb_report_findings"
+   ]
+  },
+  {
+   "id": "case_correlation_causation",
+   "title": "Ads and sales move together",
+   "skill": "causality",
+   "method": "root-cause-investigation",
+   "dataset_type": "sales_export",
+   "boss_question": "Did the ad campaign cause the sales rise in {region}?",
+   "forecast_directions": [
+    "up",
+    "down",
+    "flat"
+   ],
+   "trap_id": "correlation_vs_causation",
+   "trap": "Ad spend and sales both rise because of a third factor (a holiday season), so the link is not causal.",
+   "dirt": [],
+   "reference_steps": [
+    "Chart spend and sales over time",
+    "Check for a common driver such as season or price promotion",
+    "Compare treated and untreated regions or periods",
+    "Word the finding as an association unless a test exists"
+   ],
+   "truth_statement_templates": [
+    "Ad spend and sales are associated (r = {r}), but a holiday explains much of the rise.",
+    "Regions without the campaign rose by {pct_control}, so the campaign effect is at most {pct_effect}."
+   ],
+   "wrong_paths": [
+    {
+     "path": "Say the campaign caused the rise",
+     "why": "Without a comparison group, a coincident holiday explains the same pattern."
+    },
+    {
+     "path": "Say there is no relationship",
+     "why": "There is a link; it just cannot be called causal from this data."
+    }
+   ],
+   "difficulty": 3,
+   "unlock_day": 16,
+   "handbook_card_ids": [
+    "hb_corr_vs_cause",
+    "hb_confounder",
+    "hb_scatter"
+   ]
+  },
+  {
+   "id": "case_base_rate",
+   "title": "The fraud alarm that cries wolf",
+   "skill": "statistics",
+   "method": "programmatic-eda",
+   "dataset_type": "loan_book",
+   "boss_question": "The risk model flags an account. Is it likely a real default?",
+   "forecast_directions": [],
+   "trap_id": "base_rate",
+   "trap": "The model is accurate, but defaults are rare, so most flags are false alarms.",
+   "dirt": [],
+   "reference_steps": [
+    "State the base rate of default",
+    "Build a table of flagged and not flagged by real outcome",
+    "Compute the share of flags that are real",
+    "Report precision, not just model accuracy"
+   ],
+   "truth_statement_templates": [
+    "Only {precision} of flagged accounts actually default because defaults are rare ({base_rate}).",
+    "Out of {n_flags} flags, {n_true} were real defaults."
+   ],
+   "wrong_paths": [
+    {
+     "path": "Treat a flag as a 90% chance of default",
+     "why": "Accuracy figures ignore how rare the event is."
+    },
+    {
+     "path": "Ignore the model completely",
+     "why": "It still raises the odds; use it as a screen, not a verdict."
+    }
+   ],
+   "difficulty": 4,
+   "unlock_day": 20,
+   "handbook_card_ids": [
+    "hb_base_rate",
+    "hb_report_findings",
+    "hb_confidence_calibration"
+   ]
+  },
+  {
+   "id": "case_survivorship",
+   "title": "Only the survivors answered",
+   "skill": "causality",
+   "method": "cohort-analysis",
+   "dataset_type": "loan_book",
+   "boss_question": "How risky is our loan book, based on the default rate?",
+   "forecast_directions": [
+    "up",
+    "down",
+    "flat"
+   ],
+   "trap_id": "survivorship_bias",
+   "trap": "Closed and defaulted accounts were removed from the export, so the book looks safer than it is.",
+   "dirt": [
+    "survivorship"
+   ],
+   "reference_steps": [
+    "Check the status column for closed or charged-off values",
+    "Ask what was removed and request the full history",
+    "Build cohorts by origination month and track defaults over time",
+    "Report the default rate with and without closed accounts"
+   ],
+   "truth_statement_templates": [
+    "The export only contained {n_open} open accounts; {n_closed} closed accounts were missing.",
+    "Including closed accounts, the default rate is {rate_full}, not {rate_open}."
+   ],
+   "wrong_paths": [
+    {
+     "path": "Compute the default rate from the file",
+     "why": "Defaulted accounts are the ones that were removed."
+    },
+    {
+     "path": "Assume the missing accounts all defaulted",
+     "why": "Many closed accounts were simply repaid; get the real records."
+    }
+   ],
+   "difficulty": 4,
+   "unlock_day": 18,
+   "handbook_card_ids": [
+    "hb_survivorship",
+    "hb_cohort",
+    "hb_missing_values"
+   ]
+  },
+  {
+   "id": "case_cherry_picking",
+   "title": "The perfect date range",
+   "skill": "causality",
+   "method": "analysis-planning",
+   "dataset_type": "market_prices",
+   "boss_question": "A colleague says {series} has risen {pct_cherry} this month. Is that fair?",
+   "forecast_directions": [
+    "up",
+    "down",
+    "flat"
+   ],
+   "trap_id": "cherry_picking",
+   "trap": "The quoted rise starts at a temporary low and ends at a temporary high; over the full period the series is flat.",
+   "dirt": [],
+   "reference_steps": [
+    "Ask for the start and end dates behind the claim",
+    "Chart the full period",
+    "Compare several windows",
+    "State the change over a window chosen before looking"
+   ],
+   "truth_statement_templates": [
+    "The quoted rise holds only for {window_cherry}; over the full period the change was {pct_full}.",
+    "Different windows gave results from {low} to {high}."
+   ],
+   "wrong_paths": [
+    {
+     "path": "Accept the quoted figure",
+     "why": "It is real but selected to look good."
+    },
+    {
+     "path": "Call the colleague dishonest",
+     "why": "Say the window is arbitrary and show the full picture."
+    }
+   ],
+   "difficulty": 3,
+   "unlock_day": 22,
+   "handbook_card_ids": [
+    "hb_cherry_pick",
+    "hb_seasonality",
+    "hb_assumptions_log"
+   ]
+  },
+  {
+   "id": "case_misleading_axis",
+   "title": "The chart that shouts",
+   "skill": "charts",
+   "method": "visualization-builder",
+   "dataset_type": "sales_export",
+   "boss_question": "Make a chart of sales for the board. Does {region} outperform the others?",
+   "forecast_directions": [],
+   "trap_id": "misleading_axis",
+   "trap": "A bar chart whose axis starts at a high value makes a 3% difference look enormous.",
+   "dirt": [],
+   "reference_steps": [
+    "Aggregate units by region",
+    "Build a bar chart with the Y-axis starting at zero",
+    "Sort the bars and add units and a clear title",
+    "State the real size of the difference"
+   ],
+   "truth_statement_templates": [
+    "{region} sold {pct_gap} more than the next region, a modest difference.",
+    "With a zero-based axis the bars look similar, which matches the data."
+   ],
+   "wrong_paths": [
+    {
+     "path": "Truncate the axis to show differences clearly",
+     "why": "Truncation makes small gaps look huge and misleads the board."
+    },
+    {
+     "path": "Use a pie chart instead",
+     "why": "Pies make small differences harder to see, not more honest."
+    }
+   ],
+   "difficulty": 2,
+   "unlock_day": 12,
+   "handbook_card_ids": [
+    "hb_bar_axis",
+    "hb_sort_label",
+    "hb_dual_axis",
+    "hb_pie_caution"
+   ]
+  },
+  {
+   "id": "case_double_counting",
+   "title": "Customers in two lists",
+   "skill": "data_cleaning",
+   "method": "segmentation-analysis",
+   "dataset_type": "sales_export",
+   "boss_question": "How many unique customers bought in {region} this month?",
+   "forecast_directions": [],
+   "trap_id": "double_counting",
+   "trap": "Customers who bought through both web and app appear in both channel lists, so adding the lists overstates unique customers.",
+   "dirt": [
+    "duplicates"
+   ],
+   "reference_steps": [
+    "Count customers in each channel",
+    "Find customers present in both",
+    "Count unique customer IDs across channels",
+    "Check parts versus total"
+   ],
+   "truth_statement_templates": [
+    "There were {n_unique} unique customers, not {n_sum}; {n_overlap} used both channels.",
+    "Channel totals add to more than the true total."
+   ],
+   "wrong_paths": [
+    {
+     "path": "Add the web and app counts",
+     "why": "Customers who used both are counted twice."
+    },
+    {
+     "path": "Use only the larger channel",
+     "why": "That ignores customers who bought only through the other one."
+    }
+   ],
+   "difficulty": 2,
+   "unlock_day": 8,
+   "handbook_card_ids": [
+    "hb_double_counting",
+    "hb_duplicates",
+    "hb_subtotal_rows"
+   ]
+  },
+  {
+   "id": "case_late_data",
+   "title": "The half-finished Friday",
+   "skill": "data_cleaning",
+   "method": "time-series-analysis",
+   "dataset_type": "web_funnel",
+   "boss_question": "Did sign-ups fall sharply on the last day, and should we panic?",
+   "forecast_directions": [
+    "down",
+    "flat"
+   ],
+   "trap_id": "late_arriving_data",
+   "trap": "The last day in the export is incomplete, so it looks like a crash.",
+   "dirt": [
+    "late_arriving"
+   ],
+   "reference_steps": [
+    "Check export time versus end of day",
+    "Compare the last day's volume to a normal day at the same hour",
+    "Exclude or flag the partial day",
+    "Report the trend on complete days"
+   ],
+   "truth_statement_templates": [
+    "The final day was a partial day (exported at {export_time}); the trend on complete days was {direction}.",
+    "Excluding the partial day, average sign-ups were {avg_complete}."
+   ],
+   "wrong_paths": [
+    {
+     "path": "Report a collapse on the last day",
+     "why": "The records had not arrived yet."
+    },
+    {
+     "path": "Delete the last day without saying so",
+     "why": "Note that data was excluded and why."
+    }
+   ],
+   "difficulty": 2,
+   "unlock_day": 6,
+   "handbook_card_ids": [
+    "hb_late_data",
+    "hb_dates_timezones",
+    "hb_line_time"
+   ]
+  },
+  {
+   "id": "case_ab_significance",
+   "title": "Is a 7-point lift real?",
+   "skill": "statistics",
+   "method": "ab-test-analysis",
+   "dataset_type": "ab_test_log",
+   "boss_question": "Variant B looks better. Should we roll it out?",
+   "forecast_directions": [
+    "up",
+    "flat"
+   ],
+   "trap_id": "ab_significance",
+   "trap": "A visible difference may still be random; significance depends on the sample size and the p-value.",
+   "dirt": [
+    "test_accounts"
+   ],
+   "reference_steps": [
+    "Remove test accounts",
+    "Check the groups are similar in size",
+    "Compute conversion per variant",
+    "Run the significance test and read the p-value with the effect size",
+    "Recommend roll out only if the difference is meaningful and significant"
+   ],
+   "truth_statement_templates": [
+    "B converts {rate_b} versus {rate_a} for A (p = {p}); the result is {sig_word}.",
+    "The effect is {diff_points} points; the interval ranges from {ci_low} to {ci_high}."
+   ],
+   "wrong_paths": [
+    {
+     "path": "Pick the higher rate",
+     "why": "Without a significance check the gap may be luck."
+    },
+    {
+     "path": "Say p = 0.04 means a 96% chance B is better",
+     "why": "A p-value is not the probability that the hypothesis is true."
+    }
+   ],
+   "difficulty": 3,
+   "unlock_day": 13,
+   "handbook_card_ids": [
+    "hb_ab_test",
+    "hb_pvalue",
+    "hb_confidence_interval"
+   ]
+  },
+  {
+   "id": "case_ab_peeking",
+   "title": "Stop the test now, it's winning",
+   "skill": "statistics",
+   "method": "ab-test-analysis",
+   "dataset_type": "ab_test_log",
+   "boss_question": "The test hit p < 0.05 on day 3 of a 14-day plan. Can we stop and ship?",
+   "forecast_directions": [
+    "up",
+    "flat"
+   ],
+   "trap_id": "ab_peeking",
+   "trap": "Checking a test repeatedly and stopping at the first significant result inflates false positives.",
+   "dirt": [],
+   "reference_steps": [
+    "Review the planned sample size and duration",
+    "Compute how many looks were taken",
+    "Treat early significance as provisional",
+    "Wait for the planned sample, or use a sequential method"
+   ],
+   "truth_statement_templates": [
+    "The test planned {n_plan} users per variant but had {n_now}; the early result is provisional.",
+    "With {n_looks} looks, the chance of at least one false positive is far above 5%."
+   ],
+   "wrong_paths": [
+    {
+     "path": "Stop and ship because p < 0.05",
+     "why": "Repeated looks make false winners common."
+    },
+    {
+     "path": "Throw away the test",
+     "why": "The data is fine; it is the stopping rule that is not."
+    }
+   ],
+   "difficulty": 4,
+   "unlock_day": 24,
+   "handbook_card_ids": [
+    "hb_peeking",
+    "hb_pvalue",
+    "hb_sample_size"
+   ]
+  },
+  {
+   "id": "case_ab_sample_size",
+   "title": "Too few users to tell",
+   "skill": "statistics",
+   "method": "ab-test-analysis",
+   "dataset_type": "ab_test_log",
+   "boss_question": "The new button shows +1 point, but the test only had a few hundred users. What do we know?",
+   "forecast_directions": [
+    "flat",
+    "up"
+   ],
+   "trap_id": "ab_sample_size",
+   "trap": "The test is too small to detect a small effect, so 'no significant difference' does not mean 'no difference'.",
+   "dirt": [],
+   "reference_steps": [
+    "Compute the required users per variant for the target lift",
+    "Compare with the actual sample",
+    "Report the result as inconclusive",
+    "Recommend running longer or accepting a bigger minimum lift"
+   ],
+   "truth_statement_templates": [
+    "The test had {n_actual} users per variant but needed about {n_needed} to detect {lift}.",
+    "The result is inconclusive, not negative."
+   ],
+   "wrong_paths": [
+    {
+     "path": "Conclude the button has no effect",
+     "why": "Absence of evidence is not evidence of absence in a small test."
+    },
+    {
+     "path": "Conclude the button works",
+     "why": "The interval includes zero."
+    }
+   ],
+   "difficulty": 4,
+   "unlock_day": 26,
+   "handbook_card_ids": [
+    "hb_sample_size",
+    "hb_confidence_interval",
+    "hb_pvalue"
+   ]
+  },
+  {
+   "id": "case_funnel_dropoff",
+   "title": "Where do customers leave?",
+   "skill": "communication",
+   "method": "funnel-analysis",
+   "dataset_type": "web_funnel",
+   "boss_question": "Which step of the sign-up flow should we fix first?",
+   "forecast_directions": [],
+   "trap_id": "funnel_dropoff",
+   "trap": "Raw counts hide which step loses the largest share; the biggest percentage drop is the best place to look.",
+   "dirt": [],
+   "reference_steps": [
+    "Order steps and count users per step",
+    "Compute step-to-step conversion",
+    "Find the largest proportional drop",
+    "Check that the last day is complete",
+    "Segment the weak step by device or source"
+   ],
+   "truth_statement_templates": [
+    "The biggest drop is from {step_a} to {step_b} ({conv_step}).",
+    "Overall conversion from visit to purchase is {conv_total}."
+   ],
+   "wrong_paths": [
+    {
+     "path": "Fix the step with the largest absolute drop",
+     "why": "The first step always loses the most users in raw numbers."
+    },
+    {
+     "path": "Include the partial last day",
+     "why": "That makes late steps look worse than they are."
+    }
+   ],
+   "difficulty": 2,
+   "unlock_day": 10,
+   "handbook_card_ids": [
+    "hb_funnel",
+    "hb_late_data",
+    "hb_segmentation"
+   ]
+  },
+  {
+   "id": "case_cohort_retention",
+   "title": "New users are not loyal users",
+   "skill": "communication",
+   "method": "cohort-analysis",
+   "dataset_type": "web_funnel",
+   "boss_question": "Is customer retention improving?",
+   "forecast_directions": [
+    "up",
+    "down",
+    "flat"
+   ],
+   "trap_id": "cohort_retention",
+   "trap": "Overall active users grow because of new sign-ups while every new cohort retains worse than the last.",
+   "dirt": [],
+   "reference_steps": [
+    "Define a cohort by sign-up month",
+    "Compute weeks since sign-up for each event",
+    "Build a retention table by cohort",
+    "Compare cohorts at the same age"
+   ],
+   "truth_statement_templates": [
+    "Week-4 retention fell from {ret_old} to {ret_new} across cohorts, although total active users grew.",
+    "Growth is driven by new sign-ups, not stickiness."
+   ],
+   "wrong_paths": [
+    {
+     "path": "Look at total active users",
+     "why": "New sign-ups hide churn."
+    },
+    {
+     "path": "Compare cohorts of different ages",
+     "why": "Older cohorts have had more time to fall; compare at the same age."
+    }
+   ],
+   "difficulty": 3,
+   "unlock_day": 17,
+   "handbook_card_ids": [
+    "hb_cohort",
+    "hb_survivorship",
+    "hb_funnel"
+   ]
+  },
+  {
+   "id": "case_segmentation",
+   "title": "The average customer does not exist",
+   "skill": "communication",
+   "method": "segmentation-analysis",
+   "dataset_type": "sales_export",
+   "boss_question": "Our average basket is flat. Is anything changing?",
+   "forecast_directions": [
+    "up",
+    "down",
+    "flat"
+   ],
+   "trap_id": "segmentation",
+   "trap": "A flat average hides two segments moving in opposite directions.",
+   "dirt": [],
+   "reference_steps": [
+    "Compute the average basket overall",
+    "Segment by customer type or channel",
+    "Compare each segment over time",
+    "Report segment sizes and changes"
+   ],
+   "truth_statement_templates": [
+    "The overall average is flat, but {segment_a} rose {pct_a} while {segment_b} fell {pct_b}.",
+    "Segment sizes were {n_a} and {n_b}."
+   ],
+   "wrong_paths": [
+    {
+     "path": "Report that nothing changed",
+     "why": "The movement cancels out in the average."
+    },
+    {
+     "path": "Create dozens of segments",
+     "why": "Small segments are noisy; keep a few meaningful ones."
+    }
+   ],
+   "difficulty": 3,
+   "unlock_day": 19,
+   "handbook_card_ids": [
+    "hb_segmentation",
+    "hb_noise_sample",
+    "hb_histogram"
+   ]
+  },
+  {
+   "id": "case_root_cause",
+   "title": "Why did revenue fall?",
+   "skill": "communication",
+   "method": "root-cause-investigation",
+   "dataset_type": "sales_export",
+   "boss_question": "Revenue fell {pct_drop} this week. Why?",
+   "forecast_directions": [
+    "down"
+   ],
+   "trap_id": "root_cause_drilldown",
+   "trap": "A total decline is caused by one narrow part (one region and product); the first plausible reason is not the full explanation.",
+   "dirt": [],
+   "reference_steps": [
+    "Confirm the drop is real (not a data issue)",
+    "Split by region, then product, then channel",
+    "Find the part explaining most of the change",
+    "Check that the finding accounts for the whole drop"
+   ],
+   "truth_statement_templates": [
+    "{region} {product} explains {share_explained} of the decline.",
+    "Other regions were within normal variation."
+   ],
+   "wrong_paths": [
+    {
+     "path": "Blame the economy",
+     "why": "It is a story, not a finding."
+    },
+    {
+     "path": "Stop after the first split",
+     "why": "A region-level drop may still hide a single product."
+    }
+   ],
+   "difficulty": 3,
+   "unlock_day": 15,
+   "handbook_card_ids": [
+    "hb_root_cause",
+    "hb_segmentation",
+    "hb_audit_first"
+   ]
+  },
+  {
+   "id": "case_regression_to_mean",
+   "title": "The fix that fixed nothing",
+   "skill": "statistics",
+   "method": "programmatic-eda",
+   "dataset_type": "sales_export",
+   "boss_question": "We ran a promotion in the 5 weakest shops and sales rose. Did it work?",
+   "forecast_directions": [
+    "up",
+    "down",
+    "flat"
+   ],
+   "trap_id": "regression_to_mean",
+   "trap": "Shops chosen for being the worst tend to improve next period even with no action.",
+   "dirt": [],
+   "reference_steps": [
+    "Check how the shops were chosen",
+    "Look at several earlier periods",
+    "Compare with similar untreated shops",
+    "Estimate the effect beyond the natural rebound"
+   ],
+   "truth_statement_templates": [
+    "The 5 treated shops rose {pct_treated}, but similar untreated weak shops rose {pct_control}.",
+    "Most of the rise matches a natural rebound."
+   ],
+   "wrong_paths": [
+    {
+     "path": "Credit the promotion",
+     "why": "Extreme results are partly luck and tend to move toward the average."
+    },
+    {
+     "path": "Say the promotion hurt",
+     "why": "It did not; the effect is simply unproven."
+    }
+   ],
+   "difficulty": 4,
+   "unlock_day": 28,
+   "handbook_card_ids": [
+    "hb_regression_mean",
+    "hb_noise_sample",
+    "hb_corr_vs_cause"
+   ]
+  },
+  {
+   "id": "case_join_mismatch",
+   "title": "The customers who vanished",
+   "skill": "data_cleaning",
+   "method": "data-quality-audit",
+   "dataset_type": "loan_book",
+   "boss_question": "What is average balance by customer segment?",
+   "forecast_directions": [],
+   "trap_id": "join_mismatch",
+   "trap": "Customer IDs differ in format between the two tables, so a join silently drops customers.",
+   "dirt": [
+    "join_mismatch"
+   ],
+   "reference_steps": [
+    "Compare distinct keys in both tables",
+    "Standardise keys (trim spaces, leading zeros)",
+    "Join and compare the row count with the original",
+    "Recompute by segment"
+   ],
+   "truth_statement_templates": [
+    "After fixing key formats, {n_matched} of {n_total} accounts matched instead of {n_matched_raw}.",
+    "Average balance for {segment} was {avg_clean}."
+   ],
+   "wrong_paths": [
+    {
+     "path": "Use the joined table as is",
+     "why": "Missing customers are not random, so the averages are biased."
+    },
+    {
+     "path": "Join on the customer name",
+     "why": "Names are not unique or stable."
+    }
+   ],
+   "difficulty": 3,
+   "unlock_day": 21,
+   "handbook_card_ids": [
+    "hb_join_keys",
+    "hb_text_standardize",
+    "hb_audit_first"
+   ]
+  },
+  {
+   "id": "case_test_accounts",
+   "title": "Staff signed up too",
+   "skill": "data_cleaning",
+   "method": "data-quality-audit",
+   "dataset_type": "ab_test_log",
+   "boss_question": "What is the conversion rate for new users this week?",
+   "forecast_directions": [
+    "up",
+    "down",
+    "flat"
+   ],
+   "trap_id": "test_accounts",
+   "trap": "Internal and test accounts convert at unusual rates and distort the metric.",
+   "dirt": [
+    "test_accounts"
+   ],
+   "reference_steps": [
+    "Scan user IDs and emails for test patterns",
+    "Check unusual activity per user",
+    "Filter out confirmed test accounts and record the rule",
+    "Recompute the conversion rate"
+   ],
+   "truth_statement_templates": [
+    "After removing {n_test} test accounts, conversion was {rate_clean}, not {rate_raw}.",
+    "The exclusion rule was: {rule}."
+   ],
+   "wrong_paths": [
+    {
+     "path": "Keep everyone",
+     "why": "Test accounts are not customers."
+    },
+    {
+     "path": "Remove all high-activity users",
+     "why": "A real power user is not a test account."
+    }
+   ],
+   "difficulty": 2,
+   "unlock_day": 23,
+   "handbook_card_ids": [
+    "hb_test_accounts",
+    "hb_assumptions_log",
+    "hb_audit_first"
+   ]
+  },
+  {
+   "id": "case_subtotal_rows",
+   "title": "The rows named Total",
+   "skill": "data_cleaning",
+   "method": "data-quality-audit",
+   "dataset_type": "sales_export",
+   "boss_question": "What was total revenue last month?",
+   "forecast_directions": [],
+   "trap_id": "double_counting_subtotals",
+   "trap": "Subtotal and repeated header rows sit inside the data, so a column sum counts some rows twice.",
+   "dirt": [
+    "subtotal_rows",
+    "repeated_headers"
+   ],
+   "reference_steps": [
+    "Scan for text in number columns",
+    "Filter out repeated headers and total rows",
+    "Sum the remaining rows",
+    "Reconcile with the file's own grand total"
+   ],
+   "truth_statement_templates": [
+    "Revenue was {rev_clean}, not {rev_raw}; {n_subtotals} subtotal rows and {n_headers} repeated headers were removed.",
+    "The cleaned sum matches the grand total in the file."
+   ],
+   "wrong_paths": [
+    {
+     "path": "Sum the whole column",
+     "why": "Subtotals are included, inflating revenue."
+    },
+    {
+     "path": "Remove every row with a missing region",
+     "why": "Some real rows may have a blank region."
+    }
+   ],
+   "difficulty": 2,
+   "unlock_day": 25,
+   "handbook_card_ids": [
+    "hb_subtotal_rows",
+    "hb_double_counting",
+    "hb_audit_first"
+   ]
+  },
+  {
+   "id": "case_negative_refunds",
+   "title": "Refunds are not errors",
+   "skill": "data_cleaning",
+   "method": "data-quality-audit",
+   "dataset_type": "sales_export",
+   "boss_question": "What was net revenue in {region}, and did returns rise?",
+   "forecast_directions": [
+    "up",
+    "down",
+    "flat"
+   ],
+   "trap_id": "refunds_vs_cancellations",
+   "trap": "Negative amounts are refunds that reduce revenue; cancelled orders are different and should not count as sales.",
+   "dirt": [
+    "negative_values"
+   ],
+   "reference_steps": [
+    "List negative amounts and statuses",
+    "Separate refunds from cancellations",
+    "Compute gross, refunds and net revenue",
+    "Compare the refund rate with the previous period"
+   ],
+   "truth_statement_templates": [
+    "Gross revenue was {gross}, refunds {refunds} and net {net}.",
+    "The refund rate moved from {rate_old} to {rate_new}."
+   ],
+   "wrong_paths": [
+    {
+     "path": "Drop negative rows as errors",
+     "why": "That overstates revenue."
+    },
+    {
+     "path": "Count cancelled orders as sales",
+     "why": "They never completed."
+    }
+   ],
+   "difficulty": 2,
+   "unlock_day": 27,
+   "handbook_card_ids": [
+    "hb_refunds_cancellations",
+    "hb_double_counting",
+    "hb_audit_first"
+   ]
+  },
+  {
+   "id": "case_truncated_export",
+   "title": "The file that stopped in September",
+   "skill": "data_cleaning",
+   "method": "data-quality-audit",
+   "dataset_type": "sales_export",
+   "boss_question": "How did sales in the full year compare with last year?",
+   "forecast_directions": [
+    "up",
+    "down",
+    "flat"
+   ],
+   "trap_id": "truncated_export",
+   "trap": "The export stopped at a row limit, so the last part of the year is missing.",
+   "dirt": [
+    "truncated_export"
+   ],
+   "reference_steps": [
+    "Check the first and last dates",
+    "Check the row count for a round number",
+    "Request a complete export or limit conclusions to the covered period",
+    "Compare like periods only"
+   ],
+   "truth_statement_templates": [
+    "The data ends on {last_date} at exactly {n_rows} rows; the comparison only covers {covered}.",
+    "A complete export is needed for a full-year claim."
+   ],
+   "wrong_paths": [
+    {
+     "path": "Compare the partial year to the full year",
+     "why": "It will look like a collapse."
+    },
+    {
+     "path": "Extrapolate the missing months silently",
+     "why": "State the assumption or ask for the data."
+    }
+   ],
+   "difficulty": 3,
+   "unlock_day": 29,
+   "handbook_card_ids": [
+    "hb_truncated_export",
+    "hb_late_data",
+    "hb_audit_first"
+   ]
+  },
+  {
+   "id": "case_competitor_scrape",
+   "title": "Prices from a messy scrape",
+   "skill": "data_cleaning",
+   "method": "programmatic-eda",
+   "dataset_type": "competitor_scrape",
+   "boss_question": "Is the rival really cheaper than us on {item}?",
+   "forecast_directions": [
+    "down",
+    "flat",
+    "up"
+   ],
+   "trap_id": "mixed_units_currency",
+   "trap": "Scraped prices mix pack sizes, currencies and promo labels, so raw prices are not comparable.",
+   "dirt": [
+    "mixed_currency",
+    "mixed_units",
+    "category_typos",
+    "missing_values"
+   ],
+   "reference_steps": [
+    "Standardise item names",
+    "Convert prices to one currency",
+    "Convert to price per unit (per kg or per piece)",
+    "Handle missing and promo prices",
+    "Compare medians"
+   ],
+   "truth_statement_templates": [
+    "Per unit, the rival is {pct_diff} cheaper on {item} (median of {n} listings).",
+    "{n_excluded} listings were excluded for missing price."
+   ],
+   "wrong_paths": [
+    {
+     "path": "Compare raw prices",
+     "why": "A bigger pack costs more but not per unit."
+    },
+    {
+     "path": "Compare means",
+     "why": "A few extreme listings shift the mean; use the median."
+    }
+   ],
+   "difficulty": 3,
+   "unlock_day": 30,
+   "handbook_card_ids": [
+    "hb_units_currency",
+    "hb_text_standardize",
+    "hb_mean_median"
+   ]
+  },
+  {
+   "id": "case_data_rescue",
+   "title": "The full rescue",
+   "skill": "data_cleaning",
+   "method": "data-quality-audit",
+   "dataset_type": "sales_export",
+   "boss_question": "We need a reliable weekly sales figure for {region} for the board. Can you provide it?",
+   "forecast_directions": [
+    "up",
+    "down",
+    "flat"
+   ],
+   "trap_id": "multiple_defects",
+   "trap": "One file has several defects at once: duplicates, typos, zeros that mean missing, and an incomplete last day.",
+   "dirt": [
+    "duplicates",
+    "category_typos",
+    "zero_as_null",
+    "late_arriving"
+   ],
+   "reference_steps": [
+    "Audit: row counts, distinct keys, zeros, date range",
+    "Remove duplicates",
+    "Standardise region names",
+    "Treat outage zeros as missing",
+    "Exclude the partial last day",
+    "Aggregate, compare with last week and log the assumptions"
+   ],
+   "truth_statement_templates": [
+    "After {n_steps} cleaning steps, weekly units in {region} were {value}, {pct_change} versus last week.",
+    "Defects found: {defect_list}."
+   ],
+   "wrong_paths": [
+    {
+     "path": "Fix only the obvious defect",
+     "why": "The remaining defects still move the answer."
+    },
+    {
+     "path": "Over-clean and delete anything odd",
+     "why": "Real variation was removed, making the data look too smooth."
+    }
+   ],
+   "difficulty": 5,
+   "unlock_day": 31,
+   "handbook_card_ids": [
+    "hb_plan",
+    "hb_audit_first",
+    "hb_duplicates",
+    "hb_text_standardize",
+    "hb_zero_vs_null",
+    "hb_late_data"
+   ]
+  },
+  {
+   "id": "case_dual_axis",
+   "title": "Two axes, one story",
+   "skill": "charts",
+   "method": "visualization-builder",
+   "dataset_type": "market_prices",
+   "boss_question": "Does the exchange rate drive our raw material cost?",
+   "forecast_directions": [
+    "up",
+    "down",
+    "flat"
+   ],
+   "trap_id": "misleading_axis",
+   "trap": "A dual-axis chart with hand-picked scales makes two unrelated series look tightly linked.",
+   "dirt": [],
+   "reference_steps": [
+    "Plot each series on its own chart",
+    "Index both series to 100 at the same start date",
+    "Compute the correlation over several windows",
+    "State that the link is an association"
+   ],
+   "truth_statement_templates": [
+    "Indexed to 100, the two series diverged by {gap} points after {date}.",
+    "The apparent link in the dual-axis chart depended on the axis scales."
+   ],
+   "wrong_paths": [
+    {
+     "path": "Keep the dual-axis chart",
+     "why": "The scales were chosen to line the series up."
+    },
+    {
+     "path": "Conclude no relationship",
+     "why": "Indexing shows partial co-movement; just no proof of cause."
+    }
+   ],
+   "difficulty": 4,
+   "unlock_day": 32,
+   "handbook_card_ids": [
+    "hb_dual_axis",
+    "hb_corr_vs_cause",
+    "hb_line_time"
+   ]
+  },
+  {
+   "id": "case_histogram_skew",
+   "title": "The average that describes nobody",
+   "skill": "charts",
+   "method": "programmatic-eda",
+   "dataset_type": "support_tickets",
+   "boss_question": "What is the typical ticket resolution time?",
+   "forecast_directions": [],
+   "trap_id": "mean_vs_median",
+   "trap": "Resolution times are strongly skewed; a few very long tickets drag the mean far above the typical time.",
+   "dirt": [],
+   "reference_steps": [
+    "Draw a histogram of resolution times",
+    "Compare mean and median",
+    "Report the median and a high percentile",
+    "Segment slow tickets by category"
+   ],
+   "truth_statement_templates": [
+    "The median resolution time was {median}, while the mean was {mean} because of {n_long} very long tickets.",
+    "Slow tickets cluster in {category}."
+   ],
+   "wrong_paths": [
+    {
+     "path": "Report the mean only",
+     "why": "It describes neither the typical nor the slow tickets."
+    },
+    {
+     "path": "Delete the long tickets",
+     "why": "They are real and important."
+    }
+   ],
+   "difficulty": 3,
+   "unlock_day": 33,
+   "handbook_card_ids": [
+    "hb_mean_median",
+    "hb_histogram",
+    "hb_segmentation"
+   ]
+  }
+ ]
+}
