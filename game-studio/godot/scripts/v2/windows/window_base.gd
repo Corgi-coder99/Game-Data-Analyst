@@ -6,6 +6,7 @@ const Sprites = preload("res://scripts/v2/sprite_lib.gd")
 var sprites := Sprites.new()
 var content: Control
 signal minimize_requested
+signal close_requested
 
 func build(title: String, area: Rect2) -> void:
 	position = area.position
@@ -22,7 +23,7 @@ func build(title: String, area: Rect2) -> void:
 	bar.size = Vector2(size.x - 2, 12)
 	bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(bar)
-	label(self, title, Rect2(4, 0, size.x - 18, 12))
+	label(self, title, Rect2(4, 0, size.x - 28, 12))
 	var minimize := button(self, "", Rect2(size.x - 11, 3, 8, 8))
 	var dash := ColorRect.new()
 	dash.color = Palette.color(22)
@@ -31,6 +32,11 @@ func build(title: String, area: Rect2) -> void:
 	dash.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	minimize.add_child(dash)
 	minimize.pressed.connect(func(): minimize_requested.emit())
+	minimize.tooltip_text = "Minimize"
+	var close := button(self, "", Rect2(size.x - 21, 3, 8, 8))
+	close.tooltip_text = "Close"
+	icon(close, "cross", Vector2(0, 0))
+	close.pressed.connect(func(): close_requested.emit())
 	content = Control.new()
 	content.position = Vector2(4, 16)
 	content.size = size - Vector2(8, 20)

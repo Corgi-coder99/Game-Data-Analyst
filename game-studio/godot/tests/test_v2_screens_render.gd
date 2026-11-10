@@ -83,7 +83,7 @@ func measure(node: Node, screen: String, scroll_viewport: bool = false) -> void:
 func siblings(parent: Control, screen: String) -> void:
 	var controls: Array = []
 	for child in parent.get_children():
-		if child is Control and child.is_visible_in_tree() and not child is ColorRect and not child is Panel:
+		if child is Control and child.is_visible_in_tree() and not child is ColorRect and not child is Panel and not child.has_meta("overlay"):
 			controls.append(child)
 	for i in controls.size():
 		for j in range(i + 1, controls.size()):
@@ -102,7 +102,7 @@ func inspect(screen: String) -> void:
 	print("render ", screen, ": ", measured - before, " controls measured, window=", root.size, " viewport=", root.get_visible_rect())
 	if captures:
 		var image := root.get_texture().get_image()
-		image.save_png(OS.get_environment("TEMP").path_join("T-019c-" + screen + ".png"))
+		image.save_png(OS.get_environment("TEMP").path_join("T-021-" + screen + ".png"))
 
 func fixture(world_patch: Dictionary = {}, extra: Dictionary = {}) -> Dictionary:
 	var config: Dictionary = Loader.load_json("res://data/world.json").duplicate(true)
@@ -167,9 +167,19 @@ func run() -> void:
 	await inspect("day-start-boss")
 	flow.skip_intro()
 	var desktop: Control = flow.desktop
-	await inspect("work-news-company-tools")
+	await inspect("work-home")
+	desktop.open_window("news")
+	await inspect("work-browser")
 	desktop.select_news(desktop.entries[0].uid)
+	desktop.news_window.toggle_expanded(desktop.entries[0].uid)
+	await inspect("work-browser-expanded")
+	desktop.news_window.toggle_expanded(desktop.entries[0].uid)
+	desktop.open_window("tools")
 	desktop.use_tool(flow.game.tools()[0].id)
+	await inspect("work-codepad")
+	desktop.open_window("company")
+	await inspect("work-bi")
+	desktop.open_window("news")
 	desktop.toggle_pin(desktop.entries[0].uid)
 	desktop.toggle_pin(desktop.entries[1].uid)
 	desktop.toggle_pin(desktop.entries[2].uid)

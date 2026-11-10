@@ -87,19 +87,30 @@ func check_siblings(parent: Control) -> void:
 		for j in range(i + 1, controls.size()):
 			check(not measured_rect(controls[i]).intersects(measured_rect(controls[j])), "sibling rows disjoint: " + str(controls[i].get_path()) + " / " + str(controls[j].get_path()))
 
-func check_layout(desktop: Control) -> void:
+func settle() -> void:
 	await process_frame
 	await process_frame
 	if DisplayServer.get_name() != "headless": await RenderingServer.frame_post_draw
-	check_global_controls(desktop)
-	for window in desktop.windows.values():
+
+func check_layout(desktop: Control) -> void:
+	# Each app is measured while it is the front window.
+	for id in desktop.windows:
+		desktop.open_window(id)
+		await settle()
+		var window: Control = desktop.windows[id]
+		check_global_controls(desktop)
 		check_siblings(window)
 		check_siblings(window.content)
-	var rows: Array = desktop.news_window.rows.values()
-	for i in rows.size():
-		for j in range(i + 1, rows.size()):
-			check(not measured_rect(rows[i]).intersects(measured_rect(rows[j])), "news rows disjoint after layout")
-	for row in desktop.news_window.rows.values(): check_siblings(row)
+		check(Rect2(58, 30, 442, 290).encloses(window.get_rect()), "window inside the work area: " + id)
+		if id == "news":
+			var rows: Array = desktop.news_window.rows.values()
+			for i in rows.size():
+				for j in range(i + 1, rows.size()):
+					check(not measured_rect(rows[i]).intersects(measured_rect(rows[j])), "news rows disjoint after layout")
+			for row in rows: check_siblings(row)
+	desktop.open_window("news")
+	await settle()
+	check_siblings(desktop.coach)
 	var task_area := Rect2(0, 344, 640, 16)
 	for button in desktop.task_buttons.values():
 		var rect: Rect2 = button.get_global_rect()
@@ -179,21 +190,27 @@ func run() -> void:
 	desktop.select_news(uid)
 	check(not desktop.tools_window.buttons[tool.id].disabled and desktop.use_tool(tool.id).ok, "cached use enabled without energy")
 	check(uses.size() >= 5, "tool signals emitted")
+	# T-021: one app window at a time; icons open, the taskbar lists open windows, close removes them.
+	check(desktop.front == "" and desktop.home.visible and desktop.windows.values().all(func(w): return not w.visible), "desktop starts at home with no window")
+	check(desktop.task_buttons.values().all(func(b): return not b.visible), "taskbar lists no window at home")
 	for id in desktop.windows:
-		var rect: Rect2 = desktop.windows[id].get_rect()
+		desktop.open_window(id)
+		check(desktop.windows[id].visible and desktop.front == id and not desktop.home.visible, "window opened: " + id)
+		check(desktop.task_buttons[id].visible and desktop.task_buttons[id].button_pressed, "taskbar lists open window: " + id)
+		check(desktop.windows.keys().all(func(other): return other == id or not desktop.windows[other].visible), "only the front window shows")
 		desktop.toggle_window(id)
-		check(not desktop.windows[id].visible, "window minimized")
+		check(not desktop.windows[id].visible and desktop.task_buttons[id].visible and not desktop.task_buttons[id].button_pressed and desktop.home.visible, "taskbar minimizes the front window: " + id)
 		desktop.toggle_window(id)
-		check(desktop.windows[id].visible and desktop.windows[id].get_rect() == rect, "window restored in place")
-	check(toggles.size() == 6, "window signals")
-	# T-019c: the report tab shares the right column and takes its action limit from status().
-	check(desktop.report_window != null and not desktop.report_window.visible and desktop.task_buttons.has("report"), "report window hidden by default with a taskbar tab")
+		check(desktop.windows[id].visible, "taskbar restores the window: " + id)
+		desktop.close_window(id)
+		check(not desktop.windows[id].visible and not desktop.task_buttons[id].visible and desktop.front == "", "window closed: " + id)
+	check(toggles.size() == 16, "window signals " + str(toggles.size()))
 	check(desktop.report_window.max_actions == game.status().max_actions and game.status().max_actions == 1, "report window shows the rank action limit")
-	desktop.toggle_window("report")
-	check(desktop.report_window.visible and not desktop.company_window.visible and not desktop.tools_window.visible and desktop.task_buttons.report.button_pressed, "report tab replaces company and tools")
-	check(desktop.report_window.get_rect() == Rect2(396, 20, 240, 320), "report window fills the right column")
-	desktop.toggle_window("company")
-	check(not desktop.report_window.visible and desktop.company_window.visible and desktop.tools_window.visible and not desktop.task_buttons.report.button_pressed, "company tab brings the column back")
+	desktop.open_window("report")
+	check(desktop.report_window.get_rect() == Rect2(58, 30, 442, 290), "mail window fills the work area")
+	desktop.open_window("company")
+	check(desktop.company_window.visible and not desktop.report_window.visible, "opening another window replaces the front one")
+	for id in desktop.windows: desktop.close_window(id)
 	check(desktop.clock_minutes == 8 * 60 + 30 or desktop.clock_minutes > 8 * 60 + 30, "clock tracks tool use")
 	await check_layout(desktop)
 	scan("res://scripts/v2")
@@ -212,6 +229,9 @@ func run() -> void:
 	await process_frame
 	check(desktop.entries.size() == 6, "six long items")
 	check(desktop.entries[0].day == 6 and desktop.entries[-1].day == 1, "newest first")
+	desktop.open_window("news")
+	await process_frame
+	await process_frame
 	for row in desktop.news_window.rows.values():
 		check(row.size.x <= desktop.news_window.scroll.size.x, "row width contained")
 		for child in row.get_children():
@@ -226,9 +246,7 @@ func run() -> void:
 	check_bounds(desktop)
 	await check_layout(desktop)
 	for a in desktop.windows:
-		check(Rect2(0, 14, 640, 330).encloses(desktop.windows[a].get_rect()), "window bounds")
-		for b in desktop.windows:
-			if a != b: check(not desktop.windows[a].get_rect().intersects(desktop.windows[b].get_rect()), "windows never overlap")
+		check(Rect2(58, 30, 442, 290).encloses(desktop.windows[a].get_rect()), "window bounds")
 	check(desktop.company_window.current.integrity < 60, "low integrity fixture")
 	check(desktop.tools_window.buttons.values().all(func(b): return b.disabled), "budget shortage disables tools")
 	var keyboard := InputEventKey.new()
