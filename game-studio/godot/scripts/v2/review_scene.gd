@@ -42,6 +42,8 @@ var stage: Control
 var skipped := false
 # T-024: one extra line under the career step (net worth and mood); empty hides it.
 var life_text := ""
+# T-026: an optional second line (HR note after repeated sick days).
+var life_note := ""
 var built := false
 
 func _ready() -> void:
@@ -318,6 +320,7 @@ func _step_career() -> void:
 		"bankrupt": _text(body, strings.review.bankrupt, Rect2(0, y, 392, 17), 26, 12)
 		_: _text(body, strings.review.steady, Rect2(0, y, 392, 12), 7)
 	if life_text != "": _text(body, life_text, Rect2(0, 150, 392, 12), 28)
+	if life_note != "": _text(body, life_note, Rect2(0, 164, 392, 12), 26)
 	_show_stage(category if category != "" else "steady")
 	var delay := 0.0
 	for event in events:

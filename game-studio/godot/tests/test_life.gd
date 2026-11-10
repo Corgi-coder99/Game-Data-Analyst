@@ -278,6 +278,8 @@ func new_flow(evening: bool) -> Node:
 	node.autostart = false
 	node.fade_enabled = false
 	node.evening_enabled = evening
+	# T-026: these checks cover the T-024 evening on its own; the daily loop has test_daily_flow.
+	node.daily_enabled = false
 	root.add_child(node)
 	return node
 

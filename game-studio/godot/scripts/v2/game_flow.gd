@@ -12,6 +12,11 @@ const EndingScene = preload("res://scenes/v2/ending.tscn")
 const EveningScene = preload("res://scripts/life/evening_scene.gd")
 const LifeGame = preload("res://scripts/life/life_game.gd")
 const CommuteScene = preload("res://scenes/v2/commute.tscn")
+const MorningScene = preload("res://scripts/life/morning_scene.gd")
+const ShopPanel = preload("res://scripts/life/shop_panel.gd")
+const OvertimeScene = preload("res://scripts/life/overtime_scene.gd")
+const Hud = preload("res://scripts/life/hud.gd")
+const HUD_STATES := ["MORNING", "TRANSPORT", "COMMUTE", "SHOP", "DAY_START", "WORK", "OVERTIME", "EVENING"]
 const HORIZON := 10
 const FADE_STEP := 0.035
 const NOON := 12 * 60
@@ -35,6 +40,17 @@ var ending_view: Control
 var evening_view: Control
 var life: RefCounted
 var evening_enabled := true
+# T-026: the daily life loop (morning, transport, street, shops, overtime, bills, sleep). It runs only
+# when both daily_enabled and commute_enabled are true, so older flows keep their old behavior.
+var daily_enabled := true
+var overtime_enabled := true
+var hud_layer: CanvasLayer
+var hud: Control
+var morning_view: Control
+var shop_view: Control
+var overtime_view: Control
+var late_minutes := 0
+var focus_info: Dictionary = {"bonus": 0, "reason": "neutral"}
 var submission: Dictionary = {}
 var before_status: Dictionary = {}
 var last_message := ""
@@ -58,12 +74,29 @@ func _ready() -> void:
 	fade_rect.color = Color(Palette.color(1), 0.0)
 	fade_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	fade_layer.add_child(fade_rect)
+	hud_layer = CanvasLayer.new()
+	hud_layer.layer = 6
+	hud_layer.visible = false
+	add_child(hud_layer)
+	hud = Hud.new()
+	hud_layer.add_child(hud)
 	if autostart: start_title()
+
+func daily_active() -> bool:
+	return daily_enabled and commute_enabled
 
 func _set_state(value: String) -> void:
 	state = value
 	visited.append(value)
+	_update_hud()
 	state_changed.emit(value)
+
+func _update_hud() -> void:
+	if hud_layer == null: return
+	var on: bool = life != null and life.vitals != null and state in HUD_STATES
+	hud_layer.visible = on
+	if on:
+		hud.set_focus(strings.daily.focus_label % strings.daily.focus[focus_info.reason], state in ["DAY_START", "WORK"])
 
 # ---- transitions -------------------------------------------------------
 
@@ -125,6 +158,10 @@ func _reset_game() -> void:
 	review_view = null
 	ending_view = null
 	evening_view = null
+	morning_view = null
+	shop_view = null
+	overtime_view = null
+	late_minutes = 0
 	submission = {}
 	before_status = {}
 	boss_shown = false
@@ -158,10 +195,19 @@ func start_with_game(value: RefCounted) -> void:
 	last_message = ""
 	game = value
 	life = LifeGame.new(seed_used)
+	focus_info = {"bonus": 0, "reason": "neutral"}
+	if daily_active():
+		life.enable_daily()
+		hud.bind(life)
+	else:
+		hud.bind(null)
 	_set_state("NEW_GAME")
 	_enter_day_start()
 
 func _enter_day_start() -> void:
+	if daily_active():
+		_enter_morning()
+		return
 	_set_state("DAY_START")
 	game.begin_day()
 	phase = "sang"
@@ -172,6 +218,95 @@ func _enter_day_start() -> void:
 		_show(func(): _build_commute(day))
 	else:
 		_show(func(): _build_office(day))
+
+# ---- T-026: the daily life morning ---------------------------------------------------------------
+
+func _enter_morning() -> void:
+	_set_state("MORNING")
+	var public: Dictionary = game.status()
+	var info: Dictionary = life.vitals.begin_morning(int(public.day) + 1)
+	var sick := {}
+	if bool(info.sick): sick = {"bill": int(info.get("bill", 0)), "hr": life.vitals.hr_warning}
+	_show(func(): _build_morning(public, sick))
+
+func _build_morning(public: Dictionary, sick: Dictionary) -> void:
+	morning_view = MorningScene.new()
+	_swap(morning_view)
+	morning_view.breakfast_done.connect(func(_choice): _set_state("TRANSPORT"))
+	morning_view.finished.connect(_on_transport_chosen)
+	morning_view.open(life, public, sick)
+
+func _on_transport_chosen(id: String) -> void:
+	if state != "MORNING" and state != "TRANSPORT": return
+	var public: Dictionary = game.status()
+	if id == "":
+		late_minutes = life.vitals.late_minutes
+		_begin_work_day()
+		return
+	_set_state("COMMUTE")
+	var day := int(public.day) + 1
+	_show(func(): _build_daily_commute(day, int(public.trust), id))
+
+func _build_daily_commute(day: int, trust: int, id: String) -> void:
+	office = null
+	commute = CommuteScene.instantiate()
+	commute.day = day
+	commute.trust = trust
+	commute.setup_interactive(day, trust, life.vitals, id)
+	_swap(commute)
+	commute.shop_requested.connect(_open_shop)
+	commute.finished.connect(_arrived, CONNECT_ONE_SHOT)
+
+func _open_shop(ids: Array, _storefront: String) -> void:
+	if state != "COMMUTE": return
+	_set_state("SHOP")
+	shop_view = ShopPanel.new()
+	add_child(shop_view)
+	shop_view.closed.connect(_close_shop)
+	shop_view.open(life, ids, game.status())
+
+func _close_shop() -> void:
+	if state != "SHOP": return
+	if shop_view != null and is_instance_valid(shop_view):
+		remove_child(shop_view)
+		shop_view.queue_free()
+	shop_view = null
+	_set_state("COMMUTE")
+	if commute != null and is_instance_valid(commute): commute.resume()
+
+func _arrived() -> void:
+	if state != "COMMUTE": return
+	var result: Dictionary = life.vitals.finish_commute()
+	late_minutes = int(result.late)
+	commute = null
+	_begin_work_day()
+
+# The day starts once the player reaches the office: Focus decides the analysis Energy bonus and a
+# late arrival moves the work clock (never by more than an hour).
+func _begin_work_day() -> void:
+	focus_info = life.vitals.focus()
+	_set_state("DAY_START")
+	game.begin_day(int(focus_info.bonus))
+	if late_minutes > 0:
+		game.set("_minutes", int(game.status().minutes) + late_minutes)
+	phase = "sang"
+	boss_shown = false
+	first_tool_done = false
+	var day := int(game.status().day)
+	_update_hud()
+	_show(func(): _build_office(day))
+
+# One press of Enter in whatever daily screen is open (used by tests and the quick mode).
+func quick_advance() -> void:
+	match state:
+		"MORNING", "TRANSPORT":
+			if morning_view != null: morning_view.accept_default()
+		"COMMUTE":
+			if commute != null and is_instance_valid(commute): commute.hurry()
+		"SHOP":
+			if shop_view != null: shop_view.leave_shop()
+		"OVERTIME":
+			if overtime_view != null: overtime_view.go_home()
 
 # T-022: the morning commute plays before the office; it only uses public values (day, trust).
 func _build_commute(day: int) -> void:
@@ -195,7 +330,8 @@ func _build_office(day: int) -> void:
 	office = OfficeScene.instantiate()
 	_swap(office)
 	office.set_phase("sang")
-	office.set_clock(8, 30)
+	var arrival := 510 + late_minutes if daily_active() else 510
+	office.set_clock(arrival / 60, arrival % 60)
 	office.seated.connect(_on_seated)
 	office.dialog_closed.connect(_on_dialog_closed)
 	office.desk_clicked.connect(_on_desk_clicked)
@@ -205,6 +341,10 @@ func _on_seated() -> void:
 	if state != "DAY_START" or boss_shown or office == null: return
 	boss_shown = true
 	var text := str(game.question_today().get("text", ""))
+	if daily_active() and late_minutes > 0:
+		var remark: String = strings.daily.late_remark
+		boss_log.append({"category":"late", "text":remark})
+		text = remark + " " + text
 	boss_log.append({"category":"question", "text":text})
 	office.set_hint_visible(false)
 	office.play_boss_appears(text)
@@ -269,6 +409,7 @@ func submit_report(input: Dictionary) -> Dictionary:
 	if desktop != null: desktop.report_window.lock(true)
 	before_status = game.status()
 	var ended: Dictionary = game.end_day()
+	if life != null and life.vitals != null: life.vitals.after_work(before_status, game.status())
 	phase = "chieu"
 	_enter_review(int(ended.day))
 	return {"ok":true}
@@ -288,6 +429,7 @@ func _build_review(day: int) -> void:
 	review_view.line_shown.connect(func(category, text): boss_log.append({"category":category, "text":text}))
 	review_view.finished.connect(_after_review)
 	review_view.life_text = strings.life.review_line % [life.projected_net_worth(game.status()), life.mood]
+	if life.vitals != null and life.vitals.hr_warning and life.vitals.sick_today: review_view.life_note = strings.daily.hr_line
 	review_view.show_review(game, day, submission, before_status)
 
 # Used by tests and scripts: one press of Continue.
@@ -297,8 +439,30 @@ func continue_review() -> void:
 func _after_review() -> void:
 	if state != "REVIEW": return
 	if bool(game.status().finished): _enter_ending()
+	elif daily_active() and overtime_enabled: _enter_overtime()
 	elif evening_enabled: _enter_evening()
-	else: _enter_day_start()
+	else: _close_day()
+
+# T-026: stay late or go home. The day's wage arrives here.
+func _enter_overtime() -> void:
+	_set_state("OVERTIME")
+	var public: Dictionary = game.status()
+	_show(func(): _build_overtime(public))
+
+func _build_overtime(public: Dictionary) -> void:
+	overtime_view = OvertimeScene.new()
+	_swap(overtime_view)
+	overtime_view.finished.connect(_after_overtime)
+	overtime_view.open(life, public)
+
+func _after_overtime(_hours: int = 0) -> void:
+	if state != "OVERTIME": return
+	if evening_enabled: _enter_evening()
+	else: _close_day()
+
+func _close_day() -> void:
+	life.night()
+	_enter_day_start()
 
 # T-024: after-work life between two working days.
 func _enter_evening() -> void:
@@ -314,7 +478,7 @@ func _build_evening(public: Dictionary) -> void:
 
 func _after_evening(_skipped: bool = false) -> void:
 	if state != "EVENING": return
-	life.end_evening()
+	life.night()
 	_enter_day_start()
 
 func _enter_ending() -> void:
@@ -330,5 +494,12 @@ func _build_ending(final_status: Dictionary) -> void:
 	ending_view.replay_requested.connect(new_game.bind(-1, {}))
 	ending_view.title_requested.connect(start_title)
 	ending_view.life_lines = [strings.life.ending_net % life.net_worth(), strings.life.ending_mood % [life.mood, strings.life.mood_names[life.mood_band()]], strings.life.ending_flavor[life.mood_band()]]
+	if life.vitals != null:
+		var v: RefCounted = life.vitals
+		ending_view.life_lines.append(strings.daily.ending_vitals % [v.stamina, life.mood, v.health, v.stress])
+		var spend: Dictionary = v.spending_summary()
+		var parts: Array = []
+		for key in spend: parts.append("%s $%d" % [strings.daily.spend_names[key], int(spend[key])])
+		ending_view.life_lines.append(strings.daily.ending_spend % ", ".join(parts) if not parts.is_empty() else strings.daily.ending_spend_none)
 	ending_view.show_ending(final_status)
 	boss_log.append({"category":ending_view.boss_category, "text":ending_view.boss_line})

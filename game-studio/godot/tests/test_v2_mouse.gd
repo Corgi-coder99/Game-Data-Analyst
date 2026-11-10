@@ -88,6 +88,7 @@ func run() -> void:
 	flow = Flow.new()
 	flow.autostart = false
 	flow.fade_enabled = false
+	flow.daily_enabled = false
 	root.add_child(flow)
 	await settle()
 	# 1. Title: click Play.
