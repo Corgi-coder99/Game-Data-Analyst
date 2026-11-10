@@ -787,7 +787,7 @@ Kết quả chạy thật (worktree, Godot 4.7.2 console):
 ### T-032 | Claude subagent | 2026-11-10 | Done
 - Landing page tiếng Anh cho game v2, trung thực, không bịa số liệu, cập nhật check_web.py (sửa T-008). Spec docs/SPEC-T-032.md, worktree ai-company-t032, nhánh codex/T-032. Handoff: media-marketing/web/HANDOFF-T-032.md. Không deploy.
 
-### T-033 | Claude subagent | 2026-11-10 | In progress
+### T-033 | Claude subagent | 2026-11-10 | Done
 - Lõi phân tích dữ liệu: engine bảng dữ liệu thô bẩn, sinh từ trạng thái ẩn, thao tác no-code, pipeline, biểu đồ, kiểm tra biểu đồ gây hiểu lầm, tham chiếu và chấm điểm, solvability. Spec docs/SPEC-T-033.md, thiết kế docs/DESIGN-data-core.md, worktree ai-company-t033, nhánh codex/T-033. Chưa có UI (T-034).
 
 ### T-035a | Claude subagent | 2026-11-10 | Done
