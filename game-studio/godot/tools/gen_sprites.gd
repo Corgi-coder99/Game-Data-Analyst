@@ -1,6 +1,6 @@
 extends SceneTree
 const Palette = preload("res://scripts/v2/palette.gd")
-const GROUPS := [preload("res://tools/sprites/characters.gd"),preload("res://tools/sprites/furniture.gd"),preload("res://tools/sprites/icons.gd")]
+const GROUPS := [preload("res://tools/sprites/characters.gd"),preload("res://tools/sprites/furniture.gd"),preload("res://tools/sprites/icons.gd"),preload("res://tools/sprites/thumbs.gd")]
 static func definitions() -> Dictionary:
 	var all := {}
 	for group in GROUPS:
