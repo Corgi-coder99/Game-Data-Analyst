@@ -18,6 +18,7 @@ Trạng thái: Backlog -> In progress -> Review -> Done. Bị chặn thì chuy�
 
 | ID | Việc | Owner | Nhánh | File được sửa | Tiêu chí hoàn thành |
 |---|---|---|---|---|---|
+| T-018b | Siết thưởng phạt (báo cáo bừa phải bị phạt, đuổi, giáng chức) và sửa ván 30 ngày (chi phí kiểm chứng, điều kiện thắng). VU đã duyệt spec | Codex | codex/T-018b | game-studio/godot/data/world.json, scripts/world/*, scripts/sim/simulation.gd (chỉ use_tool), tests/test_world.gd, tests/balance_world.gd, tests/test_sim.gd | Xem game-studio/godot/docs/SPEC-T-018b.md |
 
 ## Review
 
