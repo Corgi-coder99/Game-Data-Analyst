@@ -11,27 +11,16 @@ Trạng thái: Backlog -> In progress -> Review -> Done. Bị chặn thì chuy�
 | T-001 (ví dụ) | Viết spec tính năng X | Claude | claude/T-001 | docs/spec-x.md | Spec có mô tả, đầu vào, đầu ra, ví dụ |
 | T-002 (ví dụ) | Cài đặt tính năng X theo spec T-001 | Codex | codex/T-002 | src/x.py, tests/test_x.py | Kiểm thử qua, đúng spec |
 | T-008 | check_web.py: ép stdout UTF-8 để không lỗi UnicodeEncodeError trên console Windows mặc định | Codex | codex/T-008 | media-marketing/web/check_web.py | Chạy `python -I check_web.py` (không cần -X utf8) qua 6 mục |
+| T-014 | Thay ảnh gameplay trên landing page bằng ảnh chụp từ bản mới (kinh tế T-012, gợi ý T-013), rồi chạy check_web.py | Claude | claude/T-014 | media-marketing/web/assets/*, index.html (alt) | check_web.py 6/6, ảnh khớp bản game hiện tại |
 | T-010 | Kịch bản và video quảng cáo 30 giây (làm sau T-012 để cảnh quay không hiện công ty gần hết người dùng) | Claude/Codex | chưa chốt | media-marketing/video/* | Chưa có spec |
 
 ## In progress
 
-| ID | Việc | Owner | Nhánh | File được sửa | Tiêu chí hoàn thành |
-|---|---|---|---|---|---|
+(chưa có)
 
 ## Review
 
-| ID | Việc | Owner | Nhánh | File được sửa | Tiêu chí hoàn thành |
-|---|---|---|---|---|---|
-| T-013 | Giao diện: khi nguyên nhân sự kiện đã lộ, hiện thẻ nào xử lý được (để người chơi học cơ chế). VU đã duyệt spec | Codex | codex/T-013 | game-studio/godot/scripts/sim/simulation.gd (chỉ event_reports), scripts/ui/*, scenes/game.tscn, data/strings.json, tests/test_sim.gd, tests/test_ui.gd | Xem game-studio/godot/docs/SPEC-T-013.md |
-
-### T-013 | Codex | 2026-11-10 | Review
-
-- Đã làm: event_reports() chỉ thêm remedies khi đã lộ, sao chép mảng đúng thứ tự dữ liệu; UI lấy cách xử lý từ event_reports(), hiện tên thẻ/nhãn (trong tay), đánh dấu thẻ phù hợp; gợi ý mất sau xử lý hoặc hết hạn. Giữ nguyên mọi kiểm tra cũ.
-- File đổi: game-studio/godot/scripts/sim/simulation.gd (chỉ thêm một dòng trong event_reports), scripts/ui/game_controller.gd, data/strings.json, tests/test_sim.gd, tests/test_ui.gd; TASKS.md cho trạng thái/bàn giao. Không sửa scene, dữ liệu lõi, media-marketing hoặc docs.
-- Tự quyết: viền sáng 3px và nền sáng hơn cho thẻ xử lý, giữ mờ 0,4 khi thiếu tài nguyên; thẻ cao 110px, chữ tự xuống dòng; nhiều nguyên nhân ghi nguyên nhân đầu +N, tooltip đủ tất cả. Giữ vùng cuộn sự kiện có sẵn để đọc đủ nội dung khi ba sự kiện dài; không cắt bỏ tên nguyên nhân/thẻ. Claude cần chụp màn hình/playtest theo spec.
-- Kiểm tra: Godot console 4.7.2 đúng đường dẫn VU giao, --headless --path game-studio/godot --script res://tests/<script>.gd. test_sim: 2.608 checks, 0 failures (cũ 2.392 giữ nguyên); test_ui: 134 checks, 0 failures (cũ 106 giữ nguyên), gồm bounds 640x360 và chiều cao chữ thẻ. balance_sim: exit 0, 20.000 ván, khớp nguyên 47 dòng theo thứ tự với master b7c4b94 sau khi CHỈ bỏ elapsed_seconds. Bản gốc đã chạy trước khi sửa khi HEAD trùng master; output lưu tại thư mục TEMP hệ thống, T-013-balance-master.txt và T-013-balance-result.txt. git diff --check qua. Console còn lỗi môi trường log user:// và root certificate store; không lỗi script.
-- Python: D:\Dev\ai-company\.venv\Scripts\python.exe -X utf8 -I media-marketing/web/check_web.py bị Unable to create process / Access is denied trong sandbox; chưa xác nhận 6/6, Claude tự chạy lại.
-- Git: nhánh codex/T-013, ban đầu sạch và HEAD trùng master; git add bị Permission denied khi tạo D:/Dev/ai-company/.git/worktrees/ai-company-codex/index.lock. Để file chưa stage/commit; không vượt sandbox, không push, không merge.
+(chưa có)
 
 ## Done
 
@@ -47,6 +36,7 @@ Trạng thái: Backlog -> In progress -> Review -> Done. Bị chặn thì chuy�
 | T-009 | Cân bằng lại bản demo 10 tuần (Codex). Đạt 4/5 mục tiêu demo; chưa đạt: analyst không hơn balanced, 30 tuần quá khó (chuyển sang T-011). Claude đã review, VU duyệt merge vào master | Codex | 2026-11-10 |
 | T-011 | Thẻ xử lý chỉ gỡ sự kiện khi đã lộ nguyên nhân; analyst hơn balanced 11,55 điểm % ở demo; 30 tuần khả thi về thống kê (Codex). Còn nợ kinh tế chuyển sang T-012. Claude đã review, VU duyệt merge vào master | Codex | 2026-11-10 |
 | T-012 | Chữa gốc kinh tế (Codex): Retention 85%, Cash 18.000, người thắng demo giữ khoảng 147% Users khởi điểm; bỏ hệ số chỉnh gượng ván 30 tuần; sửa 1 dòng fixture test_ui.gd (dòng 29) theo spec. GDD đã cập nhật lên 0.2. Claude đã review và chạy check_web.py, VU duyệt merge vào master | Codex | 2026-11-10 |
+| T-013 | Giao diện: gợi ý thẻ xử lý khi nguyên nhân đã lộ (Codex); event_reports() thêm remedies chỉ khi đã lộ, balance_sim giống hệt master. Claude đã review, chụp màn hình và chạy check_web.py; VU duyệt merge vào master | Codex | 2026-11-10 |
 
 ## Blocked
 
@@ -408,3 +398,12 @@ weeks | strategy | games | win % | loss median week | losses before 15 % | cash 
   Users median losses, observed weeks only: ["1:862.38(n=934)", "3:718.67(n=934)", "5:669.51(n=934)", "10:893.20(n=933)", "20:1217.29(n=871)", "30:1159.94(n=761)"]
 elapsed_seconds=32.061
 ```
+
+### T-013 | Codex | 2026-11-10 | Review
+
+- Đã làm: event_reports() chỉ thêm remedies khi đã lộ, sao chép mảng đúng thứ tự dữ liệu; UI lấy cách xử lý từ event_reports(), hiện tên thẻ/nhãn (trong tay), đánh dấu thẻ phù hợp; gợi ý mất sau xử lý hoặc hết hạn. Giữ nguyên mọi kiểm tra cũ.
+- File đổi: game-studio/godot/scripts/sim/simulation.gd (chỉ thêm một dòng trong event_reports), scripts/ui/game_controller.gd, data/strings.json, tests/test_sim.gd, tests/test_ui.gd; TASKS.md cho trạng thái/bàn giao. Không sửa scene, dữ liệu lõi, media-marketing hoặc docs.
+- Tự quyết: viền sáng 3px và nền sáng hơn cho thẻ xử lý, giữ mờ 0,4 khi thiếu tài nguyên; thẻ cao 110px, chữ tự xuống dòng; nhiều nguyên nhân ghi nguyên nhân đầu +N, tooltip đủ tất cả. Giữ vùng cuộn sự kiện có sẵn để đọc đủ nội dung khi ba sự kiện dài; không cắt bỏ tên nguyên nhân/thẻ. Claude cần chụp màn hình/playtest theo spec.
+- Kiểm tra: Godot console 4.7.2 đúng đường dẫn VU giao, --headless --path game-studio/godot --script res://tests/<script>.gd. test_sim: 2.608 checks, 0 failures (cũ 2.392 giữ nguyên); test_ui: 134 checks, 0 failures (cũ 106 giữ nguyên), gồm bounds 640x360 và chiều cao chữ thẻ. balance_sim: exit 0, 20.000 ván, khớp nguyên 47 dòng theo thứ tự với master b7c4b94 sau khi CHỈ bỏ elapsed_seconds. Bản gốc đã chạy trước khi sửa khi HEAD trùng master; output lưu tại thư mục TEMP hệ thống, T-013-balance-master.txt và T-013-balance-result.txt. git diff --check qua. Console còn lỗi môi trường log user:// và root certificate store; không lỗi script.
+- Python: D:\Dev\ai-company\.venv\Scripts\python.exe -X utf8 -I media-marketing/web/check_web.py bị Unable to create process / Access is denied trong sandbox; chưa xác nhận 6/6, Claude tự chạy lại.
+- Git: nhánh codex/T-013, ban đầu sạch và HEAD trùng master; git add bị Permission denied khi tạo D:/Dev/ai-company/.git/worktrees/ai-company-codex/index.lock. Để file chưa stage/commit; không vượt sandbox, không push, không merge.
