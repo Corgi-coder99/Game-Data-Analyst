@@ -258,10 +258,16 @@ func test_rollover_toast() -> void:
 	var october := Meta.new(PATH, Clock.new("2026-10-30"))
 	october.sink.submit_day(InputLog.build("run", "2026-10-30", 9, 1, {"question_id": "q", "forecast": "tang", "confidence": "vua", "evidence": [], "actions": []}, 540, {"focus_bonus": 0, "late_minutes": 0}, {"accuracy": 1.0, "evidence_quality": 0.0, "trust_delta": 3.0, "timing": "on_time", "pay": 100, "bonus": 0, "rank": "thuc_tap", "trust": 49, "day_score": 115}))
 	check(october.profile.data.winners.is_empty(), "no winner in the running month")
-	var flow := new_flow("2026-11-02")
-	check(flow.meta.rollover_winners.size() == 1, "loading in November settles October")
+	var meta := Meta.new(PATH, Clock.new("2026-11-02"))
+	check(meta.rollover_winners.size() == 1 and meta.profile.data.winners.size() == 1, "loading in November settles October")
+	var flow: Node = Flow.new()
+	flow.autostart = false
+	flow.fade_enabled = false
+	flow.meta = meta
+	root.add_child(flow)
+	check(flow.toast_log == ["Employee of the Month: 2026-10"] and meta.rollover_winners.is_empty(), "the winner is announced once as a toast: " + str(flow.toast_log))
 	flow.announce_rollover()
-	check(flow.toast_log == ["Employee of the Month: 2026-10"] and flow.meta.rollover_winners.is_empty(), "the winner is announced once as a toast: " + str(flow.toast_log))
+	check(flow.toast_log.size() == 1, "and not announced twice")
 	flow.queue_free()
 
 func test_replay_and_no_meta() -> void:
