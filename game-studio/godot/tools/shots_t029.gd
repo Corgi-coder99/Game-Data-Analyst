@@ -64,6 +64,14 @@ func run() -> void:
 		for i in 5: cb.advance(0.1)
 		await shot("commute-bus")
 		cb.queue_free()
+		for ride in ["moto", "taxi"]:
+			var cr := street(2, 55, ride)
+			for i in 30: cr.advance(0.1)
+			cr.player_x = 300
+			cr._start_to_work()
+			for i in 5: cr.advance(0.1)
+			await shot("commute-" + ride)
+			cr.queue_free()
 	if wants("hover"):
 		var c2 := street(1, 60)
 		c2.set_hover(0)

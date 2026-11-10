@@ -40,7 +40,7 @@ func _panel(parent: Node, area: Rect2) -> Panel:
 	var node := Panel.new()
 	node.position = area.position
 	node.size = area.size
-	node.add_theme_stylebox_override("panel", WindowTheme2.box(2))
+	node.add_theme_stylebox_override("panel", WindowTheme2.night())
 	parent.add_child(node)
 	return node
 

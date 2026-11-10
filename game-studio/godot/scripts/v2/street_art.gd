@@ -538,13 +538,13 @@ static func _shop(p: Pen, s: Dictionary, index: int, day: int, crisis: int, name
 				p.r(x + 8, sy + 11, 42, 2, 99)
 				p.r(x + 8, sy + 13, 42, 1, 100)
 				for bx in range(x + 9, x + 47, 5):
-					var kind := _h(bx, row + 1) % 4
+					var form := _h(bx, row + 1) % 4
 					var tint: int = [85, 89, 91, 93, 94, 97, 87, 90][_h(bx + row, 7) % 8]
-					if kind == 0:
+					if form == 0:
 						p.r(bx, sy + 1, 3, 10, tint)
 						p.r(bx + 1, sy, 1, 2, 100)
 						p.r(bx, sy + 1, 1, 9, 102)
-					elif kind == 1:
+					elif form == 1:
 						p.r(bx, sy + 3, 4, 8, tint)
 						p.r(bx, sy + 3, 4, 1, 102)
 						p.r(bx + 1, sy + 6, 2, 2, 102)

@@ -34,6 +34,14 @@ static func pastel(background: int, border: int, radius: int = 4) -> StyleBoxFla
 	style.content_margin_bottom = 2
 	return style
 
+# Night-blue rounded panel with a periwinkle border for the review, evening, ending and shop screens.
+static func night(border: int = 81) -> StyleBoxFlat:
+	var style := pastel(83, border, 5)
+	style.set_border_width_all(2)
+	style.content_margin_left = 3
+	style.content_margin_right = 3
+	return style
+
 # Applies the pastel look to a Button (cream normal, yellow hover, peach pressed, grey disabled).
 static func pastel_button(node: Button, fill: int = 89, border: int = 97) -> void:
 	node.add_theme_stylebox_override("normal", pastel(fill, border))

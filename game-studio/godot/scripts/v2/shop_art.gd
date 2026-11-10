@@ -14,16 +14,16 @@ const RUGS := {"cafe": [86, 85, 87], "noodle": [112, 87, 88], "mart": [94, 84, 7
 	"news": [93, 82, 80], "books": [96, 97, 98], "clothing": [85, 86, 87]}
 static var cache := {}
 
-# wall = [base, stripe/accent, wainscot], floor = [a, b, seam], kind = floor style.
+# wall = [base, stripe/accent, wainscot], floor = [a, b, seam], form = floor style.
 const SPECS := {
-	"cafe": {"wall": [70, 92, 78], "floor": [69, 70, 68], "kind": "planks", "accent": 87, "lamp": 97, "rug": [86, 85, 87]},
-	"noodle": {"wall": [78, 91, 73], "floor": [70, 69, 68], "kind": "tiles", "accent": 112, "lamp": 97},
-	"mart": {"wall": [94, 35, 84], "floor": [101, 61, 100], "kind": "tiles", "accent": 97, "lamp": 95},
-	"pharmacy": {"wall": [90, 102, 91], "floor": [102, 90, 100], "kind": "tiles", "accent": 75, "lamp": 95},
-	"bank": {"wall": [101, 102, 99], "floor": [102, 101, 100], "kind": "tiles", "accent": 28, "lamp": 96},
-	"news": {"wall": [86, 85, 88], "floor": [11, 10, 9], "kind": "planks", "accent": 93, "lamp": 97},
-	"books": {"wall": [82, 93, 79], "floor": [109, 108, 9], "kind": "planks", "accent": 89, "lamp": 97},
-	"clothing": {"wall": [86, 102, 87], "floor": [12, 13, 11], "kind": "planks", "accent": 85, "lamp": 95}}
+	"cafe": {"wall": [70, 92, 78], "floor": [69, 70, 68], "form": "planks", "accent": 87, "lamp": 97, "rug": [86, 85, 87]},
+	"noodle": {"wall": [78, 91, 73], "floor": [70, 69, 68], "form": "tiles", "accent": 112, "lamp": 97},
+	"mart": {"wall": [94, 35, 84], "floor": [101, 61, 100], "form": "tiles", "accent": 97, "lamp": 95},
+	"pharmacy": {"wall": [90, 102, 91], "floor": [102, 90, 100], "form": "tiles", "accent": 75, "lamp": 95},
+	"bank": {"wall": [101, 102, 99], "floor": [102, 101, 100], "form": "tiles", "accent": 28, "lamp": 96},
+	"news": {"wall": [86, 85, 88], "floor": [11, 10, 9], "form": "planks", "accent": 93, "lamp": 97},
+	"books": {"wall": [82, 93, 79], "floor": [109, 108, 9], "form": "planks", "accent": 89, "lamp": 97},
+	"clothing": {"wall": [86, 102, 87], "floor": [12, 13, 11], "form": "planks", "accent": 85, "lamp": 95}}
 
 static func interior(shop: String) -> Dictionary:
 	if cache.has(shop):
@@ -57,7 +57,7 @@ static func _room(p: Pen, spec: Dictionary, shop: String) -> void:
 	p.r(0, FLOOR_Y - 5, W, 1, 101)
 	p.r(0, FLOOR_Y - 1, W, 1, OUT)
 	# Floor.
-	if spec.kind == "planks":
+	if spec.form == "planks":
 		Cozy.planks(p, 0, FLOOR_Y, W, H - FLOOR_Y, floor_c[0], floor_c[1], floor_c[2], SHADOW, 8)
 	else:
 		Cozy.tiles(p, 0, FLOOR_Y, W, H - FLOOR_Y, floor_c[0], floor_c[1], floor_c[2], 16)
@@ -138,13 +138,13 @@ static func _rack(p: Pen, x: int, y: int, w: int, rows: int, row_h: int) -> void
 	for r in range(rows):
 		p.r(x + 1, y + 1 + r * row_h, w - 2, row_h - 3, SHADOW)
 
-static func _goods(p: Pen, x: int, base_y: int, w: int, kind: String, seed_value: int) -> void:
+static func _goods(p: Pen, x: int, base_y: int, w: int, form: String, seed_value: int) -> void:
 	var cx := x
 	var i := 0
 	while cx < x + w - 6:
 		var tint: int = [85, 89, 91, 93, 94, 97, 87, 90, 86, 92][(i * 3 + seed_value) % 10]
 		var roll := (i * 7 + seed_value * 3) % 5
-		match kind:
+		match form:
 			"cups":
 				p.r(cx, base_y - 5, 5, 5, 102)
 				p.r(cx, base_y - 3, 5, 1, tint)
