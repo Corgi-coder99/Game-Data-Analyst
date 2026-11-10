@@ -110,7 +110,7 @@
    "leave": 470,
    "on_time": 510,
    "max_late": 60,
-   "stop_minutes": 10,
+   "shop_visit_minutes": 5,
    "wait_minutes": 4,
    "red_probability": 0.65
   },

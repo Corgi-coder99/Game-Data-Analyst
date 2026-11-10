@@ -61,15 +61,26 @@ var lit_shop_windows: Array = []
 # and at a red light. Without `interactive` the scene behaves exactly as in T-022.
 const STOREFRONTS := ["cafe", "noodle", "mart", "bank", "news", "books"]
 const SHOP_STOPS := {"cafe": 30, "noodle": 110, "mart": 190, "bank": 282, "news": 366, "books": 450}
+const SHOP_TOP := 114
+const WALK_SPEED := 150.0
+const START_X := 6.0
 const WALK_LIGHT_X := 232
 const VEHICLE_LEN := {"walk": 0, "bus": 56, "moto": 14, "taxi": 30}
 var interactive := false
 var vitals: RefCounted
 var mode := "walk"
 var paused := ""
-var stops: Array = []
-var stop_cursor := 0
+# T-027: the street is free choice. phase: street (idle) | to_shop | shopping | light | waiting | to_work.
+var phase := "street"
 var current_stop: Dictionary = {}
+var target_shop := ""
+var hover_index := -1
+var selected_index := -1    # -1 is the Go to work button (the default), 0..5 a storefront
+var visits: Array = []
+var go_button: Button
+var tooltip_panel: Panel
+var tooltip_label: Label
+var facing := 1
 var wait_timer := 0.0
 var toast_time := -1.0
 var fast_forward := false
@@ -112,19 +123,10 @@ func setup_interactive(day_number: int, trust_value: int, vitals_module: RefCoun
 	var length: int = VEHICLE_LEN.get(mode, 0)
 	if length > 0:
 		vehicles = vehicles.filter(func(v): return v.dir < 0)
-		var look: Array = {"bus": [56, 17, 33], "moto": [55, 43, 36], "taxi": [52, 27, 64]}[mode]
-		player_vehicle = {"variety": "bus" if mode == "bus" else ("moto" if mode == "moto" else "car"), "dir": 1, "x": float(-length), "len": length, "speed": 0.0, "max": 0.0, "color": look[0], "shade": look[1], "light": look[2], "rider": 3, "bottom": LANE_DOWN, "player": true}
-		vehicles.append(player_vehicle)
-		player_visible = false
-		player_x = float(-length)
-	stops.clear()
-	for id in STOREFRONTS:
-		stops.append({"stop_type": "shop", "id": id, "x": float(SHOP_STOPS[id])})
-	if vitals != null and vitals.light_red:
-		var light_x: float = float(WALK_LIGHT_X) if length == 0 else float(246 - length - 2)
-		stops.append({"stop_type": "light", "id": "light", "x": light_x})
-	stops.sort_custom(func(a, b): return a.x < b.x)
-	stop_cursor = 0
+	player_visible = true
+	player_x = START_X
+	phase = "street"
+	selected_index = -1
 	_build_prompt()
 
 func _build_prompt() -> void:
@@ -152,6 +154,19 @@ func _build_prompt() -> void:
 	toast_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	toast_label.clip_text = false
 	toast_label.max_lines_visible = 2
+	tooltip_panel = Panel.new()
+	tooltip_panel.size = Vector2(176, 40)
+	tooltip_panel.add_theme_stylebox_override("panel", WindowTheme.box(2))
+	tooltip_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	tooltip_panel.hide()
+	ui.add_child(tooltip_panel)
+	tooltip_label = _prompt_text(tooltip_panel, Rect2(6, 3, 164, 34))
+	tooltip_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	tooltip_label.clip_text = false
+	tooltip_label.max_lines_visible = 4
+	go_button = _prompt_button(ui, Rect2(200, 334, 140, 20))
+	go_button.text = str(daily_strings.go_to_work)
+	go_button.pressed.connect(go_to_work)
 
 func _prompt_text(parent: Node, area: Rect2) -> Label:
 	var node := Label.new()
@@ -174,93 +189,163 @@ func _prompt_button(parent: Node, area: Rect2) -> Button:
 	parent.add_child(node)
 	return node
 
-func _open_stop(stop: Dictionary) -> void:
-	current_stop = stop
-	paused = str(stop.stop_type)
+# ---- T-027: free shop choice ---------------------------------------------------------------
+
+func shop_rect(index: int) -> Rect2:
+	return Rect2(index * 84, SHOP_TOP, 84, SIDEWALK_Y - SHOP_TOP)
+
+func shop_index_at(point: Vector2) -> int:
+	for i in range(STOREFRONTS.size()):
+		if shop_rect(i).has_point(point): return i
+	return -1
+
+func shop_label(index: int) -> String:
+	var id: String = STOREFRONTS[index]
+	return "%s\n%s\n%s" % [daily_strings.storefronts[id], daily_strings.shop_sells[id], daily_strings.shop_visit_tip % int(vitals.cfg.day.shop_visit_minutes)]
+
+func street_active() -> bool:
+	return interactive and phase in ["street", "to_shop"]
+
+func set_hover(index: int) -> void:
+	hover_index = index if street_active() else -1
+	_update_tooltip()
+
+func _update_tooltip() -> void:
+	var index := hover_index if hover_index >= 0 else selected_index
+	if not street_active() or index < 0:
+		tooltip_panel.hide()
+		return
+	tooltip_label.text = shop_label(index)
+	var rect := shop_rect(index)
+	tooltip_panel.position = Vector2(clampf(rect.position.x + 4.0, 4.0, W - 180.0), 70)
+	tooltip_panel.show()
+
+# Click a storefront (or confirm a keyboard selection): walk to its door, then open the shop panel.
+func visit_shop(id: String) -> bool:
+	if not street_active() or not STOREFRONTS.has(id): return false
+	target_shop = id
+	phase = "to_shop"
+	selected_index = STOREFRONTS.find(id)
+	_update_tooltip()
+	return true
+
+func select_step(direction: int) -> void:
+	if not street_active(): return
+	var count := STOREFRONTS.size() + 1
+	selected_index = (selected_index + 1 + direction + count) % count - 1
+	_update_tooltip()
+
+func activate_selected() -> void:
+	if not street_active(): return
+	if selected_index < 0:
+		go_to_work()
+	else:
+		visit_shop(STOREFRONTS[selected_index])
+
+# Ends the street phase. The red light, if the seed has one, is met here exactly once.
+func go_to_work() -> void:
+	if not interactive or phase not in ["street", "to_shop"]: return
+	target_shop = ""
+	hover_index = -1
+	tooltip_panel.hide()
+	go_button.hide()
+	if vitals.light_red and not vitals.light_resolved:
+		_open_light()
+	else:
+		_start_to_work()
+
+func _open_light() -> void:
+	phase = "light"
+	paused = "light"
+	current_stop = {"stop_type": "light", "id": "light", "x": player_x}
 	for connection in prompt_primary.pressed.get_connections(): prompt_primary.pressed.disconnect(connection.callable)
 	for connection in prompt_secondary.pressed.get_connections(): prompt_secondary.pressed.disconnect(connection.callable)
-	if paused == "shop":
-		prompt_label.text = daily_strings.shop_prompt % daily_strings.storefronts[stop.id]
-		prompt_primary.text = daily_strings.enter_shop
-		prompt_secondary.text = daily_strings.skip_shop
-		prompt_primary.pressed.connect(answer_prompt.bind("enter"))
-		prompt_secondary.pressed.connect(answer_prompt.bind("skip"))
-	else:
-		prompt_label.text = daily_strings.light_title
-		prompt_primary.text = daily_strings.wait % int(vitals.cfg.day.wait_minutes)
-		prompt_secondary.text = daily_strings.run
-		prompt_primary.pressed.connect(answer_prompt.bind("wait"))
-		prompt_secondary.pressed.connect(answer_prompt.bind("run"))
+	prompt_label.text = daily_strings.light_title
+	prompt_primary.text = daily_strings.wait % int(vitals.cfg.day.wait_minutes)
+	prompt_secondary.text = daily_strings.run
+	prompt_primary.pressed.connect(answer_prompt.bind("wait"))
+	prompt_secondary.pressed.connect(answer_prompt.bind("run"))
 	prompt_label.size = Vector2(164, 14)
 	prompt_panel.position = Vector2(clampf(player_x - 60.0, 4.0, 456.0), 90)
 	prompt_panel.show()
-	prompt_opened.emit(paused)
+	prompt_opened.emit("light")
 	if hurrying: default_answer()
 
-# choice: "enter" | "skip" at a shop; "wait" | "run" at the light.
-func answer_prompt(choice: String) -> void:
-	if paused == "" or not interactive: return
-	var stop_type := paused
-	if stop_type == "shop":
-		if choice == "enter":
-			vitals.enter_shop()
-			paused = "shopping"
-			prompt_panel.hide()
-			shop_requested.emit(vitals.cfg.storefronts[current_stop.id], str(current_stop.id))
-			return
-		_close_prompt()
-		return
-	if stop_type == "light":
-		var result: Dictionary = vitals.traffic_light(choice)
-		results.append(result)
-		var text: String = daily_strings.light_result[result.outcome]
-		match result.outcome:
-			"waited": text = text % int(result.minutes)
-			"fined": text = text % int(result.fine)
-			"accident": text = text % [int(vitals.cfg.light.accident_health), int(result.minutes)]
-		show_toast(text, 2.4)
-		if result.outcome in ["fined", "accident"]:
-			emote_name = "emote_sad"
-			emote_time = 2.4
-		prompt_panel.hide()
-		if choice == "run":
-			_close_prompt()
-		else:
-			paused = "waiting"
-			wait_timer = 1.1
-
-func _close_prompt() -> void:
-	prompt_panel.hide()
+func _start_to_work() -> void:
+	phase = "to_work"
 	paused = ""
-	stop_cursor += 1
+	var length: int = VEHICLE_LEN.get(mode, 0)
+	if length > 0:
+		var look: Array = {"bus": [56, 17, 33], "moto": [55, 43, 36], "taxi": [52, 27, 64]}[mode]
+		player_vehicle = {"variety": "bus" if mode == "bus" else ("moto" if mode == "moto" else "car"), "dir": 1, "x": player_x, "len": length, "speed": 0.0, "max": 0.0, "color": look[0], "shade": look[1], "light": look[2], "rider": 3, "bottom": LANE_DOWN, "player": true}
+		vehicles.append(player_vehicle)
+		player_visible = false
+	facing = 1
 
-# Called by the flow when the shop panel closes.
+# choice: "wait" | "run" at the light.
+func answer_prompt(choice: String) -> void:
+	if phase != "light" or not interactive: return
+	var result: Dictionary = vitals.traffic_light(choice)
+	results.append(result)
+	var text: String = daily_strings.light_result[result.outcome]
+	match result.outcome:
+		"waited": text = text % int(result.minutes)
+		"fined": text = text % int(result.fine)
+		"accident": text = text % [int(vitals.cfg.light.accident_health), int(result.minutes)]
+	show_toast(text, 2.4)
+	if result.outcome in ["fined", "accident"]:
+		emote_name = "emote_sad"
+		emote_time = 2.4
+	prompt_panel.hide()
+	if choice == "run":
+		_start_to_work()
+	else:
+		phase = "waiting"
+		paused = "waiting"
+		wait_timer = 1.1
+
+# Called by the flow when the shop panel closes: the player stands at that door again.
 func resume() -> void:
-	if paused == "shopping":
-		_close_prompt()
+	if phase == "shopping":
+		phase = "street"
+		paused = ""
+		go_button.show()
+		_update_tooltip()
 
 func show_toast(text: String, seconds: float = 2.2) -> void:
 	toast_label.text = text
 	toast_panel.show()
 	toast_time = seconds
 
-# The cheap default for Enter/Space/Esc: skip the shop, wait at the light.
+# The cheap default for Enter/Space: in the street go to work, at the light wait.
 func default_answer() -> void:
-	if paused == "shop": answer_prompt("skip")
-	elif paused == "light": answer_prompt("wait")
+	if phase in ["street", "to_shop"]: go_to_work()
+	elif phase == "light": answer_prompt("wait")
 
 func light_override() -> String:
 	if vitals == null: return ""
+	if phase == "light": return "red"
 	if player_x >= 120.0 and player_x < 330.0:
-		return "green" if (vitals.light_resolved or not vitals.light_red) else "red"
+		return "green"
 	return ""
 
+# Running arrival time at the tower from everything decided so far (visits, waits, transport), capped at +60 late.
 func clock_minutes() -> int:
-	var total := 0
-	if vitals != null:
-		var travel: int = int(vitals.cfg.transport[mode].minutes)
-		total = int(vitals.cfg.day.leave) + int(vitals.slept_in) + int(vitals.extra_minutes) + roundi(float(travel) * progress())
-	return total
+	if vitals == null: return 0
+	var travel: int = int(vitals.cfg.transport[mode].minutes)
+	var total: int = int(vitals.cfg.day.leave) + int(vitals.slept_in) + int(vitals.extra_minutes) + travel
+	return mini(total, int(vitals.cfg.day.on_time) + int(vitals.cfg.day.max_late))
+
+func late_minutes_now() -> int:
+	return maxi(0, clock_minutes() - int(vitals.cfg.day.on_time))
+
+func _walk_toward(target: float, delta: float) -> bool:
+	var speed := WALK_SPEED * (4.0 if fast_forward else 1.0)
+	if absf(target - player_x) < 0.5:
+		return true
+	facing = 1 if target > player_x else -1
+	player_x = move_toward(player_x, target, speed * delta)
+	return absf(target - player_x) < 0.5
 
 func _advance_interactive(delta: float) -> void:
 	if emote_time > 0.0: emote_time -= delta
@@ -270,28 +355,34 @@ func _advance_interactive(delta: float) -> void:
 	if enter_time >= 0.0:
 		if elapsed - enter_time >= 0.7: _finish()
 		return
-	if paused == "waiting":
-		wait_timer -= delta
-		if wait_timer <= 0.0:
-			paused = ""
-			stop_cursor += 1
-		return
-	if paused != "": return
-	var speed: float = float(vitals.cfg.transport[mode].speed) if vitals != null else 70.0
-	if fast_forward: speed *= 4.0
-	player_x += speed * delta
-	if stop_cursor < stops.size() and player_x >= float(stops[stop_cursor].x):
-		player_x = float(stops[stop_cursor].x)
-		_open_stop(stops[stop_cursor])
-	elif stop_cursor >= stops.size() and player_x >= float(DOOR_X) - 4.0:
-		player_x = float(DOOR_X) - 4.0
-		player_visible = false
-		door_open = true
-		enter_time = elapsed
-		if not player_vehicle.is_empty():
-			vehicles.erase(player_vehicle)
-			player_vehicle = {}
-	if not player_vehicle.is_empty(): player_vehicle.x = player_x
+	match phase:
+		"waiting":
+			wait_timer -= delta
+			if wait_timer <= 0.0: _start_to_work()
+		"to_shop":
+			if _walk_toward(float(SHOP_STOPS[target_shop]), delta):
+				vitals.enter_shop()
+				visits.append(target_shop)
+				current_stop = {"stop_type": "shop", "id": target_shop, "x": player_x}
+				phase = "shopping"
+				paused = "shopping"
+				go_button.hide()
+				tooltip_panel.hide()
+				facing = 1
+				shop_requested.emit(vitals.cfg.storefronts[target_shop], target_shop)
+		"to_work":
+			var speed: float = float(vitals.cfg.transport[mode].speed)
+			if fast_forward: speed *= 4.0
+			player_x += speed * delta
+			if player_x >= float(DOOR_X) - 4.0:
+				player_x = float(DOOR_X) - 4.0
+				player_visible = false
+				door_open = true
+				enter_time = elapsed
+				if not player_vehicle.is_empty():
+					vehicles.erase(player_vehicle)
+					player_vehicle = {}
+			if not player_vehicle.is_empty(): player_vehicle.x = player_x
 
 func _ready() -> void:
 	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
@@ -801,12 +892,12 @@ func _update_vehicle(v: Dictionary, state: String, delta: float) -> void:
 				spawn_left = maxf(spawn_left, u.x + u.len + 14.0)
 		v.x = spawn_left
 
-# Esc: accept the cheap default at every remaining stop and speed up.
+# Esc: leave for work now, taking the cheap default at the light, and speed up.
 func hurry() -> void:
 	if done or not interactive: return
 	fast_forward = true
 	hurrying = true
-	if paused == "shop" or paused == "light": default_answer()
+	if phase in ["street", "to_shop", "light"]: default_answer()
 
 func skip() -> void:
 	if done:
@@ -826,21 +917,37 @@ func _finish() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if done or not is_visible_in_tree():
 		return
+	if interactive:
+		_interactive_input(event)
+		return
 	var key: bool = event is InputEventKey and event.pressed and not event.echo and event.keycode in [KEY_ESCAPE, KEY_ENTER, KEY_SPACE, KEY_KP_ENTER]
 	var click: bool = event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT
-	if interactive:
-		if key and paused != "shopping":
-			get_viewport().set_input_as_handled()
-			if event.keycode == KEY_ESCAPE:
-				hurry()
-			elif paused != "":
-				default_answer()
-			else:
-				fast_forward = true
-		return
 	if key or click:
 		get_viewport().set_input_as_handled()
 		skip()
+
+func _interactive_input(event: InputEvent) -> void:
+	if phase == "shopping": return
+	if event is InputEventMouseMotion:
+		set_hover(shop_index_at(make_input_local(event).position))
+	elif event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		var index := shop_index_at(make_input_local(event).position)
+		if index >= 0 and street_active():
+			get_viewport().set_input_as_handled()
+			visit_shop(STOREFRONTS[index])
+	elif event is InputEventKey and event.pressed and not event.echo:
+		var handled := true
+		match event.keycode:
+			KEY_ESCAPE: hurry()
+			KEY_ENTER, KEY_KP_ENTER, KEY_SPACE:
+				if phase in ["street", "to_shop"]: activate_selected()
+				elif phase == "light": default_answer()
+				else: fast_forward = true
+			KEY_TAB: select_step(-1 if event.shift_pressed else 1)
+			KEY_RIGHT: select_step(1)
+			KEY_LEFT: select_step(-1)
+			_: handled = false
+		if handled: get_viewport().set_input_as_handled()
 
 func _process(delta: float) -> void:
 	advance(delta)
@@ -1051,7 +1158,30 @@ func _draw_vehicle(p: Pen, v: Dictionary) -> void:
 			p.r(x + 4, y - 18, 4, 4, 31)
 			p.r(x + 4, y - 19, 4, 2, 9)
 
+func arrive_text() -> String:
+	var total := clock_minutes()
+	var text: String = str(daily_strings.arrive_chip) % [day, total / 60, total % 60]
+	var late := late_minutes_now()
+	if late > 0: text += "   " + str(daily_strings.late_chip) % late
+	return text
+
+func _draw_highlight(p: Pen) -> void:
+	var index := hover_index if hover_index >= 0 else selected_index
+	var pulse := 64 if int(elapsed * 4.0) % 2 == 0 else 52
+	if street_active() and index >= 0:
+		var rect := shop_rect(index)
+		var x := int(rect.position.x)
+		p.frame(x, SHOP_TOP, 84, SIDEWALK_Y - SHOP_TOP, pulse)
+		p.frame(x + 1, SHOP_TOP + 1, 82, SIDEWALK_Y - SHOP_TOP - 2, 52)
+		# Sign glow around the plate.
+		p.frame(x + 2, SHOP_TOP + 36, 80, 19, pulse)
+		p.frame(x + 3, SHOP_TOP + 37, 78, 17, 53)
+	if street_active() and selected_index < 0 and go_button != null:
+		p.frame(197, 331, 146, 26, pulse)
+
 func _draw_overlay(p: Pen) -> void:
+	if interactive:
+		_draw_highlight(p)
 	if interactive and emote_time > 0.0 and emote_name != "":
 		var vehicle_len: int = VEHICLE_LEN.get(mode, 0)
 		var ey := FEET_Y - 46 if vehicle_len == 0 else LANE_DOWN - 52
@@ -1063,7 +1193,7 @@ func _draw_overlay(p: Pen) -> void:
 	var label := "DAY %d   %d:%02d AM" % [day, 8 if minute >= 60 else 7, minute % 60]
 	if interactive:
 		var total := clock_minutes()
-		label = "DAY %d   %d:%02d AM" % [day, total / 60, total % 60]
+		label = arrive_text()
 	p.r(4, 4, Pen.text_width(label, 8) + 10, 14, 1)
 	p.frame(4, 4, Pen.text_width(label, 8) + 10, 14, 5)
 	p.text(label, 9, 7, 52)
