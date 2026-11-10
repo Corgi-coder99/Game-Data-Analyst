@@ -259,7 +259,7 @@ func test_office() -> void:
 				counts[key] = int(counts.get(key, 0)) + 1
 	var expected_counts := {"data": 4, "finance": 2, "marketing": 2, "sales": 3, "executive": 1, "reception": 1, "meeting": 2, "server": 1, "break": 1}
 	check(counts == expected_counts, "NPC counts per room: " + str(counts))
-	check(office.walkers.size() == 3, "three people walk the corridor")
+	check(office.walkers.size() == 4, "three people and the office cat walk the corridor")
 	# Desks do not overlap each other or other furniture, and stay inside their rooms below the wall.
 	var desks: Array = []
 	var furniture: Array = []

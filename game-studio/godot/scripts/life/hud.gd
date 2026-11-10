@@ -7,7 +7,7 @@ const ICONS := {
 	"mood": [".xxxxx.", "x.....x", "x.x.x.x", "x.....x", "x.x.x.x", "x..x..x", ".xxxxx."],
 	"health": [".xx.xx.", "xxxxxxx", "xxxxxxx", "xxxxxxx", ".xxxxx.", "..xxx..", "...x..."],
 	"stress": [".xxxxx.", "x.....x", "x.xxx.x", "x.x.x.x", "x.x...x", "x.xxxxx", ".x....."]}
-const COLORS := {"stamina": 28, "mood": 36, "health": 26, "stress": 30}
+const COLORS := {"stamina": 96, "mood": 85, "health": 112, "stress": 93}
 const ORDER := ["stamina", "mood", "health", "stress"]
 const SEGMENT := 50
 const STRIP := Rect2(372, 0, 268, 12)

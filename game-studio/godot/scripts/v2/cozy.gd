@@ -41,11 +41,11 @@ static func pot(p: Pen, x: int, y: int, w: int, h: int, body: int = CLAY, rim: i
 	p.r(x + w, y + 1, 1, 2, OUT)
 	p.r(x - 1, y + h, w + 2, 1, OUT)
 
-static func plant_small(p: Pen, x: int, y: int, kind: int = 0) -> void:
+static func plant_small(p: Pen, x: int, y: int, variant: int = 0) -> void:
 	# Origin is the top-left of a 12x14 footprint.
 	drop_shadow(p, x, y + 4, 12, 10, 0.45)
 	pot(p, x + 2, y + 8, 8, 5)
-	match kind % 3:
+	match variant % 3:
 		0:
 			leaf(p, x + 6, y + 3, 4)
 			leaf(p, x + 2, y + 6, 2, -1)
@@ -66,10 +66,10 @@ static func plant_small(p: Pen, x: int, y: int, kind: int = 0) -> void:
 			p.px(x + 7, y + 3, 85)
 			p.px(x + 6, y + 3, 89)
 
-static func plant_big(p: Pen, x: int, y: int, kind: int = 0) -> void:
+static func plant_big(p: Pen, x: int, y: int, variant: int = 0) -> void:
 	# 22x34 footprint: a floor pot with a tall leafy plant.
 	drop_shadow(p, x, y + 18, 22, 16, 0.5)
-	pot(p, x + 4, y + 22, 14, 11, CLAY if kind % 2 == 0 else 87, PEACH if kind % 2 == 0 else 85)
+	pot(p, x + 4, y + 22, 14, 11, CLAY if variant % 2 == 0 else 87, PEACH if variant % 2 == 0 else 85)
 	p.r(x + 10, y + 8, 2, 14, LEAF_D)
 	p.r(x + 5, y + 12, 1, 10, LEAF_D)
 	p.r(x + 16, y + 11, 1, 11, LEAF_D)
@@ -79,7 +79,7 @@ static func plant_big(p: Pen, x: int, y: int, kind: int = 0) -> void:
 	leaf(p, x + 11, y + 15, 4)
 	leaf(p, x + 4, y + 19, 3, -1)
 	leaf(p, x + 18, y + 19, 3, 1)
-	if kind % 2 == 1:
+	if variant % 2 == 1:
 		p.px(x + 7, y + 7, 85)
 		p.px(x + 16, y + 6, 89)
 
@@ -237,19 +237,19 @@ static func shelf(p: Pen, x: int, y: int, w: int, rows: int, seed_value: int) ->
 		var bx := x + 3
 		var i := 0
 		while bx < x + w - 8:
-			var kind := (i * 7 + r_ * 3 + seed_value) % 9
-			if kind < 6:
+			var variant := (i * 7 + r_ * 3 + seed_value) % 9
+			if variant < 6:
 				var bw := 2 + (i + r_) % 3
 				var bh := 6 + (i * 5 + r_ * 2) % 6
 				var color: int = ACCENTS[(i + r_ * 3 + seed_value) % ACCENTS.size()]
 				p.r(bx, by + 12 - bh, bw, bh, color)
 				p.r(bx, by + 12 - bh, 1, bh, CREAM_L)
 				bx += bw + (1 if i % 4 != 3 else 3)
-			elif kind == 6:
+			elif variant == 6:
 				pot(p, bx, by + 7, 5, 5)
 				leaf(p, bx + 2, by + 4, 3)
 				bx += 8
-			elif kind == 7:
+			elif variant == 7:
 				p.r(bx, by + 4, 6, 8, 94)
 				p.frame(bx, by + 4, 6, 8, OUT)
 				p.px(bx + 2, by + 7, 89)
