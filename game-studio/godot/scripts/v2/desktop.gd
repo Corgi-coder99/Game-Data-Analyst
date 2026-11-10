@@ -1,26 +1,45 @@
 extends Control
+# The player's desktop: app icons on the left, one app window at a time in the work area,
+# a goal/tutorial strip on the right, the evidence tray and the taskbar at the bottom.
 const TooltipLabel = preload("res://scripts/v2/windows/tooltip_label.gd")
 const WindowTheme = preload("res://scripts/v2/theme_v2.gd")
 const Palette = preload("res://scripts/v2/palette.gd")
+const Sprites = preload("res://scripts/v2/sprite_lib.gd")
 const NewsWindow = preload("res://scripts/v2/windows/news_window.gd")
 const CompanyWindow = preload("res://scripts/v2/windows/company_window.gd")
 const ToolsWindow = preload("res://scripts/v2/windows/tools_window.gd")
 const ReportWindow = preload("res://scripts/v2/windows/report_window.gd")
+const TutorialPanel = preload("res://scripts/v2/tutorial_panel.gd")
 const START_MINUTES := 8 * 60 + 30
 const TOOL_MINUTES := 30
 const PUBLIC_FIELDS := ["uid", "day", "source_id", "source_tier", "source_name", "headline", "topic", "verification", "verified_by"]
+const WORK_AREA := Rect2(58, 30, 442, 290)
+# Icon order on the desktop: window id, sprite. "help" opens the tutorial instead of a window.
+const ICONS := [["news", "app_news"], ["report", "app_mail"], ["company", "app_bi"], ["tools", "app_code"], ["help", "app_help"]]
 var game: RefCounted
 var strings: Dictionary
 var news_window: Control
 var company_window: Control
 var tools_window: Control
 var report_window: Control
+var coach: Control
+var home: Panel
+var home_question: Label
+var home_heading: Label
+var home_hint: Label
 var clock_minutes := START_MINUTES
-var restore_visibility := {}
 var windows: Dictionary = {}
 var task_buttons: Dictionary = {}
+var icon_buttons: Dictionary = {}
+var tray_slots: Array = []
+var open_ids: Array = []
+var front := ""
+var sprites := Sprites.new()
 var question_scroll: ScrollContainer
+var ticker_scroll: ScrollContainer
+var ticker: Label
 var question_offset := -36.0
+var ticker_offset := -36.0
 var question: Label
 var clock: Label
 var entries: Array = []
@@ -51,34 +70,176 @@ func _build() -> void:
 	background.size = size
 	background.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(background)
-	question_scroll = ScrollContainer.new()
-	question_scroll.position = Vector2(4, 2)
-	question_scroll.size = Vector2(632, 14)
-	question_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_SHOW_NEVER
-	question_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	add_child(question_scroll)
+	var dock := ColorRect.new()
+	dock.color = Palette.color(2)
+	dock.position = Vector2(0, 28)
+	dock.size = Vector2(56, 292)
+	dock.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(dock)
+	question_scroll = _strip(Rect2(4, 2, 632, 14))
 	question = TooltipLabel.new()
 	question.mouse_filter = Control.MOUSE_FILTER_PASS
 	question_scroll.add_child(question)
+	ticker_scroll = _strip(Rect2(4, 16, 632, 12))
+	ticker = TooltipLabel.new()
+	ticker.add_theme_color_override("font_color", Palette.color(21))
+	ticker.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	ticker_scroll.add_child(ticker)
+	_build_home()
 	news_window = NewsWindow.new()
 	company_window = CompanyWindow.new()
 	tools_window = ToolsWindow.new()
-	for pair in [["news", news_window], ["company", company_window], ["tools", tools_window]]:
+	report_window = ReportWindow.new()
+	for pair in [["news", news_window], ["company", company_window], ["tools", tools_window], ["report", report_window]]:
 		add_child(pair[1])
 		pair[1].initialize(strings)
+		pair[1].hide()
 		windows[pair[0]] = pair[1]
-		pair[1].minimize_requested.connect(toggle_window.bind(pair[0]))
+		pair[1].minimize_requested.connect(minimize_window.bind(pair[0]))
+		pair[1].close_requested.connect(close_window.bind(pair[0]))
 	news_window.selected_uid.connect(_select_and_focus)
 	news_window.pin_requested.connect(toggle_pin)
+	news_window.tools_requested.connect(_verify_from_browser)
 	tools_window.requested.connect(use_tool)
-	# The report shares the right column with Company and Tools; it is a tab toggled from the taskbar.
-	report_window = ReportWindow.new()
-	add_child(report_window)
-	report_window.initialize(strings)
-	report_window.hide()
-	report_window.minimize_requested.connect(show_report.bind(false))
 	report_window.unpin_requested.connect(toggle_pin)
+	report_window.clear_requested.connect(clear_pins)
+	report_window.open_browser_requested.connect(open_window.bind("news"))
+	report_window.draft_changed.connect(_on_draft_changed)
+	report_window.locked_changed.connect(_on_report_locked)
 	report_window.submit_requested.connect(func(input): report_submitted.emit(input))
+	_build_icons()
+	coach = TutorialPanel.new()
+	add_child(coach)
+	coach.build(strings)
+	_build_tray()
+	_build_taskbar()
+	add_child(coach.overlay)
+
+func _strip(area: Rect2) -> ScrollContainer:
+	var node := ScrollContainer.new()
+	node.position = area.position
+	node.size = area.size
+	node.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_SHOW_NEVER
+	node.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	add_child(node)
+	return node
+
+func _plain_label(parent: Node, area: Rect2, font_size: int, color_index: int) -> Label:
+	var node := TooltipLabel.new()
+	node.add_theme_font_size_override("font_size", font_size)
+	node.add_theme_color_override("font_color", Palette.color(color_index))
+	node.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	node.position = area.position
+	node.size = area.size
+	node.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	parent.add_child(node)
+	node.size = area.size
+	return node
+
+func _build_home() -> void:
+	home = Panel.new()
+	home.position = WORK_AREA.position
+	home.size = WORK_AREA.size
+	home.add_theme_stylebox_override("panel", WindowTheme.box(1, 18))
+	home.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(home)
+	var title := _plain_label(home, Rect2(12, 12, 418, 18), 12, 21)
+	title.text = "Data Corp"
+	home_heading = _plain_label(home, Rect2(12, 40, 418, 12), 8, 20)
+	home_question = _plain_label(home, Rect2(12, 56, 418, 48), 12, 22)
+	home_hint = _plain_label(home, Rect2(12, 116, 418, 36), 8, 21)
+
+func _build_icons() -> void:
+	for i in ICONS.size():
+		var id: String = ICONS[i][0]
+		var tile := Button.new()
+		tile.name = "Icon_" + id
+		tile.position = Vector2(2, 32 + i * 56)
+		tile.size = Vector2(52, 52)
+		tile.clip_contents = true
+		tile.tooltip_text = strings.windows[id]
+		for state in ["normal", "pressed", "disabled", "focus"]:
+			tile.add_theme_stylebox_override(state, StyleBoxEmpty.new())
+		tile.add_theme_stylebox_override("hover", WindowTheme.box(18, 20))
+		tile.pressed.connect(_on_icon.bind(id))
+		add_child(tile)
+		var picture := TextureRect.new()
+		picture.texture = sprites.frame(ICONS[i][1])
+		picture.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		picture.stretch_mode = TextureRect.STRETCH_SCALE
+		picture.position = Vector2(14, 4)
+		picture.size = Vector2(24, 24)
+		picture.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		tile.add_child(picture)
+		var caption := Label.new()
+		caption.text = strings.windows[id]
+		caption.add_theme_font_size_override("font_size", 8)
+		caption.add_theme_color_override("font_color", Palette.color(22))
+		caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		caption.position = Vector2(0, 32)
+		caption.size = Vector2(52, 14)
+		caption.clip_text = true
+		caption.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		tile.add_child(caption)
+		caption.size = Vector2(52, 14)
+		tile.size = Vector2(52, 52)
+		icon_buttons[id] = tile
+
+func _build_tray() -> void:
+	var tray := Panel.new()
+	tray.name = "EvidenceTray"
+	tray.position = Vector2(0, 320)
+	tray.size = Vector2(640, 24)
+	tray.add_theme_stylebox_override("panel", WindowTheme.box(2, 4))
+	tray.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(tray)
+	var title := Label.new()
+	title.text = strings.tray.title
+	title.add_theme_font_size_override("font_size", 8)
+	title.add_theme_color_override("font_color", Palette.color(28))
+	title.position = Vector2(6, 5)
+	title.size = Vector2(50, 14)
+	title.clip_text = true
+	title.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	tray.add_child(title)
+	title.size = Vector2(50, 14)
+	for i in 3:
+		var x := 60 + i * 190
+		var jump := Button.new()
+		jump.position = Vector2(x, 2)
+		jump.size = Vector2(166, 20)
+		jump.clip_contents = true
+		tray.add_child(jump)
+		var picture := TextureRect.new()
+		picture.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		picture.stretch_mode = TextureRect.STRETCH_SCALE
+		picture.position = Vector2(2, 2)
+		picture.size = Vector2(16, 16)
+		picture.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		jump.add_child(picture)
+		var caption := Label.new()
+		caption.add_theme_font_size_override("font_size", 8)
+		caption.add_theme_color_override("font_color", Palette.color(22))
+		caption.position = Vector2(21, 3)
+		caption.size = Vector2(142, 14)
+		caption.clip_text = true
+		caption.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+		caption.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		jump.add_child(caption)
+		caption.size = Vector2(142, 14)
+		jump.size = Vector2(166, 20)
+		var drop := Button.new()
+		drop.text = "x"
+		drop.position = Vector2(x + 168, 2)
+		drop.size = Vector2(18, 20)
+		drop.tooltip_text = strings.tray.drop
+		tray.add_child(drop)
+		drop.size = Vector2(18, 20)
+		tray_slots.append({"jump":jump, "drop":drop, "icon":picture, "label":caption, "uid":""})
+		jump.pressed.connect(func(): if tray_slots[i].uid != "": jump_to(tray_slots[i].uid))
+		drop.pressed.connect(func(): if tray_slots[i].uid != "": toggle_pin(tray_slots[i].uid))
+
+func _build_taskbar() -> void:
 	var taskbar := ColorRect.new()
 	taskbar.color = Palette.color(2)
 	taskbar.position = Vector2(0, 344)
@@ -87,9 +248,7 @@ func _build() -> void:
 	taskbar.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(taskbar)
 	var i := 0
-	var task_ids: Array = windows.keys()
-	task_ids.append("report")
-	for id in task_ids:
+	for id in windows:
 		var task := Button.new()
 		task.theme = theme
 		task.custom_minimum_size = Vector2(108, 14)
@@ -99,7 +258,8 @@ func _build() -> void:
 		task.position = Vector2(4 + i * 112, 1)
 		task.size = Vector2(108, 14)
 		task.toggle_mode = true
-		task.button_pressed = id != "report"
+		task.button_pressed = false
+		task.visible = false
 		task.pressed.connect(toggle_window.bind(id))
 		taskbar.add_child(task)
 		task.size = Vector2(108, 14)
@@ -123,8 +283,18 @@ func setup(value: RefCounted) -> void:
 	clock_minutes = START_MINUTES
 	report_window.reset()
 	selected = ""
+	message = ""
 	clear_pins()
-	message = strings.ui.select
+	open_ids.clear()
+	front = ""
+	coach.reset_goals()
+	coach.skipped = false
+	coach.finished = false
+	coach.active = false
+	var day := int(game.status().day)
+	coach.set_day(day)
+	if day == 1: coach.start()
+	_apply_windows()
 	refresh()
 
 func refresh() -> void:
@@ -144,11 +314,18 @@ func refresh() -> void:
 		evidence_changed.emit(get_pinned())
 	if selected not in valid: selected = ""
 	var state: Dictionary = game.status()
-	var question_text: String = strings.ui.question + str(game.question_today().get("text", ""))
+	var question_body: String = str(game.question_today().get("text", ""))
+	var question_text: String = strings.ui.question + question_body
 	if question.text != question_text:
 		question_offset = -36.0
 	question.text = question_text
 	question.tooltip_text = question.text
+	home_question.text = question_body
+	home_heading.text = strings.home.question
+	home_hint.text = strings.home.hint
+	var ticker_text := "   ·   ".join(entries.map(func(item): return item.headline))
+	if ticker.text != ticker_text: ticker_offset = -36.0
+	ticker.text = ticker_text
 	clock.text = strings.ui.clock % [clock_minutes / 60, clock_minutes % 60] + "  " + strings.ui.day % [state.day, state.horizon] + "  " + ToolsWindow.dots(state)
 	news_window.display(entries, pinned, selected)
 	company_window.display(game.report_snapshot(), state)
@@ -159,7 +336,25 @@ func refresh() -> void:
 		for uid in pinned:
 			for item in entries:
 				if item.uid == uid: pinned_entries.append({"uid":item.uid, "headline":item.headline, "verification":item.verification})
-		report_window.display(str(game.question_today().get("id", "")), game.hand(), pinned_entries, int(state.get("max_actions", 1)))
+		report_window.display(str(game.question_today().get("id", "")), game.hand(), pinned_entries, int(state.get("max_actions", 1)), question_body)
+	_refresh_tray()
+
+func _refresh_tray() -> void:
+	for i in tray_slots.size():
+		var slot: Dictionary = tray_slots[i]
+		var entry := {}
+		if i < pinned.size():
+			for item in entries:
+				if item.uid == pinned[i]: entry = item
+		var has_entry := not entry.is_empty()
+		slot.uid = entry.uid if has_entry else ""
+		slot.jump.disabled = not has_entry
+		slot.drop.disabled = not has_entry
+		slot.label.text = entry.headline if has_entry else strings.tray.empty
+		slot.label.add_theme_color_override("font_color", Palette.color(22 if has_entry else 6))
+		slot.jump.tooltip_text = entry.headline if has_entry else ""
+		slot.icon.texture = sprites.frame(news_window.thumb_id(entry.topic) if has_entry else "dash")
+		slot.icon.visible = has_entry
 
 func _selected_entry() -> Dictionary:
 	for item in entries:
@@ -178,7 +373,10 @@ func clear_pins() -> void:
 func toggle_pin(uid: String) -> bool:
 	if not entries.any(func(item): return item.uid == uid): return false
 	if uid in pinned: pinned.erase(uid)
-	elif pinned.size() < 3: pinned.append(uid)
+	elif pinned.size() < 3:
+		pinned.append(uid)
+		_note("pinned")
+		coach.set_goal("pin")
 	else:
 		message = strings.ui.pin_limit
 		refresh()
@@ -190,16 +388,29 @@ func toggle_pin(uid: String) -> bool:
 func select_news(uid: String) -> bool:
 	if not entries.any(func(item): return item.uid == uid): return false
 	selected = uid
+	_note("selected")
+	coach.set_goal("read")
 	refresh()
 	return true
 
 func _select_and_focus(uid: String) -> void:
 	if select_news(uid): news_window.focus_selected()
 
+# Tray slot: show the article in the Browser.
+func jump_to(uid: String) -> void:
+	open_window("news")
+	if select_news(uid): news_window.focus_selected()
+
+func _verify_from_browser(uid: String) -> void:
+	if select_news(uid): open_window("tools")
+
 func use_tool(tool_id: String) -> Dictionary:
 	var energy_before := 0 if game == null else int(game.status().get("energy", 0))
 	var result: Dictionary = {"ok":false,"error":"day_closed"} if game == null else game.verify(selected, tool_id)
-	if result.ok: message = strings.verification[result.result]
+	if result.ok:
+		message = strings.verification[result.result]
+		_note("checked")
+		coach.set_goal("verify")
 	else: message = strings.errors.get(result.error, strings.ui.unknown)
 	# Each paid verification takes half an hour; repeated (cached) lookups are free.
 	if result.ok and int(game.status().get("energy", 0)) < energy_before:
@@ -217,43 +428,145 @@ func set_time(minutes: int) -> void:
 func start_day() -> void:
 	clock_minutes = START_MINUTES
 	selected = ""
-	message = strings.ui.select if strings != null and not strings.is_empty() else ""
-	if report_window != null: report_window.reset()
-	show_report(false)
+	message = ""
+	report_window.reset()
 	clear_pins()
+	coach.reset_goals()
+	var day := 1 if game == null else int(game.status().day)
+	coach.set_day(day)
+	if day > 1 and coach.active:
+		coach.active = false
+		coach.layout()
+	open_ids.clear()
+	front = ""
+	if day > 1:
+		open_ids.append("news")
+		front = "news"
+	_apply_windows()
 	refresh()
 
-func show_report(value: bool) -> void:
-	if report_window == null or report_window.visible == value: return
-	report_window.visible = value
-	if value:
-		restore_visibility = {"company":company_window.visible, "tools":tools_window.visible}
-		company_window.hide()
-		tools_window.hide()
-	else:
-		company_window.visible = bool(restore_visibility.get("company", true))
-		tools_window.visible = bool(restore_visibility.get("tools", true))
-	for id in windows: task_buttons[id].button_pressed = windows[id].visible
-	task_buttons["report"].button_pressed = value
-	window_toggled.emit("report", value)
+# ---- windows -------------------------------------------------------------------------
 
-func toggle_window(id: String) -> void:
-	if id == "report":
-		show_report(not report_window.visible)
-		return
-	# Company and Tools share the column with the report: choosing them brings them back.
-	if report_window != null and report_window.visible and id in ["company", "tools"]:
-		show_report(false)
-		return
+func _apply_windows() -> void:
+	var slot := 0
+	for id in windows:
+		var shown: bool = id == front
+		var was: bool = windows[id].visible
+		windows[id].visible = shown
+		var task: Button = task_buttons[id]
+		task.visible = id in open_ids
+		task.button_pressed = shown
+		if task.visible:
+			task.position = Vector2(4 + slot * 112, 1)
+			slot += 1
+		if was != shown: window_toggled.emit(id, shown)
+	home.visible = front == ""
+
+func open_window(id: String) -> void:
 	if not windows.has(id): return
-	windows[id].visible = not windows[id].visible
-	task_buttons[id].button_pressed = windows[id].visible
-	window_toggled.emit(id, windows[id].visible)
+	if id not in open_ids: open_ids.append(id)
+	front = id
+	_apply_windows()
+	match id:
+		"news":
+			_note("opened_browser")
+			coach.set_goal("read")
+		"tools": _note("opened_tools")
+		"report": _note("opened_mail")
+
+func minimize_window(id: String) -> void:
+	if front != id: return
+	front = ""
+	_apply_windows()
+
+func close_window(id: String) -> void:
+	open_ids.erase(id)
+	if front == id: front = ""
+	_apply_windows()
+
+# Taskbar behaviour: the front window is minimised, any other open window is brought forward.
+func toggle_window(id: String) -> void:
+	if not windows.has(id): return
+	if front == id: minimize_window(id)
+	else: open_window(id)
+
+func show_report(value: bool) -> void:
+	if value: open_window("report")
+	else: minimize_window("report")
+
+func _on_icon(id: String) -> void:
+	if id == "help": open_tutorial()
+	else: open_window(id)
+
+func open_tutorial() -> void:
+	coach.collapsed = false
+	coach.start()
+
+# ---- tutorial ------------------------------------------------------------------------
+
+func _note(flag: String) -> void:
+	if coach != null: coach.note(flag)
+
+func _on_draft_changed() -> void:
+	var ready: bool = report_window.forecast != "" and report_window.confidence != ""
+	coach.set_goal("write", ready)
+	if ready: _note("composed")
+
+func _on_report_locked(value: bool) -> void:
+	if not value: return
+	coach.set_goal("send")
+	_note("sent")
+
+# Where the coach-mark highlight points, in desktop coordinates.
+func coach_rect() -> Rect2:
+	if coach == null or not coach.active: return Rect2()
+	match coach.current_id():
+		"question": return question_scroll.get_global_rect()
+		"browser": return icon_buttons.news.get_global_rect()
+		"select":
+			if front == "news" and not news_window.rows.is_empty():
+				return news_window.rows.values()[0].get_global_rect().intersection(news_window.scroll.get_global_rect())
+			return icon_buttons.news.get_global_rect()
+		"codepad": return icon_buttons.tools.get_global_rect()
+		"check":
+			if front == "tools" and not tools_window.buttons.is_empty(): return tools_window.buttons.values()[0].get_global_rect()
+			return icon_buttons.tools.get_global_rect()
+		"pin":
+			if front == "news" and not news_window.pin_buttons.is_empty():
+				var key: String = selected if news_window.pin_buttons.has(selected) else news_window.pin_buttons.keys()[0]
+				return news_window.pin_buttons[key].get_global_rect().intersection(news_window.scroll.get_global_rect())
+			return icon_buttons.news.get_global_rect()
+		"mail": return icon_buttons.report.get_global_rect()
+		"forecast":
+			if front == "report" and not report_window.forecast_buttons.is_empty():
+				var first: Rect2 = report_window.forecast_buttons.values()[0].get_global_rect()
+				var last: Rect2 = report_window.confidence_buttons.values()[-1].get_global_rect()
+				return first.merge(last)
+			return icon_buttons.report.get_global_rect()
+		"send":
+			if front == "report" and report_window.submit_button != null: return report_window.submit_button.get_global_rect()
+			return icon_buttons.report.get_global_rect()
+	return Rect2()
+
+func _unhandled_input(event: InputEvent) -> void:
+	if not is_visible_in_tree() or not (event is InputEventKey) or not event.pressed or event.echo: return
+	if event.keycode in [KEY_ENTER, KEY_KP_ENTER] and coach != null and coach.active:
+		coach.advance()
+		get_viewport().set_input_as_handled()
+	elif event.keycode == KEY_ESCAPE and front != "":
+		minimize_window(front)
+		get_viewport().set_input_as_handled()
+
+func _scroll_strip(scroll: ScrollContainer, text_label: Label, offset: float, delta: float, speed: float) -> float:
+	var overflow := maxf(0, text_label.size.x - scroll.size.x)
+	if overflow <= 0: return offset
+	offset += delta * speed
+	if offset > overflow + 54: offset = -36.0
+	scroll.scroll_horizontal = int(clampf(offset, 0, overflow))
+	return offset
 
 func _process(delta: float) -> void:
 	if question == null: return
-	var overflow := maxf(0, question.size.x - question_scroll.size.x)
-	if overflow <= 0: return
-	question_offset += delta * 18.0
-	if question_offset > overflow + 54: question_offset = -36.0
-	question_scroll.scroll_horizontal = int(clampf(question_offset, 0, overflow))
+	question_offset = _scroll_strip(question_scroll, question, question_offset, delta, 18.0)
+	ticker_offset = _scroll_strip(ticker_scroll, ticker, ticker_offset, delta, 30.0)
+	if coach != null: coach.set_target(coach_rect())

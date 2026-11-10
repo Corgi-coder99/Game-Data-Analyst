@@ -9,7 +9,7 @@ var strings: Dictionary
 
 func initialize(texts: Dictionary) -> void:
 	strings = texts
-	build(strings.windows.company, Rect2(396, 20, 240, 164))
+	build(strings.windows.company, Rect2(58, 30, 240, 164))
 
 func reset_history() -> void:
 	previous.clear()
@@ -24,7 +24,9 @@ func display(snapshot: Dictionary, state: Dictionary) -> void:
 	current.ratio = float(current.arpu) / maxf(REPORTED_CHURN_FLOOR, 1.0 - float(current.retention)) / maxf(0.001, float(current.cac))
 	empty(content)
 	label(content, strings.ui.day % [state.day, state.horizon] + " · " + strings.ranks[state.rank], Rect2(0, 0, 232, 13))
-	label(content, strings.ui.trust % state.trust, Rect2(0, 13, 110, 13))
+	var trust_label := label(content, strings.ui.trust % state.trust, Rect2(0, 13, 110, 13))
+	trust_label.tooltip_text = strings.glossary.trust
+	trust_label.mouse_filter = Control.MOUSE_FILTER_PASS
 	var trust := ProgressBar.new()
 	trust.theme = theme
 	trust.show_percentage = false
