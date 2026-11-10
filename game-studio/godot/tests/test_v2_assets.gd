@@ -36,7 +36,7 @@ func run() -> void:
 	"player":[16,24,8],"khoi":[16,24,8],"mai":[16,24,8],"tu":[16,24,8],"hanh":[16,24,6],
 	"desk":[48,24,2],"chair":[16,24,1],"plant":[16,24,2],"cabinet":[24,32,1],
 	"window":[32,32,3],"door":[24,40,2],"floor":[16,16,1],"wall":[16,16,1],
-	"baseboard":[16,16,1],"clock":[16,16,1]}
+	"baseboard":[16,16,1],"clock":[16,16,1],"cat":[16,12,6]}
 	for staff in ["rin","bao","linh","dat","an","vy","sam","ngoc","ops","lead","intern","kai","mei","pat"]:
 		expected[staff] = [16,24,8]
 	for icon in ["arrow_up","arrow_down","arrow_flat","check","cross","question","lock","shield","newspaper","bubble","flag","dash","clock_old","emote_happy","emote_sad","emote_angry","emote_neutral","thumb","topic_lai_suat","topic_ty_gia","topic_nguyen_lieu","topic_suc_mua","topic_chung_khoan","topic_tin_dung","topic_noi_bo","crest_chinh_thuc","crest_bao_chi","crest_mang_xa_hoi","crest_noi_bo","app_news","app_mail","app_bi","app_code","app_help"]:

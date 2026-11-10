@@ -1,6 +1,7 @@
 extends "res://scripts/life/daily_base.gd"
 # T-026: the morning at home. Step 1: breakfast (eat / skip / sleep in). Step 2: how to get to work.
 # A sick day shows one screen instead and skips both. Enter takes the default choice, Esc hurries.
+const HomeArt = preload("res://scripts/v2/home_art.gd")
 signal breakfast_done(choice: String)
 signal finished(transport_id: String)
 var public: Dictionary = {}
@@ -24,8 +25,8 @@ func _build() -> void:
 	built = true
 	_prepare()
 	_build_room()
-	title_label = _text(self, "", Rect2(8, 4, 330, 17), 22, 12)
-	sub_label = _text(self, "", Rect2(8, 22, 296, 12), 7)
+	title_label = _text(self, "", Rect2(8, 4, 330, 17), 65, 12)
+	sub_label = _text(self, "", Rect2(8, 22, 296, 12), 66)
 	var panel := _panel(self, Rect2(312, 28, 320, 276))
 	body = Control.new()
 	body.position = Vector2(8, 8)
@@ -33,48 +34,17 @@ func _build() -> void:
 	panel.add_child(body)
 	var chat := _panel(self, Rect2(312, 308, 320, 40))
 	message_label = _wrapped(chat, "", Rect2(6, 4, 308, 32), 22, 3)
-	hint_label = _text(self, daily.default_hint, Rect2(8, 344, 296, 12), 6)
+	hint_label = _text(self, daily.default_hint, Rect2(8, 344, 296, 12), 65)
 
-# A small bedroom drawn from rectangles: wall, window, bed, nightstand with the alarm clock, rug.
+# T-028: a cozy bedroom (home_art.gd) with the alarm clock text on top and the player sprite.
 func _build_room() -> void:
-	_rect(self, 12, Rect2(0, 0, 308, 232))
-	_rect(self, 11, Rect2(0, 0, 308, 6))
-	_rect(self, 10, Rect2(0, 232, 308, 128))
-	_rect(self, 9, Rect2(0, 232, 308, 3))
-	for stripe in range(0, 308, 28):
-		_rect(self, 11, Rect2(stripe, 235, 1, 125))
-	_rect(self, 9, Rect2(196, 40, 82, 74))
-	_rect(self, 20, Rect2(200, 44, 74, 66))
-	_rect(self, 21, Rect2(200, 44, 74, 22))
-	_rect(self, 22, Rect2(200, 44, 74, 8))
-	_rect(self, 9, Rect2(235, 44, 3, 66))
-	_rect(self, 9, Rect2(200, 76, 74, 3))
-	_rect(self, 36, Rect2(250, 52, 12, 12))
-	_rect(self, 45, Rect2(252, 54, 8, 8))
-	# Bed.
-	_rect(self, 9, Rect2(14, 168, 120, 14))
-	_rect(self, 42, Rect2(16, 150, 116, 44))
-	_rect(self, 43, Rect2(16, 150, 116, 8))
-	_rect(self, 64, Rect2(16, 142, 34, 14))
-	_rect(self, 61, Rect2(20, 144, 26, 10))
-	_rect(self, 9, Rect2(14, 194, 6, 18))
-	_rect(self, 9, Rect2(128, 194, 6, 18))
-	# Nightstand and alarm clock.
-	_rect(self, 9, Rect2(150, 176, 38, 40))
-	_rect(self, 10, Rect2(152, 178, 34, 36))
-	_rect(self, 11, Rect2(152, 195, 34, 2))
-	_rect(self, 62, Rect2(156, 156, 26, 20))
-	_rect(self, 1, Rect2(158, 158, 22, 12))
+	var backdrop := TextureRect.new()
+	backdrop.texture = HomeArt.texture()
+	backdrop.size = Vector2(308, 360)
+	backdrop.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	backdrop.set_meta("overlay", true)
+	add_child(backdrop)
 	_text(self, daily.alarm, Rect2(159, 159, 21, 10), 51)
-	_rect(self, 27, Rect2(158, 152, 6, 4))
-	_rect(self, 27, Rect2(174, 152, 6, 4))
-	# Rug and plant.
-	_rect(self, 18, Rect2(60, 296, 150, 36))
-	_rect(self, 19, Rect2(66, 300, 138, 28))
-	_rect(self, 9, Rect2(266, 180, 22, 24))
-	_rect(self, 49, Rect2(264, 190, 26, 40))
-	_rect(self, 47, Rect2(262, 148, 30, 36))
-	_rect(self, 23, Rect2(268, 138, 18, 24))
 	_sprite(self, "player", 0, Vector2(92, 196), 3)
 
 # ---- steps ---------------------------------------------------------------------------------

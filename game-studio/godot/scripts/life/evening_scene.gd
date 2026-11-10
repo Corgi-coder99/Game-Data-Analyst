@@ -1,4 +1,5 @@
 extends "res://scripts/v2/windows/window_base.gd"
+const CityArt = preload("res://scripts/v2/city_art.gd")
 # T-024: the evening screen after each day's review. It shows the wallet, a simple city backdrop
 # and a menu of ways to spend money. It reads only the public status and the life module.
 const ReactionStage = preload("res://scripts/v2/reaction_stage.gd")
@@ -128,29 +129,13 @@ func _build() -> void:
 
 # A stylized city evening: sky, moon, stars, a skyline with lit windows, and the street.
 func _build_backdrop() -> void:
-	_rect(self, 17, Rect2(0, 0, 640, 360))
-	_rect(self, 18, Rect2(0, 150, 640, 110))
-	for star in [[40, 10], [90, 34], [150, 8], [330, 6], [420, 14], [470, 5], [560, 12], [610, 30], [250, 22], [380, 40]]:
-		_rect(self, 21, Rect2(star[0], star[1], 1, 1))
-	_rect(self, 22, Rect2(594, 8, 14, 14))
-	_rect(self, 18, Rect2(600, 8, 8, 8))
-	var skyline := [[0, 190, 36], [30, 170, 40], [72, 200, 30], [106, 160, 44], [154, 185, 38], [196, 175, 32], [232, 150, 46], [282, 190, 36], [322, 165, 40], [366, 195, 32], [402, 155, 46], [452, 180, 38], [494, 170, 40], [538, 200, 34], [576, 160, 46]]
-	for index in skyline.size():
-		var b: Array = skyline[index]
-		_rect(self, 3 if index % 2 == 0 else 4, Rect2(b[0], b[1], b[2], 300 - b[1]))
-		var row := 0
-		for y in range(b[1] + 6, 292, 14):
-			for wx in range(b[0] + 5, b[0] + b[2] - 6, 10):
-				if (index * 7 + row * 3 + wx / 10) % 3 != 0:
-					_rect(self, 28, Rect2(wx, y, 4, 6))
-			row += 1
-	_rect(self, 2, Rect2(0, 292, 640, 68))
-	_rect(self, 3, Rect2(0, 292, 640, 3))
-	for lamp in [60, 250, 440, 600]:
-		_rect(self, 5, Rect2(lamp, 262, 2, 30))
-		_rect(self, 28, Rect2(lamp - 2, 258, 6, 4))
-	for dash in range(10, 640, 64):
-		_rect(self, 5, Rect2(dash, 352, 24, 2))
+	# T-028: the shared cozy dusk city (city_art.gd) replaces the rectangle skyline.
+	var picture := TextureRect.new()
+	picture.texture = CityArt.backdrop("evening")
+	picture.size = Vector2(640, 360)
+	picture.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	picture.set_meta("overlay", true)
+	add_child(picture)
 
 # ---- opening ------------------------------------------------------------------
 

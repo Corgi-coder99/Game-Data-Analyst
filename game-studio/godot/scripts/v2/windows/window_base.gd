@@ -14,11 +14,11 @@ func build(title: String, area: Rect2) -> void:
 	clip_contents = true
 	var panel := Panel.new()
 	panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	panel.add_theme_stylebox_override("panel", WindowTheme.box(2))
+	panel.add_theme_stylebox_override("panel", WindowTheme.box(2, 81))
 	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(panel)
 	var bar := ColorRect.new()
-	bar.color = Palette.color(18)
+	bar.color = Palette.color(80)
 	bar.position = Vector2(1, 1)
 	bar.size = Vector2(size.x - 2, 12)
 	bar.mouse_filter = Control.MOUSE_FILTER_IGNORE

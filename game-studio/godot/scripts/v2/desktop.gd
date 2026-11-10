@@ -76,7 +76,7 @@ func _build() -> void:
 	background.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(background)
 	var dock := ColorRect.new()
-	dock.color = Color(Palette.color(2), 0.78)
+	dock.color = Color(Palette.color(83), 0.8)
 	dock.position = Vector2(0, 28)
 	dock.size = Vector2(56, 292)
 	dock.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -146,8 +146,8 @@ func _build_home() -> void:
 	home = Panel.new()
 	home.position = WORK_AREA.position
 	home.size = WORK_AREA.size
-	var home_style := WindowTheme.box(1, 53)
-	home_style.bg_color = Color(Palette.color(1), 0.8)
+	var home_style := WindowTheme.box(83, 91)
+	home_style.bg_color = Color(Palette.color(83), 0.82)
 	home.add_theme_stylebox_override("panel", home_style)
 	home.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(home)
@@ -168,7 +168,7 @@ func _build_icons() -> void:
 		tile.tooltip_text = strings.windows[id]
 		for state in ["normal", "pressed", "disabled", "focus"]:
 			tile.add_theme_stylebox_override(state, StyleBoxEmpty.new())
-		tile.add_theme_stylebox_override("hover", WindowTheme.box(18, 20))
+		tile.add_theme_stylebox_override("hover", WindowTheme.box(80, 81))
 		tile.pressed.connect(_on_icon.bind(id))
 		add_child(tile)
 		var picture := TextureRect.new()
@@ -198,7 +198,7 @@ func _build_tray() -> void:
 	tray.name = "EvidenceTray"
 	tray.position = Vector2(0, 320)
 	tray.size = Vector2(640, 24)
-	tray.add_theme_stylebox_override("panel", WindowTheme.box(2, 4))
+	tray.add_theme_stylebox_override("panel", WindowTheme.box(83, 80))
 	tray.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(tray)
 	var title := Label.new()
@@ -249,7 +249,7 @@ func _build_tray() -> void:
 
 func _build_taskbar() -> void:
 	var taskbar := ColorRect.new()
-	taskbar.color = Palette.color(2)
+	taskbar.color = Palette.color(111)
 	taskbar.position = Vector2(0, 344)
 	taskbar.size = Vector2(640, 16)
 	taskbar.clip_contents = true
