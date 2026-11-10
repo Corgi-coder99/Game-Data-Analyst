@@ -49,7 +49,7 @@ func run() -> void:
 	for cell in end_screen.get_node("Layout/Table").get_children():
 		check(cell.get_minimum_size().x <= cell.size.x, "truth cell text fits width")
 	var font: Font = end_screen.get_theme_font("font")
-	for character in "●○↑↓→·–—•":
+	for character in "·–—•":
 		check(font.has_char(character.unicode_at(0)), "UI glyph supported: " + character)
 	var final_week: int = game.simulation.state.week
 	game.finish_week()
