@@ -1,33 +1,357 @@
 {
-  "version": 1,
-  "mood": {"start": 50, "max": 100, "evening_decay": 6, "high": 70, "low": 30},
-  "food": [
-    {"id": "noodle_cart", "price": 6, "mood": 9},
-    {"id": "skewer_stall", "price": 4, "mood": 6},
-    {"id": "rice_roll", "price": 9, "mood": 13},
-    {"id": "sweet_soup", "price": 3, "mood": 4}
-  ],
-  "splurge": [
-    {"id": "gadget", "price": 40, "mood": 20},
-    {"id": "holiday", "price": 90, "mood": 40}
-  ],
-  "gold": {"start_price": 50, "min_price": 20, "max_price": 140, "drift": 0.0, "weak_drift": 0.05, "volatility": 0.05, "sell_fee": 0.02, "crash_factor": 0.8},
-  "weakness": {"trust_ref": 50, "trust_span": 30, "cash_span": 0.3, "trust_weight": 0.5, "cash_weight": 0.5},
-  "savings": {"daily_rate": 0.01},
-  "land": {"price": 400, "daily_rate": 0.015, "sell_fee": 0.1},
-  "house": {"price": 900, "daily_rate": 0.01, "rent": 12, "sell_fee": 0.12},
-  "events": {
-    "none": 0.30,
-    "lost_wallet": 0.22,
-    "gold_crash": 0.10,
-    "vendor_hike": 0.14,
-    "found_cash": 0.12,
-    "street_fine": 0.12
+ "version": 1,
+ "mood": {
+  "start": 50,
+  "max": 100,
+  "evening_decay": 6,
+  "high": 70,
+  "low": 30
+ },
+ "food": [
+  {
+   "id": "noodle_cart",
+   "price": 6,
+   "mood": 9
   },
-  "event_params": {
-    "lost_wallet": {"fraction": 0.1, "min": 3, "max": 40},
-    "street_fine": {"min": 4, "max": 12},
-    "found_cash": {"min": 5, "max": 20},
-    "vendor_hike": {"factor": 1.5}
+  {
+   "id": "skewer_stall",
+   "price": 4,
+   "mood": 6
+  },
+  {
+   "id": "rice_roll",
+   "price": 9,
+   "mood": 13
+  },
+  {
+   "id": "sweet_soup",
+   "price": 3,
+   "mood": 4
   }
+ ],
+ "splurge": [
+  {
+   "id": "gadget",
+   "price": 40,
+   "mood": 20
+  },
+  {
+   "id": "holiday",
+   "price": 90,
+   "mood": 40
+  }
+ ],
+ "gold": {
+  "start_price": 50,
+  "min_price": 20,
+  "max_price": 140,
+  "drift": 0.0,
+  "weak_drift": 0.05,
+  "volatility": 0.05,
+  "sell_fee": 0.02,
+  "crash_factor": 0.8
+ },
+ "weakness": {
+  "trust_ref": 50,
+  "trust_span": 30,
+  "cash_span": 0.3,
+  "trust_weight": 0.5,
+  "cash_weight": 0.5
+ },
+ "savings": {
+  "daily_rate": 0.01
+ },
+ "land": {
+  "price": 400,
+  "daily_rate": 0.015,
+  "sell_fee": 0.1
+ },
+ "house": {
+  "price": 900,
+  "daily_rate": 0.01,
+  "rent": 12,
+  "sell_fee": 0.12
+ },
+ "events": {
+  "none": 0.3,
+  "lost_wallet": 0.22,
+  "gold_crash": 0.1,
+  "vendor_hike": 0.14,
+  "found_cash": 0.12,
+  "street_fine": 0.12
+ },
+ "event_params": {
+  "lost_wallet": {
+   "fraction": 0.1,
+   "min": 3,
+   "max": 40
+  },
+  "street_fine": {
+   "min": 4,
+   "max": 12
+  },
+  "found_cash": {
+   "min": 5,
+   "max": 20
+  },
+  "vendor_hike": {
+   "factor": 1.5
+  }
+ },
+ "vitals": {
+  "start": {
+   "stamina": 80,
+   "mood": 70,
+   "health": 90,
+   "stress": 20,
+   "wallet": 60
+  },
+  "day": {
+   "leave": 470,
+   "on_time": 510,
+   "max_late": 60,
+   "stop_minutes": 10,
+   "wait_minutes": 4,
+   "red_probability": 0.65
+  },
+  "breakfast": {
+   "home": {
+    "price": 4,
+    "stamina": 6,
+    "mood": 3
+   },
+   "skip": {
+    "stamina": -8,
+    "mood": -5,
+    "repeat_stamina": -6,
+    "repeat_mood": -4,
+    "repeat_health": -2
+   },
+   "sleep_in": {
+    "stamina": 5,
+    "mood": 1,
+    "minutes": 15
+   }
+  },
+  "transport": {
+   "walk": {
+    "price": 0,
+    "minutes": 40,
+    "stress": 0,
+    "stamina": -6,
+    "health": 1,
+    "mood": 0,
+    "speed": 70
+   },
+   "bus": {
+    "price": 2,
+    "minutes": 25,
+    "stress": 4,
+    "stamina": -1,
+    "health": 0,
+    "mood": 0,
+    "speed": 95
+   },
+   "moto": {
+    "price": 5,
+    "minutes": 15,
+    "stress": 5,
+    "stamina": -2,
+    "health": 0,
+    "mood": 0,
+    "speed": 130
+   },
+   "taxi": {
+    "price": 20,
+    "minutes": 10,
+    "stress": -3,
+    "stamina": 0,
+    "health": 0,
+    "mood": 2,
+    "speed": 150
+   }
+  },
+  "light": {
+   "fine_probability": 0.35,
+   "fine_min": 8,
+   "fine_max": 16,
+   "fine_stress": 8,
+   "accident_probability": 0.08,
+   "accident_health": 12,
+   "accident_stress": 10,
+   "accident_minutes": 20
+  },
+  "shops": {
+   "cafe": [
+    {
+     "id": "coffee",
+     "price": 4,
+     "stamina": 10,
+     "mood": 4
+    },
+    {
+     "id": "pastry",
+     "price": 5,
+     "stamina": 6,
+     "mood": 6,
+     "meal": true
+    }
+   ],
+   "noodle": [
+    {
+     "id": "noodle_bowl",
+     "price": 6,
+     "stamina": 14,
+     "mood": 3,
+     "meal": true
+    },
+    {
+     "id": "spring_rolls",
+     "price": 4,
+     "stamina": 8,
+     "mood": 2,
+     "meal": true
+    }
+   ],
+   "mart": [
+    {
+     "id": "sandwich",
+     "price": 4,
+     "stamina": 7,
+     "mood": 1,
+     "meal": true
+    },
+    {
+     "id": "energy_drink",
+     "price": 5,
+     "stamina": 12,
+     "mood": 0,
+     "health": -1
+    }
+   ],
+   "news": [
+    {
+     "id": "magazine",
+     "price": 4,
+     "mood": 6,
+     "skill": 1
+    }
+   ],
+   "books": [
+    {
+     "id": "novel",
+     "price": 12,
+     "mood": 8,
+     "stress": -3,
+     "skill": 1
+    }
+   ],
+   "bank": [],
+   "pharmacy": [
+    {
+     "id": "vitamins",
+     "price": 10,
+     "health": 6,
+     "stress": -4
+    },
+    {
+     "id": "cold_remedy",
+     "price": 18,
+     "health": 10,
+     "stress": -2
+    }
+   ],
+   "clothing": [
+    {
+     "id": "outfit",
+     "price": 45,
+     "mood": 10,
+     "outfit": true
+    }
+   ]
+  },
+  "outfit": {
+   "days": 3,
+   "focus_mood": 8,
+   "shabby_after": 6,
+   "shabby_mood": -3,
+   "shabby_stress": 1
+  },
+  "focus": {
+   "good_mood": 80,
+   "good_stamina": 70,
+   "good_stress": 40,
+   "bad_stamina": 30,
+   "bad_stress": 80,
+   "bad_health": 30
+  },
+  "work_stress": {
+   "wrong": 10,
+   "loss": 5,
+   "gain": -3,
+   "late": 6,
+   "missed": 10,
+   "warning": 8,
+   "demotion": 12,
+   "promotion": -8,
+   "bonus": -3
+  },
+  "overtime": {
+   "pay_per_hour": 14,
+   "max_hours": 3,
+   "stamina": -8,
+   "mood": -4,
+   "stress": 5,
+   "exhausted_stamina": 12,
+   "exhausted_health": -5
+  },
+  "bills": {
+   "daily": 12,
+   "owed_cap": 60,
+   "unpaid_mood": -6,
+   "unpaid_health": -4
+  },
+  "night": {
+   "stamina": 45,
+   "overtime_penalty": 4,
+   "stress_penalty": 6,
+   "treat_bonus": 4,
+   "stress": 12,
+   "insomnia_stress": 70,
+   "mood_baseline": 70,
+   "mood_step": 8,
+   "health_gain": 2,
+   "health_loss": 2
+  },
+  "sick": {
+   "health": 15,
+   "stress": 95,
+   "bill": 30,
+   "health_restore": 20,
+   "stress_restore": 25,
+   "late_minutes": 30
+  },
+  "storefronts": {
+   "cafe": [
+    "cafe"
+   ],
+   "noodle": [
+    "noodle"
+   ],
+   "mart": [
+    "mart",
+    "pharmacy"
+   ],
+   "bank": [
+    "bank"
+   ],
+   "news": [
+    "news"
+   ],
+   "books": [
+    "books",
+    "clothing"
+   ]
+  }
+ }
 }

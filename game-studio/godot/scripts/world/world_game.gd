@@ -106,10 +106,10 @@ func _answer_set(q: Dictionary) -> Array:
 		"bank_rumor": return ["giam", "ngang"]
 	return ["tang", "giam", "ngang"]
 
-func begin_day() -> void:
+func begin_day(analysis_energy_bonus: int = 0) -> void:
 	if _open or not _ending.is_empty(): return
 	_day += 1
-	_analysis_energy = int(_config.analysis_energy)
+	_analysis_energy = maxi(1, int(_config.analysis_energy) + analysis_energy_bonus)
 	_open = true
 	_submitted = false
 	_minutes = int(_config.clock.start)
