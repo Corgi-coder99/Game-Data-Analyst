@@ -32,18 +32,22 @@ Giữ nguyên công thức tuần. Sửa **quy mô** để tăng trưởng và s
 |---|---|---|
 | chỉ quảng cáo | tối đa 10% | 0% |
 | ngẫu nhiên | tối đa 20% | tối đa 10% |
-| chỉ tối ưu | 25% đến 45% | thấp hơn cân bằng |
+| chỉ tối ưu | thấp hơn cân bằng ít nhất 10 điểm %, tối đa 40% (xem "Đính chính") | thấp hơn cân bằng |
 | cân bằng | 35% đến 55% | 25% đến 55% |
 | phân tích | cao hơn cân bằng ít nhất 10 điểm %, tối đa 85% | cao hơn cân bằng ít nhất 10 điểm % |
 
 **Tiêu chí mới về chất lượng ván chơi** (chỉ tính ván thắng, demo 10 tuần):
 
-- Users cuối ván (trung vị): cân bằng và phân tích **không thấp hơn 90%** số Users khởi điểm; chiến lược phân tích **không thấp hơn 110%**; chỉ tối ưu không thấp hơn 70%.
+- Users cuối ván (trung vị): cân bằng và phân tích **không thấp hơn 90%** số Users khởi điểm; chiến lược phân tích **không thấp hơn 110%**. Chiến lược "chỉ tối ưu" **không có yêu cầu** về Users (xem "Đính chính").
 - Ở p10 (ván thắng tệ nhất), Users cuối ván không thấp hơn 50% số Users khởi điểm.
 - Chỉ số cuối ván thắng (trung vị): Retention không quá trần mới, Conversion không quá 8%, LTV/CAC từ 2 đến 8 (như T-009).
 - Ở ván thua, đường Users trung vị tuần 1, 3, 5, 10 của chiến lược "chỉ quảng cáo" phải **không tăng**, và chỉ cần co lại chậm hơn trước (không rớt về dưới 10% trong 10 tuần).
 
 **Báo cáo bắt buộc:** `balance_sim.gd` in thêm cho mỗi chiến lược (10 và 30 tuần): Users cuối ván thắng (p10 / trung vị / p90), và đường Users trung vị tại tuần 1, 3, 5, 10 (và 20, 30 ở bản full).
+
+## Đính chính (sau câu hỏi của Codex, do Claude quyết)
+
+Bản đầu của spec tự mâu thuẫn: chiến lược "chỉ tối ưu" không có thẻ nào mang thêm người dùng, và Retention bị chặn ở khoảng 95%, nên Users của nó sau 10 tuần tối đa khoảng 60% số khởi điểm (0,95 mũ 10). Vì vậy không thể vừa yêu cầu `min_users` khoảng 70 đến 80% vừa để chiến lược này thắng 25 đến 45%. Quyết định: **giữ `min_users` 70 đến 80%** (thắng phải giữ được công ty) và **hạ yêu cầu cho "chỉ tối ưu"**: nó là chiến lược không tăng trưởng nên được phép thắng ít, tối đa 40% và thấp hơn "cân bằng" ít nhất 10 điểm %, không có yêu cầu Users cuối ván. **Không** thêm nguồn Users mới cho chiến lược này và **không** nâng trần Retention vượt khoảng 95%. Mọi mục tiêu khác giữ nguyên.
 
 ## Ràng buộc (không được phá)
 
