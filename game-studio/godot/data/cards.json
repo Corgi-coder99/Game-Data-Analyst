@@ -10,5 +10,5 @@
  {"id":"influencer_campaign","name":"Influencer Campaign","category":"growth","budget":800,"energy":2,"effects":[{"stat":"users","add":600},{"stat":"retention","add":-0.5,"duration":8,"unless_flag":"onboarding"}]},
  {"id":"loyalty_program","name":"Loyalty Program","category":"growth","budget":400,"energy":1,"effects":[{"stat":"retention","add":0.04,"duration":4},{"stat":"fixed_cost","add":20,"duration":4}]},
  {"id":"seo_content","name":"SEO Content","category":"growth","budget":300,"energy":1,"effects":[{"stat":"cac","add":-6.4,"delay":2}],"diminishing":true},
- {"id":"discount","name":"Giảm giá","category":"risk","budget":0,"energy":1,"effects":[{"stat":"conversion","add":0.015,"duration":3},{"stat":"arpu","add":-0.5,"duration":3}]}
+ {"id":"discount","name":"Discount","category":"risk","budget":0,"energy":1,"effects":[{"stat":"conversion","add":0.015,"duration":3},{"stat":"arpu","add":-0.5,"duration":3}]}
 ]}
