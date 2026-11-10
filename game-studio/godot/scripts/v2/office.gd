@@ -24,6 +24,7 @@ var player_seated := false
 var travel := 0.0
 var elapsed := 0.0
 var desk_button: Button
+var hint_label: Label
 
 func _ready() -> void:
 	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
@@ -79,7 +80,7 @@ func _ready() -> void:
 	desk_button.pressed.connect(func(): desk_clicked.emit())
 	add_child(desk_button)
 	add_label("LỐI VÀO  →",Vector2i(8,280),8,7)
-	add_label("Enter : mở bàn làm việc",Vector2i(136,264),8,7)
+	hint_label = add_label("Enter : mở bàn làm việc",Vector2i(136,264),8,7)
 	_build_dialog()
 	set_phase("sang")
 	play_arrival()
@@ -162,6 +163,19 @@ func play_arrival() -> void:
 	player_seated = false
 	arrival_active = true
 	travel = 0.0
+
+func seat_now() -> void:
+	# T-019c: skip the arrival animation (later days start seated, Esc skips on day one).
+	if player == null:
+		return
+	var was_arriving := arrival_active
+	arrival_active = false
+	player.position = Vector2i(152,184)
+	player.texture = lib.frame("player",6)
+	if not player_seated:
+		player_seated = true
+		if was_arriving:
+			seated.emit()
 
 func play_boss_appears(line: String) -> void:
 	door.texture = lib.frame("door",1)
@@ -247,3 +261,7 @@ func _draw_clock(layer: Node2D) -> void:
 
 
 
+
+func set_hint_visible(value: bool) -> void:
+	if hint_label != null:
+		hint_label.visible = value
