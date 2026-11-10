@@ -1,10 +1,10 @@
 {"events":[
- {"id":"app_bug","symptom":"Retention giảm ở cohort mới","root_cause":"Lỗi ứng dụng khi khởi động","revealed_by":["sql_deep_dive"],"resolved_by":["onboarding_redesign"],"effects":[{"stat":"retention","add":-0.08,"duration":6}]},
- {"id":"competitor_discount","symptom":"Retention giảm ở nhóm nhạy giá","root_cause":"Đối thủ giảm giá","revealed_by":["sql_deep_dive"],"resolved_by":["loyalty_program","discount"],"effects":[{"stat":"retention","add":-0.08,"duration":6}]},
- {"id":"logging_error","symptom":"Dashboard báo Retention giảm","root_cause":"Log bị trùng; Retention thực không đổi","revealed_by":["sql_deep_dive"],"resolved_by":["clean_data"],"effects":[{"stat":"integrity","add":-30,"duration":4}],"observed_effects":{"retention":-0.2}},
- {"id":"checkout_outage","symptom":"Conversion giảm","root_cause":"Lỗi thanh toán","revealed_by":["funnel_report"],"resolved_by":["fix_checkout_bug"],"effects":[{"stat":"conversion","add":-0.08,"duration":4}]},
- {"id":"server_outage","symptom":"Users và Conversion giảm","root_cause":"Máy chủ quá tải","revealed_by":["funnel_report"],"resolved_by":["support_automation"],"effects":[{"stat":"users","add":-100},{"stat":"conversion","add":-0.08,"duration":4}]},
- {"id":"trend_shift","symptom":"CAC tăng","root_cause":"Xu hướng tìm kiếm thay đổi","revealed_by":["ab_test"],"resolved_by":["seo_content"],"effects":[{"stat":"cac","add":5,"duration":4}]},
- {"id":"bad_traffic","symptom":"Retention giảm sau chiến dịch","root_cause":"Quảng cáo đưa về sai đối tượng","revealed_by":["sql_deep_dive"],"resolved_by":["onboarding_redesign"],"effects":[{"stat":"retention","add":-0.08,"duration":6}]},
- {"id":"price_fatigue","symptom":"Conversion giảm","root_cause":"Khách hàng phản ứng với giá","revealed_by":["ab_test"],"resolved_by":["loyalty_program","discount"],"effects":[{"stat":"conversion","add":-0.08,"duration":4}]}
+ {"id":"app_bug","symptom":"Retention drops in new cohorts","root_cause":"App bug at launch","revealed_by":["sql_deep_dive"],"resolved_by":["onboarding_redesign"],"effects":[{"stat":"retention","add":-0.08,"duration":6}]},
+ {"id":"competitor_discount","symptom":"Retention drops in price-sensitive groups","root_cause":"Competitor discount","revealed_by":["sql_deep_dive"],"resolved_by":["loyalty_program","discount"],"effects":[{"stat":"retention","add":-0.08,"duration":6}]},
+ {"id":"logging_error","symptom":"Dashboard shows Retention dropping","root_cause":"Duplicate logs; real Retention is unchanged","revealed_by":["sql_deep_dive"],"resolved_by":["clean_data"],"effects":[{"stat":"integrity","add":-30,"duration":4}],"observed_effects":{"retention":-0.2}},
+ {"id":"checkout_outage","symptom":"Conversion drops","root_cause":"Checkout failure","revealed_by":["funnel_report"],"resolved_by":["fix_checkout_bug"],"effects":[{"stat":"conversion","add":-0.08,"duration":4}]},
+ {"id":"server_outage","symptom":"Users and Conversion drop","root_cause":"Server overload","revealed_by":["funnel_report"],"resolved_by":["support_automation"],"effects":[{"stat":"users","add":-100},{"stat":"conversion","add":-0.08,"duration":4}]},
+ {"id":"trend_shift","symptom":"CAC rises","root_cause":"Search trend shift","revealed_by":["ab_test"],"resolved_by":["seo_content"],"effects":[{"stat":"cac","add":5,"duration":4}]},
+ {"id":"bad_traffic","symptom":"Retention drops after campaign","root_cause":"Ads brought the wrong audience","revealed_by":["sql_deep_dive"],"resolved_by":["onboarding_redesign"],"effects":[{"stat":"retention","add":-0.08,"duration":6}]},
+ {"id":"price_fatigue","symptom":"Conversion drops","root_cause":"Customers react to pricing","revealed_by":["ab_test"],"resolved_by":["loyalty_program","discount"],"effects":[{"stat":"conversion","add":-0.08,"duration":4}]}
 ]}

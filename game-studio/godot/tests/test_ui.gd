@@ -15,7 +15,7 @@ func _init() -> void:
 func run() -> void:
 	var title = load("res://scenes/title.tscn").instantiate()
 	root.add_child(title)
-	check(title.get_node("Menu/Play").text == "Chơi", "title loaded with Vietnamese strings")
+	check(title.get_node("Menu/Play").text == "Play", "title loaded with English strings")
 	title.queue_free()
 	var game = load("res://scenes/game.tscn").instantiate()
 	root.add_child(game)
@@ -49,8 +49,8 @@ func run() -> void:
 	for cell in end_screen.get_node("Layout/Table").get_children():
 		check(cell.get_minimum_size().x <= cell.size.x, "truth cell text fits width")
 	var font: Font = end_screen.get_theme_font("font")
-	for character in "ắằẳẵặấầẩẫậếềểễệốồổỗộớờởỡợứừửữựđĐ":
-		check(font.has_char(character.unicode_at(0)), "Vietnamese glyph supported: " + character)
+	for character in "·–—•":
+		check(font.has_char(character.unicode_at(0)), "UI glyph supported: " + character)
 	var final_week: int = game.simulation.state.week
 	game.finish_week()
 	check(game.simulation.state.week == final_week, "end is terminal")
@@ -85,7 +85,7 @@ func run() -> void:
 	check(game.history.size() == 1 and game.previous_week.is_empty(), "restart clears chart and weekly baseline")
 	var chart = game.get_node("Layout/Body/Dashboard/Chart")
 	check(chart.values.size() == 1 and chart.weeks == [1], "single point has week coordinate")
-	check(chart.axis_labels.has("Tuần 1") and chart.axis_labels.size() == 3, "single point has min max and week labels")
+	check(chart.axis_labels.has("Week 1") and chart.axis_labels.size() == 3, "single point has min max and week labels")
 	game.select_metric("retention")
 	check(chart.axis_labels[0].ends_with("%"), "chart uses metric percentage units")
 	game.simulation.hand = [game.simulation.cards[0]]
@@ -100,7 +100,7 @@ func run() -> void:
 	game._input(key)
 	check(game.simulation.state.week == 2, "enter finishes week")
 	check(not game.previous_week.is_empty(), "weekly comparison baseline retained")
-	check(game.get_node("Layout/Body/Details/Journal").text.contains("ước tính"), "journal identifies observed estimates")
+	check(game.get_node("Layout/Body/Details/Journal").text.contains("estimated"), "journal identifies observed estimates")
 	await process_frame
 	check(game.get_node("Layout").size.y <= 360, "dashboard fits viewport height")
 	check(game.get_node("Layout").size.x <= 640, "dashboard fits viewport width")
@@ -117,7 +117,7 @@ func run() -> void:
 	check(end_screen.get_node("Layout/Result").text == game.strings.end % [game.strings.lost, game.simulation.score()], "lose result and score agree with simulation")
 	check(end_screen.observed.users == game.displayed_report.users, "lose table preserves observed users")
 	check(end_screen.truth.users == game.simulation.state.value("users", game.simulation.config), "lose table shows actual users")
-	check(end_screen.get_node("Layout/Buttons/Replay").text == "Chơi lại" and end_screen.get_node("Layout/Buttons/Title").text == "Về tiêu đề", "Vietnamese navigation buttons")
+	check(end_screen.get_node("Layout/Buttons/Replay").text == "Play again" and end_screen.get_node("Layout/Buttons/Title").text == "Back to title", "English navigation buttons")
 	end_screen.get_node("Layout/Buttons/Title").pressed.emit()
 	await process_frame
 	await process_frame
@@ -147,21 +147,21 @@ func test_remedy_ui() -> void:
 	game.refresh()
 	var label = game.get_node("Layout/Body/Details/EventScroll/Events")
 	var hand = game.get_node("Layout/Hand")
-	check(not label.text.contains("Cách xử lý"), "hidden event has no remedy text")
+	check(not label.text.contains("Remedies"), "hidden event has no remedy text")
 	for button in hand.get_children():
-		check(button.get_meta("remedy_causes").is_empty() and not button.text.contains("Xử lý:"), "hidden event has no marked card")
+		check(button.get_meta("remedy_causes").is_empty() and not button.text.contains("Fixes:"), "hidden event has no marked card")
 	check(game.play_card("sql_deep_dive"), "UI remedy fixture reveals cause")
-	check(label.text.contains("Cách xử lý: " + game.strings.cards.onboarding_redesign + " (trong tay)"), "revealed list names remedy and hand availability")
+	check(label.text.contains("Remedies: " + game.strings.cards.onboarding_redesign + " (in hand)"), "revealed list names remedy and hand availability")
 	var marked = hand.get_child(0)
-	check(marked.text.contains("Xử lý: " + definition.root_cause), "matching card names cause")
+	check(marked.text.contains("Fixes: " + definition.root_cause), "matching card names cause")
 	check(marked.get_theme_stylebox("normal").border_width_left == 3, "matching card has distinct border")
-	check(hand.get_child(1).get_meta("remedy_causes").is_empty() and not hand.get_child(1).text.contains("Xử lý:"), "unrelated card stays unmarked")
+	check(hand.get_child(1).get_meta("remedy_causes").is_empty() and not hand.get_child(1).text.contains("Fixes:"), "unrelated card stays unmarked")
 	game.simulation.apply_effect({"stat": "cash", "add": -100000}, 0)
 	game.refresh()
 	check(hand.get_child(0).disabled and is_equal_approx(hand.get_child(0).modulate.a, 0.4), "marked unaffordable card remains dimmed")
 	game.simulation.apply_effect({"stat": "cash", "add": 100000}, 0)
 	check(game.play_card("onboarding_redesign"), "UI remedy accepted")
-	check(game.simulation.event_reports().is_empty() and not label.text.contains("Cách xử lý"), "resolved event removes list hint")
+	check(game.simulation.event_reports().is_empty() and not label.text.contains("Remedies"), "resolved event removes list hint")
 	for button in hand.get_children():
 		check(button.get_meta("remedy_causes").is_empty(), "resolved event removes card hint")
 	# Three revealed events, including one card that handles two causes.
@@ -192,7 +192,7 @@ func test_remedy_ui() -> void:
 		game.simulation.begin_week(false)
 	game.simulation.hand = [fixture_card(game, "onboarding_redesign")]
 	game.refresh()
-	check(game.simulation.event_reports().is_empty() and not label.text.contains("Cách xử lý"), "expiry removes list hints")
+	check(game.simulation.event_reports().is_empty() and not label.text.contains("Remedies"), "expiry removes list hints")
 	check(hand.get_child(0).get_meta("remedy_causes").is_empty(), "expiry removes hand hints")
 	game.queue_free()
 	await process_frame
