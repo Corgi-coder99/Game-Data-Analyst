@@ -1,0 +1,101 @@
+{
+ "version":1,
+ "base_date":"2026-03-01",
+ "history_days":15,
+ "window":7,
+ "dead_zone_pct":2.0,
+ "bands":[-20,-10,-5,-2,2,5,10,20],
+ "step_pct":{"low":0.01,"mid":0.02,"high":0.035},
+ "vnd_per_usd":24000,
+ "late_keep":0.35,
+ "rows":{"min":40,"max":400},
+ "ramp":{
+  "dirt_count":[[1,1],[2,2],[3,3],[4,4],[5,5],[9,6]],
+  "files":[[1,1],[3,2],[6,3]],
+  "rows_scale":[[1,0.4],[2,0.55],[3,0.75],[5,1.0]],
+  "easy":["duplicates","mixed_dates","category_typos","missing_blank"],
+  "easy_until_day":2,
+  "starter":["sales_export","support_tickets","competitor_scrape"],
+  "starter_until_day":2,
+  "first_file":"sales_export"
+ },
+ "dirt":{
+  "order":["late_partial","outliers","missing_blank","missing_na","missing_zero","refunds_negative","test_accounts","join_key_mismatch","category_typos","mixed_units","mixed_dates","duplicates","subtotal_rows","repeated_header"],
+  "fraction":{"duplicates":[0.04,0.08],"missing_blank":[0.04,0.08],"missing_na":[0.04,0.08],"missing_zero":[0.03,0.06],"mixed_units":[0.1,0.2],"mixed_dates":[0.2,0.5],"category_typos":[0.1,0.25],"outliers":[0.02,0.04]},
+  "count":{"refunds_negative":[2,5],"test_accounts":[2,5],"subtotal_rows":[1,3],"repeated_header":[1,3]},
+  "date_formats":["dmy","mon","iso_tz","compact"],
+  "tz":["+07:00","Z","+00:00"],
+  "na_tokens":["N/A","n/a","NA"]
+ },
+ "datasets":{
+  "sales_export":{
+   "title":"Sales export","variable":"suc_mua","sign":1,"noise":0.05,"per_day":[10,18],
+   "dirt":["duplicates","missing_blank","missing_na","missing_zero","mixed_units","mixed_dates","category_typos","outliers","repeated_header","subtotal_rows","refunds_negative","test_accounts","late_partial"],
+   "typo_cols":["region"],
+   "typos":{"region":{"Hanoi":["Ha Noi","hanoi","HANOI","Hanoi "," Hanoi"],"Hue":["hue","Hue ","HUE"],"Danang":["Da Nang","danang","DaNang"],"Saigon":["Sai Gon","saigon","HCMC"]}},
+   "missing_cols":[{"col":"price","policy":"drop","zero":true},{"col":"units","policy":"drop","zero":false},{"col":"channel","policy":"fill","fill":"unknown","zero":false}],
+   "outlier_col":"units"
+  },
+  "market_prices":{
+   "title":"Market prices","variable":"","sign":1,"noise":0.02,"per_day":[3,4],
+   "series":[{"name":"Policy rate","variable":"lai_suat","base":4.5,"unit":"%"},{"name":"FX rate","variable":"ty_gia","base":24000,"unit":"VND/USD"},{"name":"Raw material","variable":"nguyen_lieu","base":800,"unit":"USD/t"},{"name":"Stock index","variable":"chung_khoan","base":1200,"unit":"pts"}],
+   "dirt":["duplicates","missing_blank","missing_na","missing_zero","mixed_units","mixed_dates","category_typos","outliers","repeated_header","subtotal_rows","late_partial"],
+   "typo_cols":["series"],
+   "typos":{"series":{"Policy rate":["policy_rate","Policy Rate","POLICY RATE"],"FX rate":["fx_rate","Fx Rate","FX Rate "],"Raw material":["raw_material","Raw Material","raw material "],"Stock index":["stock_index","Stock Index","STOCK INDEX"]}},
+   "missing_cols":[{"col":"value","policy":"drop","zero":true},{"col":"venue","policy":"fill","fill":"unknown","zero":false}],
+   "outlier_col":"value"
+  },
+  "web_funnel":{
+   "title":"Web funnel","variable":"suc_mua","sign":1,"noise":0.04,"per_day":[1,1],
+   "dirt":["duplicates","missing_blank","missing_na","missing_zero","mixed_dates","category_typos","repeated_header","subtotal_rows","late_partial"],
+   "typo_cols":["step"],
+   "typos":{"step":{"visit":["Visit","VISIT"," visit"],"signup":["Sign up","sign_up","Signup"],"cart":["Cart","add to cart","CART "],"purchase":["Purchase","purchased","PURCHASE"]}},
+   "missing_cols":[{"col":"users","policy":"drop","zero":true,"protect":"purchase"}],
+   "steps":["visit","signup","cart","purchase"],"step_base":[2400,768,400,200],"sources":["search","social","direct"],"source_share":[0.5,0.3,0.2]
+  },
+  "loan_book":{
+   "title":"Loan book","variable":"tin_dung","sign":-1,"noise":0.1,"per_day":[10,18],
+   "dirt":["duplicates","missing_blank","missing_na","mixed_units","mixed_dates","category_typos","outliers","repeated_header","subtotal_rows","test_accounts","join_key_mismatch","late_partial"],
+   "typo_cols":["status"],
+   "typos":{"status":{"current":["Current","CURRENT"," current"],"late":["Late","LATE","late "],"default":["Default","DEFAULT","in default"]}},
+   "missing_cols":[{"col":"days_past_due","policy":"drop","zero":false},{"col":"balance","policy":"drop","zero":false}],
+   "outlier_col":"balance","base_dpd":18,"customers":60
+  },
+  "support_tickets":{
+   "title":"Support tickets","variable":"nguyen_lieu","sign":1,"noise":0.0,"per_day":[9,13],
+   "dirt":["duplicates","missing_blank","missing_na","mixed_dates","category_typos","repeated_header","subtotal_rows","test_accounts","late_partial"],
+   "typo_cols":["category","severity"],
+   "typos":{"category":{"billing":["Billing","BILLING"," billing"],"bug":["Bug","BUG","bug "],"account":["Account","ACCOUNT"," account"],"shipping":["Shipping","SHIPPING","shipping "]},"severity":{"low":["Low","LOW"," low"],"medium":["Medium","MED","med"],"high":["High","HIGH","high "]}},
+   "missing_cols":[{"col":"severity","policy":"fill","fill":"unknown","zero":false},{"col":"category","policy":"fill","fill":"unknown","zero":false}]
+  },
+  "ab_test_log":{
+   "title":"A/B test log","variable":"suc_mua","sign":1,"noise":0.0,"per_day":[8,20],
+   "dirt":["duplicates","missing_blank","missing_na","mixed_dates","category_typos","repeated_header","subtotal_rows","test_accounts"],
+   "typo_cols":["variant"],
+   "typos":{"variant":{"A":["a"," A","Variant A"],"B":["b","B ","Variant B"]}},
+   "missing_cols":[{"col":"converted","policy":"drop","zero":false}],
+   "base_rate":0.2,"uplift":{"low":0.25,"mid":0.6,"high":1.0},"alpha_z":1.96
+  },
+  "competitor_scrape":{
+   "title":"Competitor scrape","variable":"nguyen_lieu","sign":1,"noise":0.03,"per_day":[3,4],
+   "items":[{"name":"Phone case","base":12},{"name":"Charger","base":25},{"name":"Headset","base":60}],
+   "shops":[{"name":"QuickMart","off":0.0},{"name":"ValueHub","off":-0.03},{"name":"TechBay","off":0.04},{"name":"VN Gadget","off":0.02}],
+   "dirt":["duplicates","missing_blank","missing_na","missing_zero","mixed_units","mixed_dates","category_typos","outliers","repeated_header","subtotal_rows","late_partial"],
+   "typo_cols":["shop"],
+   "typos":{"shop":{"QuickMart":["Quick Mart","quickmart","QUICKMART"],"ValueHub":["Value Hub","valuehub","VALUEHUB"],"TechBay":["Tech Bay","techbay","TECHBAY"],"VN Gadget":["VN gadget","vn_gadget","Vn Gadget "]}},
+   "missing_cols":[{"col":"price","policy":"drop","zero":true}],
+   "outlier_col":"price"
+  }
+ },
+ "shocks":{
+  "checkout_outage":{"dataset":"web_funnel","factor":0.6,"step":"purchase"},
+  "server_outage":{"dataset":"web_funnel","factor":0.5},
+  "bad_traffic":{"dataset":"web_funnel","factor":0.8},
+  "competitor_discount":{"dataset":"competitor_scrape","factor":0.88},
+  "price_fatigue":{"dataset":"sales_export","factor":0.9},
+  "trend_shift":{"dataset":"sales_export","factor":1.08},
+  "app_bug":{"dataset":"support_tickets","factor":1.35}
+ },
+ "charts":{"bar_max_categories":12,"pie_max_slices":5,"unsorted_min_categories":4,"smoothing_min_window":3,"spike_z":3.0,"spike_min_points":5},
+ "grader":{"weights":{"cleaning":0.4,"findings":0.4,"chart":0.2},"chart_flag_penalty":0.25,"wrong_penalty":0.5,"adjacent_band":0.5,"direction_only":0.4}
+}
