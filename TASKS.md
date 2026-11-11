@@ -796,3 +796,11 @@ Kết quả chạy thật (worktree, Godot 4.7.2 console):
 
 ### T-034 | Claude subagent | 2026-11-10 | In progress
 - UI lõi dữ liệu: app Files/Sheet (bước sửa được), trình tạo biểu đồ + cảnh báo gây hiểu lầm, Dashboard, đính kèm phân tích và chọn kết luận trong Mail, bước 'Your analysis' ở họp cuối ngày. Spec docs/SPEC-T-034.md, worktree ai-company-t034, nhánh codex/T-034. Handoff: docs/HANDOFF-T-034.md.
+
+
+### T-035 | Claude subagent | 2026-11-11 | Backlog
+- Lớp học tập: app Handbook, gợi ý tốn Energy, huấn luyện cuối ngày (Dr. Linh), tutorial 5 ngày, tiến độ kỹ năng. Spec docs/SPEC-T-035.md. Chờ T-034 merge rồi giao.
+
+
+### T-037 | Codex | 2026-11-11 | In progress
+- Âm thanh tự sinh bằng mã (SFX + nhạc lo-fi + cài đặt âm lượng), không tải asset ngoài. Spec game-studio/godot/docs/SPEC-T-037.md, worktree ai-company-codex, nhánh codex/T-037. File được sửa: scripts/audio/*, tests/test_t037_*, một dòng hook trong game_flow.gd/reaction_stage.gd/tutorial_panel.gd/scripts/life/*, màn Settings (T-030), data/strings_v2.json (mục audio). Không sửa desktop.gd, windows/*, Mail, review_scene (T-034 đang sửa).
