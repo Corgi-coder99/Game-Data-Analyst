@@ -18,7 +18,7 @@ func open(p_session: RefCounted, p_file_id: String, host: Control) -> void:
 	texts = session.learn_text()
 	name = "HintPopup"
 	set_meta("overlay", true)
-	size = Vector2(300, 190)
+	size = Vector2(340, 226)
 	position = Vector2(maxf(0.0, (host.size.x - size.x) / 2.0), maxf(0.0, (host.size.y - size.y) / 2.0))
 	z_index = 60
 	host.add_child(self)
@@ -26,31 +26,31 @@ func open(p_session: RefCounted, p_file_id: String, host: Control) -> void:
 
 func render() -> void:
 	UI.clear(self)
-	UI.panel(self, Rect2(0, 0, 300, 190), 2, 28)
+	UI.panel(self, Rect2(0, 0, 340, 226), 2, 28)
 	var used: int = session.hint_level(file_id)
 	var total: int = int(session.learn_cfg.get("hint_levels", 3))
 	UI.label(self, "%s  %d/%d" % [texts.hint_button, used, total], Rect2(6, 3, 200, 12), 28)
 	var y := 18
 	if used == 0:
-		UI.wrapped(self, texts.hint_tip % session.hint_cost(), Rect2(6, y, 288, 30), 7, 3)
-		y += 32
+		UI.wrapped(self, texts.hint_tip % session.hint_cost(), Rect2(6, y, 328, 36), 7, 3)
+		y += 38
 	for level in range(1, used + 1):
 		var info: Dictionary = session.hint_text(file_id, level)
-		UI.label(self, str(info.title), Rect2(6, y, 288, 10), 21)
-		y += 10
-		var lines := 2 if level != 2 else 5
-		var body := UI.wrapped(self, str(info.text), Rect2(6, y, 288, 10 * lines), 22, lines)
+		UI.label(self, str(info.title), Rect2(6, y, 328, 12), 21)
+		y += 13
+		var lines := 2 if level != 2 else 7
+		var body := UI.wrapped(self, str(info.text), Rect2(6, y, 328, 12 * lines), 22, lines)
 		body.name = "HintText%d" % level
-		y += 10 * lines + 2
+		y += 12 * lines + 3
 	var cost_text: String = texts.hint_tip % session.hint_cost()
-	get_button = UI.button(self, "%s (-%d)" % [texts.hint_button, session.hint_cost()], Rect2(6, 170, 110, 16), cost_text)
+	get_button = UI.button(self, "%s (-%d)" % [texts.hint_button, session.hint_cost()], Rect2(6, 204, 110, 16), cost_text)
 	get_button.name = "HintGet"
 	get_button.disabled = used >= total
 	get_button.pressed.connect(_request)
-	close_button = UI.button(self, texts.hint_close, Rect2(240, 170, 54, 16))
+	close_button = UI.button(self, texts.hint_close, Rect2(280, 204, 54, 16))
 	close_button.name = "HintClose"
 	close_button.pressed.connect(close)
-	note_label = UI.label(self, session.message, Rect2(120, 172, 118, 12), 26)
+	note_label = UI.label(self, session.message, Rect2(124, 206, 150, 12), 26)
 
 func _request() -> void:
 	var info: Dictionary = session.request_hint(file_id)

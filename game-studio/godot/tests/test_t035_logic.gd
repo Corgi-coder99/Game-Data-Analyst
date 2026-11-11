@@ -255,8 +255,8 @@ func test_hints() -> void:
 
 # ---- 4. coaching ----------------------------------------------------------------------------------------
 
-func fake_file(entries: Array, items: Array = []) -> Dictionary:
-	return {"name": "sales_export", "grade": {"cleaning": {"entries": entries}, "findings": {"items": items}}}
+func fake_file(entries: Array, items: Array = [], chart: Dictionary = {"present": false, "flags": []}) -> Dictionary:
+	return {"name": "sales_export", "grade": {"cleaning": {"entries": entries}, "findings": {"items": items}, "chart": chart}}
 
 func test_coaching() -> void:
 	var texts: Dictionary = strings.learn.coaching
@@ -285,6 +285,16 @@ func test_coaching() -> void:
 	check(hinted_ok[0].text.contains(base.hint_note_praise), "a hint changes the praise line too")
 	# tutorial days always use Dr. Linh
 	eq(Coaching.tips(fake_file([{"type": "duplicates", "rows": 4, "fixed": 4, "missed": 0, "wrongly_removed": 0}]), 3, 0, base, true)[0].voice, "linh", "tutorial mentor is Dr. Linh")
+	# chart quality flags get a tip with their teaching text; a clean chart is praised
+	var ui: Dictionary = strings.data_ui
+	var flagged := Coaching.tips(fake_file([], [], {"present": true, "flags": [{"id": "truncated_bar_axis", "teach_key": "chart_teach_truncated_bar_axis"}, {"id": "missing_units", "teach_key": "chart_teach_missing_units"}]}), 2, 0, base, false, 0, ui)
+	eq(flagged.size(), 2, "one tip per chart flag")
+	eq(flagged[0].said, ui.chart_teach_truncated_bar_axis, "the teaching text of the flag")
+	eq(flagged[0].outcome, "miss", "a flagged chart is a miss")
+	check(flagged[0].card_id == "hb_bar_axis" and flagged[1].card_id == "hb_sort_label", "flags point at their Handbook cards")
+	var clean_chart := Coaching.tips(fake_file([], [], {"present": true, "flags": []}), 2, 0, base, false, 0, ui)
+	check(clean_chart.size() == 1 and clean_chart[0].outcome == "praise", "a clean chart is praised")
+	for flag_id in Content.FLAG_CARD: check(not Content.card_by_id(Content.FLAG_CARD[flag_id]).is_empty() and ui.has("chart_teach_" + flag_id), "flag %s has a card and teaching text" % flag_id)
 	# findings coaching
 	var ab := Coaching.tips(fake_file([], [{"id": "ab_significant", "score": 0.0}]), 4, 0, base)
 	eq(ab.size(), 1, "a wrong A/B finding is coached")
@@ -409,8 +419,8 @@ func test_tutorial() -> void:
 	bad[0].end_day()
 	var bad_review: Dictionary = bad[1].data.analysis_review(1)
 	check(float(bad_review.files[0].grade.total) < 0.75, "a sloppy day-1 policy is not solved (%.2f)" % bad_review.files[0].grade.total)
-	var bad_tips := Coaching.tips(bad_review.files[0], 1, 0, strings.learn, true)
-	check(bad_tips.size() == 2 and bad_tips[0].outcome != "praise", "the sloppy play is coached on both traps")
+	var bad_tips := Coaching.tips(bad_review.files[0], 1, 0, strings.learn, true, 0, strings.data_ui)
+	check(bad_tips.size() >= 2 and bad_tips[0].outcome != "praise" and bad_tips[1].outcome != "praise", "the sloppy play is coached on both traps")
 	check(not LearnSettle.settle(learn2, bad_review, bad[0].review(1).result, {"confidence": "cao"}, 1, true).solved, "unsolved day")
 	eq(learn2.tutorial_mode(), "on", "tutorial stays on until five days are solved")
 	# Fisher exact test and the documented numbers

@@ -24,7 +24,7 @@ static func outcome_of(entry: Dictionary) -> String:
 
 # One tip per trap of the file: {trap, outcome, voice, text, said, case_id, card_id, type}.
 # `file` is one entry of DataGame.review(day).files; `hint_levels` the hint levels the player used on this file's case.
-static func tips(file: Dictionary, day: int, hint_levels: int, texts: Dictionary, tutorial: bool = false, start_index: int = 0) -> Array:
+static func tips(file: Dictionary, day: int, hint_levels: int, texts: Dictionary, tutorial: bool = false, start_index: int = 0, ui_texts: Dictionary = {}) -> Array:
 	var order: Array = []
 	var by_trap := {}
 	for e in file.grade.cleaning.entries:
@@ -42,6 +42,14 @@ static func tips(file: Dictionary, day: int, hint_levels: int, texts: Dictionary
 		by_trap[trap2] = {"trap": trap2, "outcome": "praise" if float(item.score) >= 1.0 else "miss", "type": str(item.id)}
 		order.append(trap2)
 	var out: Array = []
+	# A chart: praise when it is clean, otherwise one tip per quality flag with its teaching text.
+	var chart: Dictionary = file.grade.chart
+	var chart_tips: Array = []
+	if chart.present:
+		if chart.flags.is_empty():
+			chart_tips.append({"outcome": "praise", "said": "", "card": "hb_bar_axis", "type": "chart_clean"})
+		for flag in chart.flags:
+			chart_tips.append({"outcome": "miss", "said": str(ui_texts.get(str(flag.teach_key), flag.id)), "card": str(Content.FLAG_CARD.get(str(flag.id), "hb_choose_chart")), "type": str(flag.id)})
 	for i in order.size():
 		var tip: Dictionary = by_trap[order[i]]
 		var voice := voice_for(day, start_index + i, tutorial)
@@ -50,4 +58,11 @@ static func tips(file: Dictionary, day: int, hint_levels: int, texts: Dictionary
 		if hint_levels > 0:
 			text += " " + str(texts.hint_note_praise if tip.outcome == "praise" else texts.hint_note_miss)
 		out.append({"trap": tip.trap, "outcome": tip.outcome, "voice": voice, "text": text, "said": str(c.get("trap", "")), "case_id": str(c.get("id", "")), "card_id": str(c.handbook_card_ids[0]) if not c.is_empty() and not c.handbook_card_ids.is_empty() else "", "type": tip.type})
+	for k in chart_tips.size():
+		var item: Dictionary = chart_tips[k]
+		var voice2 := voice_for(day, start_index + out.size(), tutorial)
+		var line := line_for("misleading_axis", item.outcome, voice2)
+		if hint_levels > 0: line += " " + str(texts.hint_note_praise if item.outcome == "praise" else texts.hint_note_miss)
+		var chart_case: Dictionary = CaseMap.by_trap("misleading_axis", "")
+		out.append({"trap": "misleading_axis", "outcome": item.outcome, "voice": voice2, "text": line, "said": item.said if item.said != "" else str(chart_case.get("trap", "")), "case_id": str(chart_case.get("id", "")), "card_id": item.card, "type": item.type})
 	return out

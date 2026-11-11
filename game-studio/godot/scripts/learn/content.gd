@@ -18,6 +18,8 @@ const DIRT_TRAP := {
 	"test_accounts": "test_accounts", "late_partial": "late_arriving_data", "join_key_mismatch": "join_mismatch"}
 # Statistical findings -> coaching trap id (used when the finding is wrong or missed).
 const FINDING_TRAP := {"ab_significant": "ab_significance", "biggest_dropoff": "funnel_dropoff", "better_version": "simpsons_paradox"}
+# Chart quality flag -> the Handbook card that teaches it.
+const FLAG_CARD := {"truncated_bar_axis": "hb_bar_axis", "dual_axis": "hb_dual_axis", "too_many_categories": "hb_choose_chart", "unsorted_bars": "hb_sort_label", "missing_units": "hb_sort_label", "smoothing_hides_spikes": "hb_moving_average", "pie_too_many_slices": "hb_pie_caution"}
 # Sheet operation -> Handbook cards unlocked when the player uses it.
 const OP_CARDS := {
 	"dedupe": ["hb_duplicates"], "standardize": ["hb_text_standardize"], "missing": ["hb_missing_values"], "convert": ["hb_units_currency"],

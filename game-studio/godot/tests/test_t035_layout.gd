@@ -233,7 +233,9 @@ func hint_screens() -> void:
 	var session: RefCounted = desktop.data_session
 	await settle()
 	var fid: String = session.files[0].id
+	desktop.open_data("files")
 	desktop.data_window.open_file(fid)
+	desktop.open_data("sheet")
 	await settle()
 	var sheet_view: Control = desktop.data_window.sheet_view
 	check(sheet_view.hint_button != null and sheet_view.hint_button.get_global_rect().size.y >= 14.0, "Sheet has a Hint button")
@@ -241,7 +243,7 @@ func hint_screens() -> void:
 	sheet_view.hint_button.pressed.emit()
 	await settle()
 	var popup: Control = sheet_view.find_child("HintPopup", true, false)
-	check(popup != null, "the Hint button opens the popup")
+	check(popup != null and popup.is_visible_in_tree(), "the Hint button opens the popup")
 	check(int(made[0].status().energy) == 3, "opening the popup is free")
 	scan(popup, "hint popup 0", true)
 	shot("06-hint-popup-empty")
@@ -267,6 +269,7 @@ func hint_screens() -> void:
 	desktop.open_data("charts")
 	await settle()
 	var chart_view: Control = desktop.data_window.chart_view
+	check(desktop.front == "data" and chart_view.is_visible_in_tree(), "the Charts tab is showing")
 	check(chart_view.hint_button != null, "Charts has a Hint button")
 	scan(desktop.data_window, "charts with hint", true)
 	chart_view.hint_button.pressed.emit()
@@ -316,9 +319,6 @@ func review_coaching() -> void:
 		var desktop: Control = made[1]
 		var session: RefCounted = desktop.data_session
 		await settle()
-		if variant == "mixed":
-			# two hints, a half-done cleaning
-			game.begin_day() if false else null
 		var fid: String = session.files[0].id
 		session.open_file(fid)
 		if variant == "mixed":

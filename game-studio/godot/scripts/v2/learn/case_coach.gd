@@ -32,7 +32,7 @@ func build(all_strings: Dictionary) -> void:
 	position = AREA.position
 	size = AREA.size
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	panel = UI.panel(self, Rect2(0, 0, 132, 176), 2, 21)
+	panel = UI.panel(self, Rect2(0, 0, 132, 206), 2, 21)
 	var portrait := TextureRect.new()
 	portrait.texture = sprites.frame("drlinh")
 	portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
@@ -42,14 +42,14 @@ func build(all_strings: Dictionary) -> void:
 	portrait.size = Vector2(24, 36)
 	portrait.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	panel.add_child(portrait)
-	title_label = UI.wrapped(panel, "", Rect2(32, 4, 96, 30), 28, 3)
-	step_label = UI.label(panel, "", Rect2(32, 30, 96, 10), 7)
-	text_label = UI.wrapped(panel, "", Rect2(4, 44, 124, 60), 22, 6)
-	stuck_label = UI.wrapped(panel, "", Rect2(4, 106, 124, 46), 21, 4)
-	next_button = UI.button(panel, texts.next, Rect2(4, 156, 58, 16))
+	title_label = UI.wrapped(panel, "", Rect2(32, 4, 96, 34), 28, 3)
+	step_label = UI.label(panel, "", Rect2(4, 42, 124, 12), 7)
+	text_label = UI.wrapped(panel, "", Rect2(4, 56, 124, 66), 22, 6)
+	stuck_label = UI.wrapped(panel, "", Rect2(4, 124, 124, 55), 21, 5)
+	next_button = UI.button(panel, texts.next, Rect2(4, 186, 58, 16))
 	next_button.name = "CoachNext"
 	next_button.pressed.connect(press_next)
-	stuck_button = UI.button(panel, texts.stuck, Rect2(66, 156, 62, 16))
+	stuck_button = UI.button(panel, texts.stuck, Rect2(66, 186, 62, 16))
 	stuck_button.name = "CoachStuck"
 	stuck_button.pressed.connect(show_stuck)
 	overlay = TutorialPanel.Overlay.new()

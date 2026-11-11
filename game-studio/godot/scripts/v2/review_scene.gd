@@ -285,7 +285,7 @@ func _analysis_results(review: Dictionary) -> void:
 func coaching_tips(review: Dictionary) -> Array:
 	var out: Array = []
 	for f in review.files:
-		out.append_array(Coaching.tips(f, day, int(hints_by_file.get(f.id, 0)), strings.learn, tutorial_day, out.size()))
+		out.append_array(Coaching.tips(f, day, int(hints_by_file.get(f.id, 0)), strings.learn, tutorial_day, out.size(), strings.data_ui))
 	return out
 
 # Page 2 of the step: one tip at a time (the mentor line for the outcome, what the data said, a correct
@@ -302,15 +302,15 @@ func _analysis_coaching(review: Dictionary) -> void:
 		var color := 24 if tip.outcome == "praise" else (26 if tip.outcome == "wrong_fix" else 28)
 		_text(body, "%s  -  %s  -  %s" % [c.tip_of % [tip_index + 1, tips.size()], c.mentor[tip.voice], c.outcome[tip.outcome]], Rect2(0, 0, 420, 12), color)
 		tip_nodes["line"] = _wrapped(body, str(tip.text), Rect2(0, 14, 420, 44), 22, 4)
-		tip_nodes["said"] = _wrapped(body, c.said % tip.said, Rect2(0, 62, 420, 22), 7, 2)
+		tip_nodes["said"] = _wrapped(body, c.said % tip.said, Rect2(0, 60, 420, 36), 7, 3)
 		var case_entry: Dictionary = Content.case_by_id(str(tip.case_id))
-		var y := 88
+		var y := 100
 		if not case_entry.is_empty():
 			_text(body, c.steps, Rect2(0, y, 420, 12), 21)
-			y += 12
+			y += 13
 			for i in mini(4, case_entry.reference_steps.size()):
-				_text(body, "%d. %s" % [i + 1, case_entry.reference_steps[i]], Rect2(8, y, 410, 11), 22)
-				y += 11
+				_text(body, "%d. %s" % [i + 1, case_entry.reference_steps[i]], Rect2(8, y, 410, 12), 22)
+				y += 12
 		var card: Dictionary = Content.card_by_id(str(tip.card_id))
 		if not card.is_empty():
 			tip_nodes["card"] = _text(body, c.card % card.title, Rect2(0, y + 4, 420, 12), 20)
@@ -337,7 +337,7 @@ func _analysis_coaching(review: Dictionary) -> void:
 			_render_step())
 		tip_buttons["prev"] = prev
 		tip_buttons["next"] = nxt
-	_skill_bars(Rect2(432, 54, 176, 150))
+	_skill_bars(Rect2(432, 66, 176, 140))
 
 func _skill_bars(area: Rect2) -> void:
 	if learn_state == null: return
