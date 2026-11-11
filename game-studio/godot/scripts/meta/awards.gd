@@ -55,6 +55,7 @@ static func rule_met(rule: Dictionary, profile: Dictionary) -> bool:
 		"rank_index": return int(stats.best_rank_index) >= value
 		"best_ontime": return int(stats.best_ontime) >= value
 		"best_streak": return int(profile.best_streak) >= value
+		"learn_event": return int(profile.get("learn", {}).get("events", {}).get(str(rule.get("event", "")), 0)) > 0
 	return false
 
 # Unlocks every achievement whose rule is met and that is not owned yet. Each is earned exactly once.

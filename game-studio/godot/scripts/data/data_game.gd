@@ -9,6 +9,11 @@ const Pipeline = preload("res://scripts/data/pipeline.gd")
 const Charts = preload("res://scripts/data/charts.gd")
 const Grader = preload("res://scripts/data/grader.gd")
 const Loader = preload("res://scripts/data.gd")
+# T-035: learning layer hooks (case mapping, hints, tutorial files). Hidden facts stay in this class.
+const CaseMap = preload("res://scripts/learn/case_map.gd")
+const Content = preload("res://scripts/learn/content.gd")
+const TutorialFiles = preload("res://scripts/learn/tutorial_files.gd")
+var _tutorial := false
 var _gen: RefCounted
 var _ref: RefCounted
 var _charts: RefCounted
@@ -31,8 +36,49 @@ func _init(source: RefCounted, seed_value: int, cfg: Dictionary = {}) -> void:
 	_grader = Grader.new(config)
 
 func _files(day: int) -> Array:
-	if not _cache.has(day): _cache[day] = _gen.generate(day)
+	if not _cache.has(day):
+		_cache[day] = [TutorialFiles.build(day)] if tutorial_day(day) else _gen.generate(day)
 	return _cache[day]
+
+# T-035: in tutorial mode days 1..5 use the five hand-built files instead of generated ones (set before day 1).
+func set_tutorial(on: bool) -> void:
+	_tutorial = on
+	_cache.clear()
+
+func tutorial_day(day: int) -> bool:
+	return _tutorial and day >= 1 and day <= TutorialFiles.DAYS
+
+# T-035: skill-based difficulty adjustment (learn/ramp.gd) for one day; ignored once the day's files exist.
+func set_adjustment(day: int, adjustment: Dictionary) -> void:
+	if not _cache.has(day) and not tutorial_day(day): _gen.adjustments[day] = adjustment.duplicate(true)
+
+func _case_of(f: Dictionary) -> Dictionary:
+	if f.has("case_id"): return Content.case_by_id(str(f.case_id))
+	return CaseMap.for_file(str(f.name), f.dirt_types, int(f.get("day", 1)))
+
+# T-035: the public part of the day's case: id, title and skill only (no trap, steps or wrong paths).
+func case_public(day: int, file_id: String) -> Dictionary:
+	var f := _file(day, file_id)
+	return {} if f.is_empty() else CaseMap.public(_case_of(f))
+
+# T-035: Handbook cards of the case, for tutorial days only (a guided case may open its cards at once).
+func tutorial_cards(day: int, file_id: String) -> Array:
+	var f := _file(day, file_id)
+	return f.cards.duplicate() if not f.is_empty() and f.has("cards") else []
+
+# T-035: structured hint parts for one level (1 problem type, 2 method card, 3 Sheet operation families).
+# No text and no reference step leaves this class; learn/hints.gd turns the parts into words.
+func hint(day: int, file_id: String, level: int) -> Dictionary:
+	var f := _file(day, file_id)
+	if f.is_empty() or _is_reviewed(day): return {"ok":false, "error":"day_closed"}
+	if level < 1 or level > 3: return {"ok":false, "error":"bad_level"}
+	var c := _case_of(f)
+	var families: Array = []
+	for step in _ref.steps(f):
+		var family: String = str(Content.OP_FAMILY.get(str(step.op), ""))
+		if family != "" and not families.has(family): families.append(family)
+	families.sort()
+	return {"ok":true, "level":level, "case_id":str(c.get("id", "")), "skill":str(c.get("skill", "data_cleaning")), "card_id":str(c.handbook_card_ids[0]) if not c.is_empty() and not c.handbook_card_ids.is_empty() else "", "families":families}
 
 func _file(day: int, file_id: String) -> Dictionary:
 	if not _allowed(day): return {}
@@ -136,5 +182,6 @@ func review(day: int) -> Dictionary:
 		var submission: Dictionary = _submissions.get(key, {})
 		var grade: Dictionary = _grader.grade(f, _ref, ev.truth, submission)
 		var manifest: Array = f.manifest.map(func(m): return {"type":m.type, "columns":m.columns, "rows":m.rows.size(), "row_ids":m.rows})
-		out.append({"id":f.id, "name":f.name, "submitted":_submissions.has(key), "dirt":f.dirt_types, "manifest":manifest, "reference_steps":_ref.steps(f), "reference_table":ev.dataset.to_dict(), "truth":ev.truth, "hidden":f.hidden.duplicate(), "grade":grade})
+		var case_entry := _case_of(f)
+		out.append({"case_id":str(case_entry.get("id", "")), "id":f.id, "name":f.name, "submitted":_submissions.has(key), "dirt":f.dirt_types, "manifest":manifest, "reference_steps":_ref.steps(f), "reference_table":ev.dataset.to_dict(), "truth":ev.truth, "hidden":f.hidden.duplicate(), "grade":grade})
 	return {"ok":true, "day":day, "files":out}

@@ -39,6 +39,7 @@ const TEXTS := {
 var cfg: Dictionary
 var scenario: RefCounted
 var seed_value: int
+var adjustments: Dictionary = {}
 
 func _init(p_scenario: RefCounted = null, p_seed: int = 0, p_cfg: Dictionary = {}) -> void:
 	scenario = p_scenario
@@ -59,7 +60,14 @@ func _ramp(table: Array, day: int) -> float:
 	return out
 
 func difficulty(day: int) -> Dictionary:
-	return {"dirt":int(_ramp(cfg.ramp.dirt_count, day)), "files":int(_ramp(cfg.ramp.files, day)), "scale":_ramp(cfg.ramp.rows_scale, day)}
+	var dirt := int(_ramp(cfg.ramp.dirt_count, day))
+	var scale := _ramp(cfg.ramp.rows_scale, day)
+	# T-035: optional skill-based adjustment (learn/ramp.gd) for this day; empty means no change.
+	var adj: Dictionary = adjustments.get(day, {})
+	if not adj.is_empty():
+		dirt = clampi(dirt + int(adj.dirt), int(adj.min_dirt), int(adj.max_dirt))
+		scale = scale * float(adj.scale_mult)
+	return {"dirt":dirt, "files":int(_ramp(cfg.ramp.files, day)), "scale":scale}
 
 func plan(day: int) -> Dictionary:
 	var rng := _rng(day, "plan")

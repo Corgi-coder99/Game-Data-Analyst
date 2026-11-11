@@ -5,6 +5,8 @@ extends RefCounted
 const DS = preload("res://scripts/data/dataset.gd")
 const Pipeline = preload("res://scripts/data/pipeline.gd")
 const Ops = preload("res://scripts/data/ops.gd")
+# T-035: emitted when the player adds or edits a step (the Handbook unlocks the card of that operation).
+signal step_changed(op: String)
 var file_id := ""
 var title := ""
 var raw: RefCounted
@@ -65,6 +67,7 @@ func add_step(step: Dictionary) -> Dictionary:
 	view_removed = false
 	_touch()
 	selected_col = clampi(selected_col, -1, table().cols.size() - 1)
+	step_changed.emit(str(step.get("op", "")))
 	return p
 
 func edit_step(index: int, step: Dictionary) -> Dictionary:
@@ -74,6 +77,7 @@ func edit_step(index: int, step: Dictionary) -> Dictionary:
 	pipeline.edit(index, step)
 	selected_step = index
 	_touch()
+	step_changed.emit(str(step.get("op", "")))
 	return p
 
 func delete_step(index: int) -> bool:

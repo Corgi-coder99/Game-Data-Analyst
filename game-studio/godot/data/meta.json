@@ -136,7 +136,15 @@
   {"id": "survived_10", "name": "Survived 10 Days", "desc": "Finish a full run", "rule": "run_survived", "value": 0},
   {"id": "senior", "name": "Promoted to Senior", "desc": "Reach Senior Analyst", "rule": "rank_index", "value": 2},
   {"id": "zero_late_week", "name": "Zero Late Week", "desc": "7 days in a row on time", "rule": "best_ontime", "value": 7},
-  {"id": "streak_7", "name": "7-Day Streak", "desc": "Work 7 calendar days in a row", "rule": "best_streak", "value": 7}
+  {"id": "streak_7", "name": "7-Day Streak", "desc": "Work 7 calendar days in a row", "rule": "best_streak", "value": 7},
+  {"id": "first_clean", "name": "First Clean", "desc": "Fix every bad row in a file", "rule": "learn_event", "event": "first_clean", "value": 0},
+  {"id": "sharp_eye", "name": "Sharp Eye", "desc": "Catch an entry-error outlier", "rule": "learn_event", "event": "sharp_eye", "value": 0},
+  {"id": "dup_hunter", "name": "Duplicate Hunter", "desc": "Remove every copied row", "rule": "learn_event", "event": "dup_hunter", "value": 0},
+  {"id": "no_cherry_picking", "name": "No Cherry Picking", "desc": "Get the 7-day change right", "rule": "learn_event", "event": "no_cherry_picking", "value": 0},
+  {"id": "honest_axis", "name": "Honest Axis", "desc": "Attach a clean bar chart", "rule": "learn_event", "event": "honest_axis", "value": 0},
+  {"id": "healthy_skepticism", "name": "Healthy Skepticism", "desc": "Judge an A/B test correctly", "rule": "learn_event", "event": "healthy_skepticism", "value": 0},
+  {"id": "skill_level_3", "name": "Rising Analyst", "desc": "Reach level 3 in any skill", "rule": "learn_event", "event": "skill_level_3", "value": 0},
+  {"id": "tutorial_graduate", "name": "Tutorial Graduate", "desc": "Solve the five tutorial cases", "rule": "learn_event", "event": "tutorial_graduate", "value": 0}
  ],
  "ranks": {"thuc_tap": "Intern", "chuyen_vien": "Analyst", "chuyen_vien_chinh": "Senior Analyst", "truong_nhom": "Team Lead", "giam_doc": "Analytics Director"}
 }

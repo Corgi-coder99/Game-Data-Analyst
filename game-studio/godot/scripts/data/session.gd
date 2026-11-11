@@ -7,7 +7,13 @@ const DataGame = preload("res://scripts/data/data_game.gd")
 const Sheet = preload("res://scripts/data/sheet_model.gd")
 const Ops = preload("res://scripts/data/ops.gd")
 const Loader = preload("res://scripts/data.gd")
+# T-035: learning layer (hints, Handbook unlocks, tutorial files, skill-based ramp).
+const Content = preload("res://scripts/learn/content.gd")
+const Hints = preload("res://scripts/learn/hints.gd")
+const Ramp = preload("res://scripts/learn/ramp.gd")
 signal changed
+signal cards_unlocked(ids: Array)
+signal hint_given(info: Dictionary)
 var data: RefCounted
 var world: RefCounted
 var cfg: Dictionary = {}
@@ -22,15 +28,36 @@ var findings: Dictionary = {}
 var minutes_spent := 0
 var message := ""
 var _serial := 0
+# T-035: LearnState of the profile (null when learning features are not attached), hint log and texts.
+var learn: RefCounted
+var learn_cfg: Dictionary = {}
+var tutorial := false
+var hint_log: Dictionary = {}
+var file_case: Dictionary = {}
+var learn_texts: Dictionary = {}
 
 # `world_or_scenario` and `seed_value` as for DataGame. The scoring hook is installed on a real world.
 func _init(world_source: RefCounted, seed_value: int, data_cfg: Dictionary = {}) -> void:
 	var all: Dictionary = data_cfg if not data_cfg.is_empty() else Loader.load_json("res://data/datasets.json")
 	cfg = all.get("data", {})
+	learn_cfg = all.get("learn", {})
 	data = DataGame.new(world_source, seed_value, all)
 	if world_source.get("_scenario") != null:
 		world = world_source
 		world.analysis_scorer = Callable(data, "score_analysis")
+
+# T-035: attach the profile LearnState. Tutorial mode makes days 1-5 use the hand-built files.
+func attach_learn(state: RefCounted, tutorial_on: bool = false) -> void:
+	learn = state
+	tutorial = tutorial_on
+	data.set_tutorial(tutorial_on)
+
+func learn_text() -> Dictionary:
+	if learn_texts.is_empty(): learn_texts = Loader.load_json("res://data/strings_v2.json").get("learn", {})
+	return learn_texts
+
+func tutorial_today() -> bool:
+	return tutorial and data.tutorial_day(day)
 
 func limit(key: String, fallback: int) -> int:
 	return int(cfg.get(key, fallback))
@@ -46,8 +73,12 @@ func begin_day(value: int) -> void:
 	minutes_spent = 0
 	message = ""
 	files = []
+	hint_log.clear()
+	file_case.clear()
+	if learn != null and not data.tutorial_day(day): data.set_adjustment(day, Ramp.adjust(learn_cfg, day, learn.mean_level()))
 	for f in data.files_today(day):
 		files.append({"id":f.id, "title":f.title, "name":f.name, "row_count":f.row_count, "table":f.table, "lookup_tables":f.lookup_tables, "findings":f.findings})
+		file_case[f.id] = str(data.case_public(day, f.id).get("id", ""))
 	changed.emit()
 
 # Plain difficulty hint by day only: it says nothing about this file.
@@ -78,9 +109,78 @@ func open_file(file_id: String) -> RefCounted:
 	if not opened.has(file_id):
 		if not _spend(limit("minutes_per_file", 10)): return null
 		opened[file_id] = true
-	if not sheets.has(file_id): sheets[file_id] = Sheet.new(info)
+		# A guided tutorial case opens its Handbook cards at once.
+		if tutorial_today(): _unlock(data.tutorial_cards(day, file_id), "tutorial")
+	if not sheets.has(file_id):
+		sheets[file_id] = Sheet.new(info)
+		sheets[file_id].step_changed.connect(_on_step_op)
 	changed.emit()
 	return sheets[file_id]
+
+# ---- T-035: Handbook unlocks and hints ---------------------------------------------------------------------
+
+func _unlock(ids: Array, source: String) -> void:
+	if learn == null: return
+	var fresh: Array = learn.unlock_many(ids, source)
+	if not fresh.is_empty(): cards_unlocked.emit(fresh)
+
+func _on_step_op(op: String) -> void:
+	if learn == null: return
+	var fresh: Array = learn.unlock_for_op(op)
+	if not fresh.is_empty(): cards_unlocked.emit(fresh)
+
+# The file a hint refers to: the first opened file, else the first file of the day.
+func hint_file() -> String:
+	for id in opened:
+		return str(id)
+	return str(files[0].id) if not files.is_empty() else ""
+
+func hint_cost() -> int:
+	return int(learn_cfg.get("hint_energy", 1))
+
+# Levels already given for the case of this file (0..3).
+func hint_level(file_id: String) -> int:
+	return hint_log.get("%d|%s" % [day, file_case.get(file_id, "")], {}).size()
+
+func hint_text(file_id: String, level: int) -> Dictionary:
+	return hint_log.get("%d|%s" % [day, file_case.get(file_id, "")], {}).get(level, {})
+
+# Gives the next hint level of the file's case for hint_energy analysis Energy (once per case per level).
+# Returns {ok, level, title, text, card_id, energy_left} or {ok:false, error}. Nothing is spent on failure.
+func request_hint(file_id: String) -> Dictionary:
+	if learn == null or file_info(file_id).is_empty(): return {"ok":false, "error":"no_file"}
+	var key := "%d|%s" % [day, file_case.get(file_id, "")]
+	var given: Dictionary = hint_log.get(key, {})
+	var level := given.size() + 1
+	if level > int(learn_cfg.get("hint_levels", 3)):
+		message = "No more hints for this case."
+		return {"ok":false, "error":"no_more_hints"}
+	var parts: Dictionary = data.hint(day, file_id, level)
+	if not parts.ok: return parts
+	var energy_left := -1
+	if world != null and world.has_method("spend_analysis_energy"):
+		var spent: Dictionary = world.spend_analysis_energy(hint_cost())
+		if not spent.ok:
+			message = "A hint costs %d Energy." % hint_cost() if spent.error == "no_analysis_energy" else "The day is closed."
+			return spent
+		energy_left = int(spent.energy_left)
+	var info := Hints.compose(parts, learn_text())
+	info["ok"] = true
+	info["energy_left"] = energy_left
+	given[level] = info
+	hint_log[key] = given
+	learn.record_hint()
+	if str(info.card_id) != "": _unlock([info.card_id], "hint")
+	message = ""
+	hint_given.emit(info)
+	changed.emit()
+	return info
+
+# Hint levels used on each file of today (for the review: coaching lines and the Hint used tag).
+func hints_by_file() -> Dictionary:
+	var out := {}
+	for f in files: out[f.id] = hint_level(f.id)
+	return out
 
 func sheet(file_id: String) -> RefCounted:
 	return sheets.get(file_id)
