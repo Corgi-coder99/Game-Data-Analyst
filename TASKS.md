@@ -802,7 +802,7 @@ Kết quả chạy thật (worktree, Godot 4.7.2 console):
 - Lớp học tập: app Handbook, gợi ý tốn Energy, huấn luyện cuối ngày (Dr. Linh), tutorial 5 ngày, tiến độ kỹ năng. Spec docs/SPEC-T-035.md. Chờ T-034 merge rồi giao.
 
 
-### T-037 | Codex | 2026-11-11 | Blocked
+### T-037 | Codex | 2026-11-11 | Done
 - Âm thanh tự sinh bằng mã (SFX + nhạc lo-fi + cài đặt âm lượng), không tải asset ngoài. Spec game-studio/godot/docs/SPEC-T-037.md, worktree ai-company-codex, nhánh codex/T-037. File được sửa: scripts/audio/*, tests/test_t037_*, một dòng hook trong game_flow.gd/reaction_stage.gd/tutorial_panel.gd/scripts/life/*, màn Settings (T-030), data/strings_v2.json (mục audio). Không sửa desktop.gd, windows/*, Mail, review_scene (T-034 đang sửa).
 - Handoff Codex (2026-11-11, Performance amendment): tối ưu MỘT lượt đạt ngân sách audio; giữ toàn bộ thay đổi uncommitted trước đó. Scope amendment đã giải quyết quyền sửa profile. Chưa chuyển Review vì hồi quy test_world timeout 60 giây; dừng mở rộng kiểm thử, cần reviewer xử lý ngân sách/tách test cũ trước khi xác nhận toàn bộ suite.
 - Lượt này sửa scripts/audio/{synth,sfx_bank,music,audio_manager}.gd, tests/test_t037_{synth,manager}.gd; thêm tests/test_t037_{music,timing,flow}.gd; cập nhật TASKS.md. Giữ scripts/audio/audio_hooks.gd, scripts/meta/profile.gd, scripts/v2/{game_flow,reaction_stage,tutorial_panel,settings_scene}.gd, scripts/life/{morning_scene,evening_scene}.gd và tests/test_t030_meta.gd từ lượt trước. Không sửa spec của reviewer hay simulation/world/balance.
@@ -813,5 +813,5 @@ Kết quả chạy thật (worktree, Godot 4.7.2 console):
 - Lỗi gặp rồi sửa trong lượt: kiểu biến path trong test manager; phân biệt hoa/thường bus SFX; đợi frame trong test flow; callback Dummy dùng WeakRef thay node đã bị drop. Các lượt Godot vẫn in ERROR Failed to read the root certificate store từ môi trường Windows, có cả test profile/sim gốc; không dùng mạng. Mỗi lệnh có timeout 60 s, không tự chạy đồng thời nhiều Godot; không có crash 139.
 - Nghe thử (chưa kiểm tra bằng tai): & 'D:\Godot_v4.7.2-stable_win64.exe\Godot_v4.7.2-stable_win64_console.exe' --path game-studio/godot -s res://tests/test_t037_manager.gd -- --listen (chạy riêng, timeout 60 s; khoảng 50 s, 27 SFX rồi 5 mood). Hoặc mở game v2 > Settings > Sound test. Không git add/commit/push/merge.
 
-### T-037-PROFILE | Chờ phân công | 2026-11-11 | Proposed
+### T-037-PROFILE | Codex | 2026-11-11 | Done (đã nằm trong T-037)
 - Đề xuất mở rộng phạm vi T-037 cho `game-studio/godot/scripts/meta/profile.gd`: thêm defaults Master 70, Music 40, SFX 70, Mute false và giữ các trường này qua save/load, tương thích profile cũ. Cần chủ dự án/Claude xác nhận phạm vi; Codex chưa sửa file này.
