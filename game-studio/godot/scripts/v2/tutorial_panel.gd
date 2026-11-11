@@ -202,6 +202,7 @@ func advance() -> void:
 	_after_step()
 
 func _after_step() -> void:
+	preload("res://scripts/audio/audio_manager.gd").emit_for(self, "confirm")
 	# Skip steps whose action the player already did.
 	while active and step < steps.size() and flag_done(step): step += 1
 	if step >= steps.size():

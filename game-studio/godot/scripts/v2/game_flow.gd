@@ -111,6 +111,7 @@ func _ready() -> void:
 	if autostart and meta_enabled and meta == null:
 		meta = Meta.new()
 		tutorial_choice_enabled = true
+	if autostart: preload("res://scripts/audio/audio_manager.gd").install(self)
 	announce_rollover()
 	if autostart: start_title()
 
@@ -121,6 +122,7 @@ func announce_rollover() -> void:
 	meta.rollover_winners = []
 
 func toast(text: String) -> void:
+	preload("res://scripts/audio/audio_manager.gd").emit_for(self, "achievement")
 	toast_log.append(text)
 	if toast_view != null: toast_view.push(text)
 
@@ -539,6 +541,7 @@ func _build_review(day: int) -> void:
 	review_view = ReviewScene.instantiate()
 	_swap(review_view)
 	review_view.line_shown.connect(func(category, text): boss_log.append({"category":category, "text":text}))
+	review_view.line_shown.connect(func(category, _text): preload("res://scripts/audio/audio_manager.gd").review_for(self, category))
 	review_view.finished.connect(_after_review)
 	review_view.life_text = strings.life.review_line % [life.projected_net_worth(game.status()), life.mood]
 	if life.vitals != null and life.vitals.hr_warning and life.vitals.sick_today: review_view.life_note = strings.daily.hr_line
