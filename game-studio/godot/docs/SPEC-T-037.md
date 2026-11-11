@@ -27,3 +27,6 @@ The game has no sound. Add audio **without any external assets or downloads**: a
 
 ## Handoff
 In `TASKS.md` under T-037 (Vietnamese, short, per AGENTS.md): files changed, test counts, how to verify by ear (command to open the sound test), limitations. Do not push or merge; the reviewer commits on your behalf if git add is blocked.
+
+## Scope amendment (2026-11-11, reviewer decision after Codex's blocker)
+`scripts/meta/profile.gd` drops unknown `settings` keys on load, so audio settings would be erased. You may therefore also edit `scripts/meta/profile.gd` (additive: extend the default `settings` with `audio` fields master/music/sfx/mute and keep unknown-key sanitizing for others; backward compatible with old profile files) and `tests/test_t030_meta.gd` (add checks only; do not relax any). Note: another task (T-035, learning layer) will add skill-progress fields to the same profile file later; keep your edit small and additive to ease merging.
