@@ -219,6 +219,9 @@ func run() -> void:
 	await pick_text(panel, picker_name, "Hanoi")
 	check(session.finding(fid, "top_region") == "Hanoi", "finding chosen")
 	await shot("6-mail-analysis")
+	# Writing up findings costs clock minutes; the Mail window may redraw, so re-read the panel.
+	panel = desktop.report_window.analysis_panel
+	check(panel != null and is_instance_valid(panel), "analysis panel stays open after choosing a finding")
 	await click(panel.find_child("AnalysisDone", true, false), "Done")
 	await settle(2)
 	check(coach.current_id() == "forecast", "the coach asks for the forecast: " + coach.current_id())

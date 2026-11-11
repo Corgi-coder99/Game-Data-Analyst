@@ -109,7 +109,7 @@
    "q9":[{"dataset":"loan_book"}]
   }
  },
- "data":{"minutes_per_file":90,"minutes_per_clean":120,"minutes_per_chart":60,"minutes_findings":75,"max_pinned":4,"max_attached":3,"analysis_bonus":2.0,"analysis_good":0.6,"analysis_wrong_penalty":7.0,"analysis_wrong_below":0.5,"flag_penalty":0.5,"flag_penalty_max":1.5},
+ "data":{"minutes_per_file":90,"minutes_per_clean":120,"minutes_per_chart":60,"minutes_findings":75,"max_pinned":4,"max_attached":3,"analysis_bonus":1.5,"analysis_good":0.6,"analysis_wrong_penalty":3.0,"analysis_wrong_below":0.5,"flag_penalty":0.5,"flag_penalty_max":1.5},
  "charts":{"bar_max_categories":12,"pie_max_slices":5,"unsorted_min_categories":4,"smoothing_min_window":3,"spike_z":3.0,"spike_min_points":5},
  "learn":{
   "hint_energy":1,

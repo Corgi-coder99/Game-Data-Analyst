@@ -112,7 +112,8 @@ func run() -> void:
 	await shot("1-files")
 	await click(desktop.data_window.files_view.open_buttons[fid], "Open file")
 	check(desktop.data_window.tab == "sheet" and session.opened.has(fid), "Open shows the Sheet")
-	check(int(game.status().minutes) == minutes_before + 10 and int(game.status().energy) == 3, "opening cost 10 minutes and no Energy")
+	var file_minutes := int(preload("res://scripts/data.gd").load_json("res://data/datasets.json").data.minutes_per_file)
+	check(int(game.status().minutes) == minutes_before + file_minutes and int(game.status().energy) == 3, "opening costs the configured minutes and no Energy")
 	var sheet_view: Control = desktop.data_window.sheet_view
 	var rows_raw: int = sheet_view.sheet.row_count()
 	# 2. Dedupe from the toolbar
@@ -180,6 +181,9 @@ func run() -> void:
 	for f in session.findings: chosen += session.findings[f].size()
 	check(chosen == 1, "a finding is chosen")
 	await shot("5-mail-analysis")
+	# Writing up findings costs clock minutes; the Mail window may redraw, so re-read the panel.
+	panel = desktop.report_window.analysis_panel
+	check(panel != null and is_instance_valid(panel), "analysis panel stays open after choosing a finding")
 	await click(panel.find_child("AnalysisDone", true, false), "Done")
 	check(desktop.report_window.analysis_panel == null, "panel closes")
 	# 7. Send
