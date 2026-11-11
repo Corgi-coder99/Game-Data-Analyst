@@ -39,7 +39,7 @@ func run() -> void:
 	"baseboard":[16,16,1],"clock":[16,16,1],"cat":[16,12,6]}
 	for staff in ["rin","bao","linh","dat","an","vy","sam","ngoc","ops","lead","intern","kai","mei","pat"]:
 		expected[staff] = [16,24,8]
-	for icon in ["arrow_up","arrow_down","arrow_flat","check","cross","question","lock","shield","newspaper","bubble","flag","dash","clock_old","emote_happy","emote_sad","emote_angry","emote_neutral","thumb","crest_chinh_thuc","crest_bao_chi","crest_mang_xa_hoi","crest_noi_bo","app_news","app_mail","app_bi","app_code","app_help"]:
+	for icon in ["arrow_up","arrow_down","arrow_flat","check","cross","question","lock","shield","newspaper","bubble","flag","dash","clock_old","emote_happy","emote_sad","emote_angry","emote_neutral","thumb","crest_chinh_thuc","crest_bao_chi","crest_mang_xa_hoi","crest_noi_bo","app_news","app_mail","app_bi","app_code","app_help","app_files","app_sheet","app_charts"]:
 		expected[icon] = [8,8,1]
 	for topic in ["lai_suat","ty_gia","nguyen_lieu","suc_mua","chung_khoan","tin_dung","noi_bo"]:
 		expected["topic_" + topic] = [32,32,1]

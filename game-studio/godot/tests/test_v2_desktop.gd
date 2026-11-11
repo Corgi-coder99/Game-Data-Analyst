@@ -204,7 +204,7 @@ func run() -> void:
 		check(desktop.windows[id].visible, "taskbar restores the window: " + id)
 		desktop.close_window(id)
 		check(not desktop.windows[id].visible and not desktop.task_buttons[id].visible and desktop.front == "", "window closed: " + id)
-	check(toggles.size() == 16, "window signals " + str(toggles.size()))
+	check(toggles.size() == 4 * desktop.windows.size(), "window signals " + str(toggles.size()))
 	check(desktop.report_window.max_actions == game.status().max_actions and game.status().max_actions == 1, "report window shows the rank action limit")
 	desktop.open_window("report")
 	check(desktop.report_window.get_rect() == Rect2(58, 30, 442, 290), "mail window fills the work area")

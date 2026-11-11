@@ -55,6 +55,76 @@ static func default_params(op: String, col: String = "") -> Dictionary:
 			if p.has(key) and p[key] is String: p[key] = col
 	return p
 
+# Inverse of build(): dialog params of an existing step (editing a step reopens its dialog).
+static func params_from_step(step: Dictionary) -> Dictionary:
+	var op := str(step.get("op", ""))
+	var p := default_params(op)
+	match op:
+		"sort":
+			p.col = step.get("col", "")
+			p.order = "descending" if step.get("desc", false) else "ascending"
+		"filter":
+			p.col = step.get("col", "")
+			p.cmp = step.get("cmp", "==")
+			p.value = str(step.get("value", ""))
+		"dedupe": p.cols = step.get("cols", []).duplicate()
+		"missing":
+			p.col = ALL if step.get("col", "") == "*" else step.get("col", "")
+			p.mode = step.get("mode", "drop")
+			p.value = str(step.get("value", ""))
+			p.zero = "yes" if step.get("zero_missing", false) else "no"
+		"standardize":
+			p.col = step.get("col", "")
+			p.case = step.get("case", "none")
+			var map: Dictionary = step.get("map", {})
+			p.merge = map.keys()
+			p.into = str(map.values()[0]) if not map.is_empty() else ""
+		"convert":
+			p.col = step.get("col", "")
+			p.mode = step.get(kind_key(), "number")
+			p.factor = float(step.get("factor", 1.0))
+			p.currency_col = step.get("currency_col", "")
+			var parts: Array = []
+			for code in step.get("rates", {}): parts.append("%s=%s" % [code, str(step.rates[code])])
+			p.rates = ", ".join(parts)
+			p.out = step.get("out", "")
+		"parse_date":
+			p.col = step.get("col", "")
+			p.format = step.get("format", "auto")
+		"computed":
+			p.name = step.get("name", "")
+			p.fn = step.get("fn", "add")
+			p.a = step.get("a", "")
+			p.b = step.get("b", NONE)
+			p.b_value = float(step.get("b_value", 1.0))
+			p.window = float(step.get("window", 3))
+		"group":
+			p.by = step.get("by", []).duplicate()
+			var aggs: Array = step.get("aggs", [])
+			if aggs.size() > 0:
+				p.col = aggs[0].col
+				p.fn = aggs[0].fn
+			if aggs.size() > 1:
+				p.col2 = aggs[1].col
+				p.fn2 = aggs[1].fn
+		"pivot":
+			for key in ["index", "columns", "values", "fn"]: p[key] = step.get(key, p[key])
+		"join":
+			p.other = step.get("other", "")
+			p.left_key = step.get("left_key", "")
+			p.right_key = step.get("right_key", "")
+			p.join_type = step.get(kind_key(), "left")
+		"outliers":
+			p.col = step.get("col", "")
+			p.method = step.get("method", "iqr")
+			p.k = float(step.get("k", 1.5))
+			p.action = step.get("action", "flag")
+		"sample":
+			p.n = float(step.get("n", 20))
+			p.mode = step.get("mode", "head")
+			p.seed = float(step.get("seed", 1))
+	return p
+
 # Builds the step. Returns {} when the params are incomplete (the dialog keeps OK disabled).
 static func build(op: String, p: Dictionary) -> Dictionary:
 	match op:

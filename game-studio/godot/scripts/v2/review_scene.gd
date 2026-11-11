@@ -45,6 +45,10 @@ var life_text := ""
 # T-026: an optional second line (HR note after repeated sick days).
 var life_note := ""
 var built := false
+# T-034: DataGame of the run (set by the flow). With an analysis in the report the review gets one more step.
+var data_game: RefCounted
+var analysis_step := false
+const AnalysisReview = preload("res://scripts/data/analysis_review.gd")
 
 func _ready() -> void:
 	_build()
@@ -123,6 +127,7 @@ func show_review(value: RefCounted, ended_day: int, report: Dictionary, status_b
 	before = status_before.duplicate(true)
 	data = game.review(day)
 	if data.has("error"): return false
+	analysis_step = submission.has("analysis") and data_game != null
 	status = game.status()
 	lines_shown.clear()
 	title_label.text = strings.review.title + " · " + strings.ui.day % [day, int(status.horizon)]
@@ -132,11 +137,14 @@ func show_review(value: RefCounted, ended_day: int, report: Dictionary, status_b
 
 func next_step() -> void:
 	if data.is_empty(): return
-	if step >= STEP_COUNT - 1:
+	if step >= step_count() - 1:
 		finished.emit()
 		return
 	step += 1
 	_render_step()
+
+func step_count() -> int:
+	return STEP_COUNT + (1 if analysis_step else 0)
 
 func rank_index(rank: String) -> int:
 	return RANK_ORDER.find(rank)
@@ -174,17 +182,37 @@ func _render_step() -> void:
 	float_time = -1.0
 	sweep_time = -1.0
 	sweep_root = null
-	header_label.text = "%d/%d  %s" % [step + 1, STEP_COUNT, strings.review.steps[step]]
-	var last := step == STEP_COUNT - 1
+	var logical := step - 1 if analysis_step and step >= 6 else step
+	var is_analysis := analysis_step and step == 5
+	header_label.text = "%d/%d  %s" % [step + 1, step_count(), strings.data_ui.review.step if is_analysis else strings.review.steps[logical]]
+	var last := step == step_count() - 1
 	continue_button.text = strings.review["continue"] if not last else (strings.review.to_ending if bool(status.finished) else strings.review.next_day)
-	if step >= 1 and step <= 4: _say("", strings.review.say[step])
-	match step:
+	if is_analysis:
+		_say("", strings.data_ui.review.say)
+		_step_analysis()
+		return
+	if logical >= 1 and logical <= 4: _say("", strings.review.say[logical])
+	match logical:
 		0: _step_reaction()
 		1: _step_answer()
 		2: _step_news()
 		3: _step_shocks()
 		4: _step_actions()
 		5: _step_career()
+
+# T-034: cleaning, findings, chart warnings and the reference steps in plain words (from DataGame.review).
+func _step_analysis() -> void:
+	var review: Dictionary = data_game.analysis_review(day)
+	var bonus := float(data.result.get("analysis", 0.0))
+	var lines: Dictionary = AnalysisReview.build(review, submission, strings.data_ui, bonus)
+	var y := 0
+	for item in lines.left:
+		_text(body, item.text, Rect2(0, y, 300, 12), item.color)
+		y += 13
+	y = 0
+	for item in lines.right:
+		_text(body, item.text, Rect2(308, y, 300, 12), item.color)
+		y += 13
 
 func _step_reaction() -> void:
 	var category := reaction_category()

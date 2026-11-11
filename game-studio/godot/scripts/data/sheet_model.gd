@@ -40,6 +40,9 @@ func result() -> Dictionary:
 func table() -> RefCounted:
 	return result().dataset
 
+func table_before(index: int) -> RefCounted:
+	return table() if index < 0 else pipeline.run(index).dataset
+
 func shown_table() -> RefCounted:
 	if view_removed and selected_step >= 0: return step_diff(selected_step).removed_table
 	return table()

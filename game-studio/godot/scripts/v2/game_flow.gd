@@ -457,6 +457,7 @@ func _enter_work() -> void:
 func _build_desktop() -> void:
 	if desktop == null:
 		desktop = DesktopScene.instantiate()
+		desktop.data_seed = seed_used
 		desktop.setup(game)
 		desktop.tool_used.connect(_on_tool_used)
 		desktop.time_changed.connect(_on_time_changed)
@@ -508,6 +509,8 @@ func _build_review(day: int) -> void:
 	review_view.finished.connect(_after_review)
 	review_view.life_text = strings.life.review_line % [life.projected_net_worth(game.status()), life.mood]
 	if life.vitals != null and life.vitals.hr_warning and life.vitals.sick_today: review_view.life_note = strings.daily.hr_line
+	# T-034: the data core's review (cleaning, findings, chart) is read only here, after the day ended.
+	if desktop != null and desktop.data_session != null: review_view.data_game = desktop.data_session.data
 	review_view.show_review(game, day, submission, before_status)
 
 # Used by tests and scripts: one press of Continue.

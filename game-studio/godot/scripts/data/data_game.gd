@@ -122,6 +122,10 @@ func score_analysis(day: int, analysis: Dictionary) -> float:
 	if answered > 0 and grade < float(cfg.get("analysis_wrong_below", 0.3)): return -float(cfg.get("analysis_wrong_penalty", 0.0))
 	return 0.0
 
+# T-034: the review record for the "Your analysis" step; same gate as review().
+func analysis_review(day: int) -> Dictionary:
+	return review(day)
+
 # Only after the day's review: manifest, reference result, truth, hidden values and the grade.
 func review(day: int) -> Dictionary:
 	if not _allowed(day) or not _is_reviewed(day): return {"ok":false, "error":"day_not_reviewable"}

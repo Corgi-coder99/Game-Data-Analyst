@@ -38,8 +38,8 @@ func texts_of(node: Node, out: Array) -> void:
 	for child in node.get_children(): texts_of(child, out)
 
 func test_icons(desktop: Control) -> void:
-	check(desktop.icon_buttons.keys() == ["news", "report", "company", "tools", "help"], "five desktop icons")
-	var captions := {"news":"Browser", "report":"Mail", "company":"Insight BI", "tools":"Code Pad", "help":"Help"}
+	check(desktop.icon_buttons.keys() == ["news", "files", "sheet", "charts", "report", "company", "tools", "help"], "eight desktop icons (T-034 adds Files, Sheet, Charts)")
+	var captions := {"news":"Browser", "report":"Mail", "company":"Dashboard", "tools":"Code Pad", "help":"Help", "files":"Files", "sheet":"Sheet", "charts":"Charts"}
 	for id in captions:
 		var tile: Button = desktop.icon_buttons[id]
 		var caption := ""
@@ -213,7 +213,7 @@ func test_tutorial() -> void:
 	var coach: Control = desktop.coach
 	check(coach.active and coach.current_id() == "question" and coach.bubble.visible, "tutorial starts on day 1")
 	check(coach.goals_panel.visible and coach.goals.values().all(func(v): return not v), "goal checklist shows five open goals")
-	check(coach.steps.size() == 9 and coach.steps.map(func(s): return int(s.group)).max() == 6, "six tutorial groups")
+	check(coach.steps.size() == 12 and coach.steps.map(func(s): return int(s.group)).max() == 7, "seven tutorial groups (T-034 adds Files, Sheet, Charts)")
 	check(desktop.coach_rect().size.x > 0 or not desktop.is_inside_tree(), "question step has a target")
 	check(coach.text_label.text.begins_with("This is today's question"), "Ms. Hanh explains the question")
 	# Continue moves on without an action; real actions move on by themselves.
@@ -229,7 +229,7 @@ func test_tutorial() -> void:
 	check(coach.current_id() == "pin" and coach.goals.verify, "using a tool advances and ticks Verify")
 	desktop.open_window("news")
 	desktop.toggle_pin(desktop.entries[0].uid)
-	check(coach.current_id() == "mail" and coach.goals.pin, "pinning advances and ticks Pin")
+	check(coach.current_id() == "files" and coach.goals.pin, "pinning advances and ticks Pin")
 	press(desktop.icon_buttons.report)
 	check(coach.current_id() == "forecast", "opening Mail advances")
 	desktop.report_window.choose_forecast("tang")

@@ -9,6 +9,8 @@ const NewsWindow = preload("res://scripts/v2/windows/news_window.gd")
 const CompanyWindow = preload("res://scripts/v2/windows/company_window.gd")
 const ToolsWindow = preload("res://scripts/v2/windows/tools_window.gd")
 const ReportWindow = preload("res://scripts/v2/windows/report_window.gd")
+const DataWindow = preload("res://scripts/v2/windows/data_window.gd")
+const DataSession = preload("res://scripts/data/session.gd")
 const TutorialPanel = preload("res://scripts/v2/tutorial_panel.gd")
 const CityArt = preload("res://scripts/v2/city_art.gd")
 const START_MINUTES := 8 * 60 + 30
@@ -16,13 +18,19 @@ const TOOL_MINUTES := 30
 const PUBLIC_FIELDS := ["uid", "day", "source_id", "source_tier", "source_name", "headline", "topic", "verification", "verified_by"]
 const WORK_AREA := Rect2(58, 30, 442, 290)
 # Icon order on the desktop: window id, sprite. "help" opens the tutorial instead of a window.
-const ICONS := [["news", "app_news"], ["report", "app_mail"], ["company", "app_bi"], ["tools", "app_code"], ["help", "app_help"]]
+const ICONS := [["news", "app_news"], ["files", "app_files"], ["sheet", "app_sheet"], ["charts", "app_charts"], ["report", "app_mail"], ["company", "app_bi"], ["tools", "app_code"], ["help", "app_help"]]
+# T-034: these icons open the Data window on a tab.
+const DATA_TABS := ["files", "sheet", "charts"]
 var game: RefCounted
 var strings: Dictionary
 var news_window: Control
 var company_window: Control
 var tools_window: Control
 var report_window: Control
+var data_window: Control
+# T-034: the run's data session (files, sheets, pins). Created for a real world only; data_seed is set by the flow.
+var data_session: RefCounted
+var data_seed := 0
 var coach: Control
 var home: Panel
 var home_question: Label
@@ -95,7 +103,8 @@ func _build() -> void:
 	company_window = CompanyWindow.new()
 	tools_window = ToolsWindow.new()
 	report_window = ReportWindow.new()
-	for pair in [["news", news_window], ["company", company_window], ["tools", tools_window], ["report", report_window]]:
+	data_window = DataWindow.new()
+	for pair in [["news", news_window], ["company", company_window], ["tools", tools_window], ["report", report_window], ["data", data_window]]:
 		add_child(pair[1])
 		pair[1].initialize(strings)
 		pair[1].hide()
@@ -162,8 +171,8 @@ func _build_icons() -> void:
 		var id: String = ICONS[i][0]
 		var tile := Button.new()
 		tile.name = "Icon_" + id
-		tile.position = Vector2(2, 32 + i * 56)
-		tile.size = Vector2(52, 52)
+		tile.position = Vector2(2, 32 + i * 36)
+		tile.size = Vector2(52, 34)
 		tile.clip_contents = true
 		tile.tooltip_text = strings.windows[id]
 		for state in ["normal", "pressed", "disabled", "focus"]:
@@ -175,8 +184,8 @@ func _build_icons() -> void:
 		picture.texture = sprites.frame(ICONS[i][1])
 		picture.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		picture.stretch_mode = TextureRect.STRETCH_SCALE
-		picture.position = Vector2(14, 4)
-		picture.size = Vector2(24, 24)
+		picture.position = Vector2(18, 1)
+		picture.size = Vector2(16, 16)
 		picture.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		tile.add_child(picture)
 		var caption := Label.new()
@@ -184,13 +193,13 @@ func _build_icons() -> void:
 		caption.add_theme_font_size_override("font_size", 8)
 		caption.add_theme_color_override("font_color", Palette.color(22))
 		caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		caption.position = Vector2(0, 32)
+		caption.position = Vector2(0, 18)
 		caption.size = Vector2(52, 14)
 		caption.clip_text = true
 		caption.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		tile.add_child(caption)
 		caption.size = Vector2(52, 14)
-		tile.size = Vector2(52, 52)
+		tile.size = Vector2(52, 34)
 		icon_buttons[id] = tile
 
 func _build_tray() -> void:
@@ -314,6 +323,7 @@ func setup(value: RefCounted) -> void:
 	var day := int(game.status().day)
 	coach.set_day(day)
 	if day == 1: coach.start()
+	_make_data_session()
 	_apply_windows()
 	refresh()
 
@@ -484,6 +494,7 @@ func start_day() -> void:
 	if day > 1:
 		open_ids.append("news")
 		front = "news"
+	_start_data_day()
 	_apply_windows()
 	refresh()
 
@@ -491,6 +502,8 @@ func start_day() -> void:
 
 func _apply_windows() -> void:
 	var slot := 0
+	# Up to four entries keep the classic 108 px width; more entries share the 448 px left of the clock.
+	var pitch := mini(112, 448 / maxi(1, open_ids.size()))
 	for id in windows:
 		var shown: bool = id == front
 		var was: bool = windows[id].visible
@@ -499,7 +512,9 @@ func _apply_windows() -> void:
 		task.visible = id in open_ids
 		task.button_pressed = shown
 		if task.visible:
-			task.position = Vector2(4 + slot * 112, 1)
+			task.custom_minimum_size = Vector2(pitch - 4, 14)
+			task.size = Vector2(pitch - 4, 14)
+			task.position = Vector2(4 + slot * pitch, 1)
 			slot += 1
 		if was != shown: window_toggled.emit(id, shown)
 	home.visible = front == ""
@@ -538,7 +553,43 @@ func show_report(value: bool) -> void:
 
 func _on_icon(id: String) -> void:
 	if id == "help": open_tutorial()
+	elif id in DATA_TABS: open_data(id)
 	else: open_window(id)
+
+# T-034: Files, Sheet and Charts are tabs of one Data window.
+func open_data(tab: String) -> void:
+	open_window("data")
+	if data_session != null: data_window.show_tab(tab)
+	match tab:
+		"files": _note("opened_files")
+		"sheet": _note("opened_sheet")
+		"charts": _note("opened_charts")
+
+# Opening files and pinning cost clock minutes in the world; the desktop clock follows.
+func _sync_data() -> void:
+	if game == null or not game.has_method("status"): return
+	var minutes := int(game.status().get("minutes", clock_minutes))
+	if data_session != null and not data_session.pins.is_empty(): _note("charted")
+	if minutes != clock_minutes:
+		clock_minutes = minutes
+		time_changed.emit(clock_minutes)
+		refresh()
+
+func _make_data_session() -> void:
+	if game == null or not game.has_method("spend_minutes"): return
+	if data_session == null:
+		data_session = DataSession.new(game, data_seed)
+		data_window.attach_session(data_session)
+		company_window.attach_session(data_session)
+		report_window.attach_session(data_session)
+		data_session.changed.connect(_sync_data)
+		data_window.data_changed.connect(_sync_data)
+	_start_data_day()
+
+func _start_data_day() -> void:
+	if data_session == null: return
+	data_session.begin_day(int(game.status().day))
+	data_window.reset_day()
 
 func open_tutorial() -> void:
 	coach.collapsed = false
@@ -579,6 +630,9 @@ func coach_rect() -> Rect2:
 				var key: String = selected if news_window.pin_buttons.has(selected) else news_window.pin_buttons.keys()[0]
 				return news_window.pin_buttons[key].get_global_rect().intersection(news_window.scroll.get_global_rect())
 			return icon_buttons.news.get_global_rect()
+		"files": return icon_buttons.files.get_global_rect()
+		"sheet": return icon_buttons.sheet.get_global_rect()
+		"chart": return icon_buttons.charts.get_global_rect()
 		"mail": return icon_buttons.report.get_global_rect()
 		"forecast":
 			if front == "report" and not report_window.forecast_buttons.is_empty():
