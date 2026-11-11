@@ -43,9 +43,11 @@ func test_relevance() -> void:
 				if not f.hidden.relevant: check(not p.focus.avoid.has(f.name), "a secondary file is of another type")
 
 func test_bots() -> void:
-	var games := 120
+	# 200 games keep the whole test under the 9-minute command limit (the spec suggested 300); the analysis
+	# grade, ramp and defect numbers come from every second game.
+	var games := 200
 	var bots: Array = ["verifier"] + Analyst.BOTS
-	var s: Dictionary = Balance.analyst_stats(104, games, 10, bots)
+	var s: Dictionary = Balance.analyst_stats(104, games, 10, bots, 2)
 	var win := func(bot): return 100.0 * s[bot].wins / games
 	var acc := func(bot): return s[bot].accuracy / games
 	var grade := func(bot): return s[bot].grade / maxf(1.0, s[bot].graded)
@@ -54,7 +56,7 @@ func test_bots() -> void:
 	for bot in bots: print("%s: win %.1f%% accuracy %.3f grade %.3f bonus/day %.2f minutes %.0f late %.1f%%" % [bot, win.call(bot), acc.call(bot), grade.call(bot), bonus.call(bot), s[bot].minutes / maxf(1.0, s[bot].days), late.call(bot)])
 	check(win.call("analyst_clean") >= win.call("verifier") + 8.0, "analyst_clean wins at least 8 points more than verifier (%.1f vs %.1f)" % [win.call("analyst_clean"), win.call("verifier")])
 	check(acc.call("analyst_clean") > acc.call("verifier"), "analyst_clean is more accurate than verifier")
-	# looser margin than the 2000-game target (+2): 120 games have a standard error of about 6 points
+	# looser margin than the 2000-game target (+2): the difference of two 200-game win rates has a standard error of about 5 points
 	check(win.call("analyst_sloppy") <= win.call("verifier") + 10.0, "analyst_sloppy is not better than verifier (%.1f vs %.1f, reduced-run margin 10)" % [win.call("analyst_sloppy"), win.call("verifier")])
 	check(grade.call("analyst_sloppy") < grade.call("analyst_clean") - 0.3, "sloppy has a clearly lower analysis grade (%.2f vs %.2f)" % [grade.call("analyst_sloppy"), grade.call("analyst_clean")])
 	check(win.call("analyst_slow") <= win.call("analyst_clean") - 8.0, "analyst_slow is at least 8 points worse than analyst_clean (%.1f vs %.1f)" % [win.call("analyst_slow"), win.call("analyst_clean")])

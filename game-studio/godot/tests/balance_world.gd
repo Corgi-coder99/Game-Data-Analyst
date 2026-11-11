@@ -121,7 +121,7 @@ static func propose_analyst(game: RefCounted, session: RefCounted, bot: String, 
 	if not payload.is_empty(): report["analysis"] = payload
 	return report
 
-static func run_analyst(seed_value: int, days: int, bot: String) -> Dictionary:
+static func run_analyst(seed_value: int, days: int, bot: String, detail: bool = true) -> Dictionary:
 	var game := Game.new(seed_value, days)
 	var session := Session.new(game, seed_value)
 	var vstats := {}
@@ -163,6 +163,7 @@ static func run_analyst(seed_value: int, days: int, bot: String) -> Dictionary:
 			explore.clash += 1
 			explore.clash_data_ok += int(last.data == answer)
 			explore.clash_news_ok += int(last.news == answer)
+		if not detail: continue
 		var data_review: Dictionary = session.data.review(day)
 		for f in data_review.files:
 			if f.id != last.file_id or not f.submitted: continue
@@ -291,13 +292,15 @@ func _init() -> void:
 	print("shock coverage: %d/8" % all_shocks.size())
 	quit()
 
-static func analyst_stats(first_seed: int, games: int, days: int, bots: Array) -> Dictionary:
+# `detail_every`: the analysis grade, the ramp and the defect table come from every n-th game (the data review
+# is the slow part); wins, accuracy, bonus, minutes and late days always come from every game.
+static func analyst_stats(first_seed: int, games: int, days: int, bots: Array, detail_every: int = 1) -> Dictionary:
 	var stats := {}
 	for bot in bots:
 		stats[bot] = {"games":games, "wins":0, "fired":0, "accuracy":0.0, "grade":0.0, "graded":0, "minutes":0.0, "late":0, "days":0, "bonus":0.0, "trusts":[], "explore":{}, "defects":{}, "solved":{}}
 	for i in games:
 		for bot in bots:
-			var result: Dictionary = run_game(first_seed + i, days, bot) if bot == "verifier" else run_analyst(first_seed + i, days, bot)
+			var result: Dictionary = run_game(first_seed + i, days, bot) if bot == "verifier" else run_analyst(first_seed + i, days, bot, i % detail_every == 0)
 			var row: Dictionary = stats[bot]
 			row.wins += int(result.won)
 			row.fired += int(result.ending == "fired")
@@ -323,11 +326,13 @@ static func analyst_stats(first_seed: int, games: int, days: int, bots: Array) -
 
 func analyst_table(config: Dictionary, games: int, days: int) -> void:
 	var first := 0
+	var detail_every := 1
 	var bots: Array = ["verifier"] + Analyst.BOTS
 	for arg in OS.get_cmdline_user_args():
 		if arg.begins_with("--first="): first = int(arg.trim_prefix("--first="))
 		if arg.begins_with("--bots="): bots = Array(arg.trim_prefix("--bots=").split(","))
-	var stats := analyst_stats(int(config.balance.seed) + first, games, days, bots)
+		if arg.begins_with("--detail-every="): detail_every = maxi(1, int(arg.trim_prefix("--detail-every=")))
+	var stats := analyst_stats(int(config.balance.seed) + first, games, days, bots, detail_every)
 	print("days | bot | games | first | win % | fired % | accuracy | trust p50 | analysis grade | bonus per day | minutes used | late % | wins | fired | acc sum | grade sum | graded | minutes sum | late days | days")
 	for bot in bots:
 		var row: Dictionary = stats[bot]

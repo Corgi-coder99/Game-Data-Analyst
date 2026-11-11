@@ -267,7 +267,8 @@ func test_ranges_and_ramp() -> void:
 				if day == 1: check(f.dirt_types.size() == 1, "day 1 has exactly one dirt type")
 				check(f.dirt_types.size() <= 6 and f.dirt_types.size() >= 1, "dirt types 1..6")
 			check(names.size() == files.size(), "files of one day are distinct types")
-			if day == 1: check(files[0].name == "sales_export", "day 1 starts with the sales export")
+			# T-036: on day 1 the only file is the one relevant to the boss question (was: always the sales export).
+			if day == 1: check(files[0].name == g.plan(1).focus.dataset and files[0].hidden.relevant, "day 1 is the file relevant to the day's question")
 	check(all_types.size() >= 12, "at least 12 defect types appear (%d)" % all_types.size())
 	check(counts[1] > 0 and counts[2] > 0 and counts[3] > 0, "days with 1, 2 and 3 files exist")
 	var avg_dirt := func(day): return float(dirt_by_day[day].reduce(func(a, b): return a + b, 0)) / dirt_by_day[day].size()

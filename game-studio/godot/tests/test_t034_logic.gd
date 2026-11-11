@@ -81,10 +81,10 @@ func test_sheet() -> void:
 	var before_minutes: int = made[0].status().minutes
 	var sheet: RefCounted = session.open_file(fid)
 	check(sheet != null, "open file")
-	eq(made[0].status().minutes, before_minutes + 10, "opening a file costs minutes_per_file")
+	eq(made[0].status().minutes, before_minutes + session.limit("minutes_per_file", 10), "opening a file costs minutes_per_file")
 	eq(made[0].status().energy, 3, "opening a file costs no Energy")
 	session.open_file(fid)
-	eq(made[0].status().minutes, before_minutes + 10, "reopening is free")
+	eq(made[0].status().minutes, before_minutes + session.limit("minutes_per_file", 10), "reopening is free")
 	var raw_rows: int = sheet.row_count()
 	var p: Dictionary = sheet.preview({"op":"dedupe", "cols":[]})
 	check(p.ok and p.rows_before == raw_rows and p.rows_after <= raw_rows, "row count preview")
@@ -144,7 +144,7 @@ func test_session() -> void:
 	var before: int = game.status().minutes
 	var pin: String = session.pin_chart(fid, "raw", spec, "My chart")
 	check(pin != "" and session.pins.size() == 1 and session.dashboard[0] == pin, "pin chart lands on the dashboard")
-	eq(game.status().minutes, before + 10, "pinning costs minutes_per_chart")
+	eq(game.status().minutes, before + session.limit("minutes_per_chart", 10), "pinning costs minutes_per_chart")
 	check(not session.pin_chart(fid, "raw", {"type":"bar", "x":"zzz", "y":"zzz"}).is_empty() == false, "bad chart is not pinned")
 	check(session.pin_table(fid) != "", "pin table")
 	var col := ""
@@ -236,8 +236,9 @@ func test_bots() -> void:
 		check(not none.has_key and none.adjust == 0.0, "no analysis: hook never called (seed %d)" % seed_value)
 		check(clean.grade > sloppy.grade, "cleaner grade %.2f above sloppy %.2f (seed %d)" % [clean.grade, sloppy.grade, seed_value])
 		check(clean.grade >= 0.6 and clean.adjust > 0.0 and clean.delta > none.delta - 0.0001 + clean.adjust - 0.2, "cleaner earns a positive bonus (seed %d, grade %.2f)" % [seed_value, clean.grade])
-		eq(sloppy.adjust, 0.0, "sloppy analysis equals no analysis with the default config (seed %d)" % seed_value)
-		eq(sloppy.delta, none.delta, "sloppy delta unchanged (seed %d)" % seed_value)
+		# T-036: a sloppy analysis is now worse than no analysis (wrong-analysis penalty and chart flag penalty).
+		check(sloppy.adjust < 0.0, "sloppy analysis costs trust with the tuned config (seed %d, %.1f)" % [seed_value, sloppy.adjust])
+		eq(sloppy.delta, snappedf(none.delta + sloppy.adjust, 0.1), "the penalty is added to the report delta (seed %d)" % seed_value)
 		eq(clean.delta, snappedf(none.delta + clean.adjust, 0.1), "bonus is added to the report delta (seed %d)" % seed_value)
 		sum_clean += clean.grade
 		sum_sloppy += sloppy.grade
@@ -245,9 +246,9 @@ func test_bots() -> void:
 	print("bots: cleaner mean grade %.3f, sloppy mean grade %.3f over %d seeds" % [sum_clean / n, sum_sloppy / n, n])
 
 func test_scores_hook_config() -> void:
-	# a non-zero penalty config hurts a confidently wrong analysis; the default is zero
+	# a non-zero penalty config hurts a confidently wrong analysis (T-036: the tuned default is above zero)
 	var cfg: Dictionary = Loader.load_json("res://data/datasets.json").duplicate(true)
-	eq(cfg.data.analysis_wrong_penalty, 0.0, "default wrong-analysis penalty is 0")
+	check(float(cfg.data.analysis_wrong_penalty) > 0.0, "the tuned wrong-analysis penalty is above 0")
 	cfg.data.analysis_wrong_penalty = 2.0
 	var game := Game.new(104, 10)
 	var session := Session.new(game, 104, cfg)
