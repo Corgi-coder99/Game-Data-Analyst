@@ -437,7 +437,7 @@ func wall_screen() -> void:
 	var learn := LearnState.new(meta.profile.data.learn)
 	learn.add_xp("data_cleaning", 55)
 	learn.add_xp("charts", 22)
-	learn.add_xp("statistics", 150)
+	learn.add_xp("statistics", 200)
 	learn.add_xp("causality", 5)
 	meta.profile.data.achievements["first_clean"] = "2026-11-11"
 	meta.profile.data.achievements["sharp_eye"] = "2026-11-11"

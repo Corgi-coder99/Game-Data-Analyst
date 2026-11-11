@@ -26,6 +26,9 @@ var attached: Array = []
 var dashboard: Array = ["", "", "", ""]
 var findings: Dictionary = {}
 var minutes_spent := 0
+# T-036: files whose cleaning time was charged today, and whether the findings write-up was charged.
+var cleaned: Dictionary = {}
+var findings_charged := false
 var message := ""
 var _serial := 0
 # T-035: LearnState of the profile (null when learning features are not attached), hint log and texts.
@@ -70,6 +73,8 @@ func begin_day(value: int) -> void:
 	attached.clear()
 	dashboard = ["", "", "", ""]
 	findings.clear()
+	cleaned.clear()
+	findings_charged = false
 	minutes_spent = 0
 	message = ""
 	files = []
@@ -114,6 +119,7 @@ func open_file(file_id: String) -> RefCounted:
 	if not sheets.has(file_id):
 		sheets[file_id] = Sheet.new(info)
 		sheets[file_id].step_changed.connect(_on_step_op)
+		sheets[file_id].step_changed.connect(_on_clean.bind(file_id))
 	changed.emit()
 	return sheets[file_id]
 
@@ -123,6 +129,13 @@ func _unlock(ids: Array, source: String) -> void:
 	if learn == null: return
 	var fresh: Array = learn.unlock_many(ids, source)
 	if not fresh.is_empty(): cards_unlocked.emit(fresh)
+
+# T-036: cleaning a file costs clock minutes once per file per day, charged with its first step
+# (config data.minutes_per_clean; 0 = free). Editing and further steps are free.
+func _on_clean(_op: String, file_id: String) -> void:
+	if cleaned.has(file_id): return
+	cleaned[file_id] = true
+	_spend(limit("minutes_per_clean", 0))
 
 func _on_step_op(op: String) -> void:
 	if learn == null: return
@@ -317,7 +330,12 @@ func options(file_id: String) -> Array:
 func set_finding(file_id: String, finding_id: String, value: Variant) -> void:
 	if not findings.has(file_id): findings[file_id] = {}
 	if value == null: findings[file_id].erase(finding_id)
-	else: findings[file_id][finding_id] = value
+	else:
+		# T-036: writing up findings costs clock minutes once per day (config data.minutes_findings; 0 = free).
+		if not findings_charged:
+			findings_charged = true
+			_spend(limit("minutes_findings", 0))
+		findings[file_id][finding_id] = value
 	changed.emit()
 
 func finding(file_id: String, finding_id: String) -> Variant:

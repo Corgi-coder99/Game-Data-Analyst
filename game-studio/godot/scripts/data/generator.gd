@@ -40,6 +40,8 @@ var cfg: Dictionary
 var scenario: RefCounted
 var seed_value: int
 var adjustments: Dictionary = {}
+# T-036: the focus of the file being built (see focus_for); empty for a secondary file.
+var _focus: Dictionary = {}
 
 func _init(p_scenario: RefCounted = null, p_seed: int = 0, p_cfg: Dictionary = {}) -> void:
 	scenario = p_scenario
@@ -69,9 +71,38 @@ func difficulty(day: int) -> Dictionary:
 		scale = scale * float(adj.scale_mult)
 	return {"dirt":dirt, "files":int(_ramp(cfg.ramp.files, day)), "scale":scale}
 
+# T-036: the day's boss question decides which file is the RELEVANT one (config `relevance.map`, keyed by the
+# PUBLIC question id; the answer is never read). Returns {} when the scenario has no question for the day
+# or the map is missing: then the old random plan is used.
+func focus_for(day: int) -> Dictionary:
+	var rel: Dictionary = cfg.get("relevance", {})
+	if rel.is_empty() or scenario == null: return {}
+	var questions: Array = scenario._questions
+	if day < 1 or day > questions.size(): return {}
+	var options: Array = rel.map.get(str(questions[day - 1].id), [])
+	if options.is_empty(): return {}
+	var rng := _rng(day, "focus")
+	var focus: Dictionary = options[rng.randi_range(0, options.size() - 1)].duplicate(true)
+	focus["question"] = str(questions[day - 1].id)
+	focus["avoid"] = options.map(func(o): return o.dataset)
+	return focus
+
 func plan(day: int) -> Dictionary:
 	var rng := _rng(day, "plan")
 	var diff := difficulty(day)
+	var focus := focus_for(day)
+	if not focus.is_empty():
+		# One relevant file at a random position, plus 0-2 secondary files of other dataset types.
+		var others: Array = NAMES.filter(func(n): return not focus.avoid.has(n))
+		for i in range(others.size() - 1, 0, -1):
+			var j := rng.randi_range(0, i)
+			var tmp = others[i]
+			others[i] = others[j]
+			others[j] = tmp
+		var names: Array = others.slice(0, maxi(0, mini(int(diff.files), NAMES.size()) - 1))
+		var at := rng.randi_range(0, names.size())
+		names.insert(at, focus.dataset)
+		return {"names":names, "dirt":diff.dirt, "scale":diff.scale, "focus":focus, "focus_index":at}
 	var pool: Array = cfg.ramp.starter.duplicate() if day <= int(cfg.ramp.starter_until_day) else NAMES.duplicate()
 	for i in range(pool.size() - 1, 0, -1):
 		var j := rng.randi_range(0, i)
@@ -87,7 +118,7 @@ func generate(day: int) -> Array:
 	var p := plan(day)
 	var files: Array = []
 	for i in p.names.size():
-		files.append(build_file(p.names[i], day, i, p.dirt, p.scale))
+		files.append(build_file(p.names[i], day, i, p.dirt, p.scale, p.focus if int(p.get("focus_index", -1)) == i else {}))
 	return files
 
 # ---------- trajectory ----------
@@ -103,25 +134,39 @@ func _shock_factor(name: String, t: int, step: String) -> float:
 	for s in scenario._shocks:
 		if t >= int(s.day) and t < int(s.end) and cfg.shocks.has(s.id):
 			var m: Dictionary = cfg.shocks[s.id]
+			# T-036: the relevant file shows only the shocks its focus names (a clean signal for the question);
+			# shocks marked focus_only never touch a secondary file.
+			if not _focus.is_empty() and not _focus.get("shocks", []).has(s.id): continue
+			if _focus.is_empty() and m.get("focus_only", false): continue
 			if m.dataset == name and (not m.has("step") or m.step == step): f *= float(m.factor)
 	return f
+
+# T-036: `relevance.lead_days`. The data reacts before the state is named: history day i shows the state
+# (and shocks) of `lead` days later, never later than today. 0 keeps the T-033 behaviour exactly.
+func _lead() -> int:
+	return int(cfg.get("relevance", {}).get("lead_days", 0))
 
 # Level per history day (index 0 is day-15 ... index 14 is day-1), mean of the smooth path normalised to 1,
 # multiplied by the shock factor active on that day.
 func levels(name: String, variable: String, sign: float, day: int, step: String = "") -> Array:
 	var hist := int(cfg.history_days)
+	var lead := _lead()
+	var flat: bool = _focus.get("flat", false)
 	var path: Array = []
 	var p := 1.0
 	for i in hist:
-		var t := day - hist + i
+		var t := mini(day - hist + i + lead, day - 1)
 		var st := _state(t, variable)
-		p *= 1.0 + sign * _sign_of(st.direction) * float(cfg.step_pct[st.magnitude])
+		if not flat: p *= 1.0 + sign * _sign_of(st.direction) * float(cfg.step_pct[st.magnitude])
 		path.append(p)
 	var mean := 0.0
 	for v in path: mean += v
 	mean /= hist
 	var out: Array = []
-	for i in hist: out.append(path[i] / mean * _shock_factor(name, day - hist + i, step))
+	for i in hist:
+		var ts := day - hist + i
+		if lead > 0: ts = mini(ts + lead + 1, day)
+		out.append(path[i] / mean * _shock_factor(name, ts, step))
 	return out
 
 func window_pct(series: Array, end_index: int) -> float:
@@ -158,7 +203,8 @@ func _rec(raw: Array, day_index: int, prot: bool = false) -> Dictionary:
 	return {"raw":raw, "clean":raw.duplicate(), "marks":{}, "day":day_index, "prot":prot, "extra":false}
 
 # ---------- one file ----------
-func build_file(name: String, day: int, index: int, dirt_count: int, scale: float) -> Dictionary:
+func build_file(name: String, day: int, index: int, dirt_count: int, scale: float, focus: Dictionary = {}) -> Dictionary:
+	_focus = focus
 	var spec: Dictionary = cfg.datasets[name]
 	var rng := _rng(day, "file%d" % index)
 	var hist := int(cfg.history_days)
@@ -171,6 +217,8 @@ func build_file(name: String, day: int, index: int, dirt_count: int, scale: floa
 	match name:
 		"market_prices":
 			var s: Dictionary = spec.series[rng.randi_range(0, spec.series.size() - 1)]
+			for candidate in spec.series:
+				if candidate.name == str(focus.get("series", "")): s = candidate
 			variable = s.variable
 			info.meta = {"series":s.name, "unit":s.unit}
 		"competitor_scrape":
@@ -568,7 +616,7 @@ func _finalize(name: String, day: int, index: int, recs: Array, info: Dictionary
 		for key in group_order:
 			if groups[key].type == defect: manifest.append(groups[key])
 	var pct := window_pct(lv, complete_last)
-	var hidden := {"variable":variable, "sign":sign, "pct":pct, "direction":direction_of(pct), "band":band_of(pct), "state_direction":_dir_name(sign * _sign_of(_state(day - 1, variable).direction)), "complete_last":complete_last}
+	var hidden := {"variable":variable, "sign":sign, "pct":pct, "direction":direction_of(pct), "band":band_of(pct), "state_direction":_dir_name(sign * _sign_of(_state(day - 1, variable).direction)), "complete_last":complete_last, "relevant":not _focus.is_empty(), "question":str(_focus.get("question", ""))}
 	if name == "ab_test_log": hidden["uplift"] = info.meta.uplift
 	recipe["typo_maps"] = {}
 	for col in recipe.typo_cols:

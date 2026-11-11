@@ -153,7 +153,11 @@ func play_day(game: RefCounted) -> void:
 
 func test_facade_and_leaks() -> void:
 	var game := Game.new(104, 10)
-	var dg := DataGame.new(game, 104, data_cfg)
+	# T-036: this facade walk-through needs the sales export on day 1, so it runs on the T-033 plan
+	# (config without `relevance`); the question-aware plan is covered by test_t036_balance.
+	var plain_cfg: Dictionary = data_cfg.duplicate(true)
+	plain_cfg.erase("relevance")
+	var dg := DataGame.new(game, 104, plain_cfg)
 	eq(dg.files_today(1), [], "no files before the day opens")
 	check(not dg.review(1).ok and dg.review(1).error == "day_not_reviewable", "no review before the day is played")
 	game.begin_day()
