@@ -798,7 +798,7 @@ Kết quả chạy thật (worktree, Godot 4.7.2 console):
 - UI lõi dữ liệu: app Files/Sheet (bước sửa được), trình tạo biểu đồ + cảnh báo gây hiểu lầm, Dashboard, đính kèm phân tích và chọn kết luận trong Mail, bước 'Your analysis' ở họp cuối ngày. Spec docs/SPEC-T-034.md, worktree ai-company-t034, nhánh codex/T-034. Handoff: docs/HANDOFF-T-034.md.
 
 
-### T-035 | Claude subagent | 2026-11-11 | Backlog
+### T-035 | Claude subagent | 2026-11-11 | Done
 - Lớp học tập: app Handbook, gợi ý tốn Energy, huấn luyện cuối ngày (Dr. Linh), tutorial 5 ngày, tiến độ kỹ năng. Spec docs/SPEC-T-035.md. Chờ T-034 merge rồi giao.
 
 
