@@ -60,6 +60,19 @@ func test_forms() -> void:
 	eq(Forms.typed(" ab "), "ab", "typed text")
 	eq(Forms.parse_rates("vnd=0.5, usd=1"), {"VND":0.5, "USD":1.0}, "rates text")
 
+func test_roundtrip() -> void:
+	var steps: Array = [
+		{"op":"sort", "col":"a", "desc":true}, {"op":"filter", "col":"a", "cmp":">", "value":3}, {"op":"filter", "col":"a", "cmp":"missing"},
+		{"op":"dedupe", "cols":["a", "b"]}, {"op":"missing", "col":"*", "mode":"drop", "zero_missing":false}, {"op":"missing", "col":"a", "mode":"value", "zero_missing":true, "value":0},
+		{"op":"standardize", "col":"a", "case":"title", "map":{"x":"X", "y":"X"}}, {"op":"convert", "col":"a", "kind":"number"}, {"op":"convert", "col":"a", "kind":"scale", "factor":2.0},
+		{"op":"parse_date", "col":"d", "format":"dmy"}, {"op":"computed", "name":"n", "fn":"div", "a":"a", "b":"b"}, {"op":"computed", "name":"n", "fn":"moving_avg", "a":"a", "window":4},
+		{"op":"group", "by":["a"], "aggs":[{"col":"b", "fn":"sum"}, {"col":"c", "fn":"mean"}]}, {"op":"pivot", "index":"a", "columns":"b", "values":"c", "fn":"sum"},
+		{"op":"join", "other":"lk", "left_key":"a", "right_key":"k", "kind":"inner"}, {"op":"outliers", "col":"a", "method":"z", "k":3.0, "action":"remove"}, {"op":"sample", "n":5, "mode":"seeded", "seed":7}]
+	for step in steps:
+		var rebuilt: Dictionary = Forms.build(step.op, Forms.params_from_step(step))
+		check(JSON.stringify(rebuilt) == JSON.stringify(step) or str(rebuilt) == str(step), "step round trip %s: %s" % [step.op, str(rebuilt)])
+		check(Forms.describe(step) != step.op, "describe in words: " + step.op)
+
 func test_sheet() -> void:
 	var made := make()
 	var session: RefCounted = made[1]
@@ -275,6 +288,7 @@ func test_leak_scan() -> void:
 
 func run() -> void:
 	test_forms()
+	test_roundtrip()
 	test_sheet()
 	test_session()
 	test_bots()

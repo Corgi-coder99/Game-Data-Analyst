@@ -588,6 +588,7 @@ func _make_data_session() -> void:
 
 func _start_data_day() -> void:
 	if data_session == null: return
+	company_window.dash_view.locked = false
 	data_session.begin_day(int(game.status().day))
 	data_window.reset_day()
 
@@ -606,6 +607,10 @@ func _on_draft_changed() -> void:
 	if ready: _note("composed")
 
 func _on_report_locked(value: bool) -> void:
+	# T-034: the dashboard layout is editable until Send.
+	if company_window.dash_view != null:
+		company_window.dash_view.locked = value
+		company_window.dash_view.refresh()
 	if not value: return
 	coach.set_goal("send")
 	_note("sent")
