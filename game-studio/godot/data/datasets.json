@@ -94,7 +94,20 @@
   "competitor_discount":{"dataset":"competitor_scrape","factor":0.88},
   "price_fatigue":{"dataset":"sales_export","factor":0.9},
   "trend_shift":{"dataset":"sales_export","factor":1.08},
-  "app_bug":{"dataset":"support_tickets","factor":1.35}
+  "app_bug":{"dataset":"support_tickets","factor":1.35},
+  "logging_error":{"dataset":"web_funnel","factor":1.3,"focus_only":true}
+ },
+ "relevance":{
+  "lead_days":6,
+  "map":{
+   "q1":[{"dataset":"market_prices","series":"Raw material"},{"dataset":"competitor_scrape"}],
+   "q3":[{"dataset":"market_prices","series":"Policy rate"}],
+   "q4":[{"dataset":"sales_export"},{"dataset":"web_funnel"}],
+   "q5":[{"dataset":"competitor_scrape","flat":true,"shocks":["competitor_discount"]}],
+   "q6":[{"dataset":"loan_book"}],
+   "q8":[{"dataset":"web_funnel","flat":true,"shocks":["logging_error"]}],
+   "q9":[{"dataset":"loan_book"}]
+  }
  },
  "data":{"minutes_per_file":10,"minutes_per_chart":10,"max_pinned":4,"max_attached":3,"analysis_bonus":1.0,"analysis_good":0.6,"analysis_wrong_penalty":0.0,"analysis_wrong_below":0.3},
  "charts":{"bar_max_categories":12,"pie_max_slices":5,"unsorted_min_categories":4,"smoothing_min_window":3,"spike_z":3.0,"spike_min_points":5},
