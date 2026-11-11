@@ -12,6 +12,10 @@ var scale_factor := 2.0
 
 func check(ok: bool, message: String) -> void:
 	checks += 1
+	var log_file := FileAccess.open("user://t035_mouse.log", FileAccess.READ_WRITE if FileAccess.file_exists("user://t035_mouse.log") else FileAccess.WRITE)
+	log_file.seek_end()
+	log_file.store_line(("ok   " if ok else "FAIL ") + message)
+	log_file.close()
 	if not ok:
 		failures += 1
 		printerr("FAIL: ", message)
@@ -148,7 +152,7 @@ func run() -> void:
 	var odd_b := chip(sheet_view.dialog, "hanoi")
 	check(odd_a != null and odd_b != null, "the dialog offers the two odd spellings as chips")
 	await click(odd_a, "chip Ha Noi")
-	await click(odd_b, "chip hanoi")
+	await click(chip(sheet_view.dialog, "hanoi"), "chip hanoi")
 	var into: LineEdit = sheet_view.dialog.find_child("Field_into", true, false)
 	await click(into, "Into field")
 	into.text = "Hanoi"
@@ -196,6 +200,8 @@ func run() -> void:
 	check(desktop.front == "handbook" and desktop.handbook_window.visible, "Handbook opens")
 	await click(desktop.handbook_window.card_buttons["hb_duplicates"], "card Duplicate rows")
 	check(desktop.handbook_window.detail_title.text == "Duplicate rows" and desktop.handbook_window.locked_note == null, "the unlocked card reads in full")
+	desktop.handbook_window.list_scroll.ensure_control_visible(desktop.handbook_window.card_buttons["hb_pvalue"])
+	await settle(2)
 	await click(desktop.handbook_window.card_buttons["hb_pvalue"], "card p-value (locked)")
 	check(desktop.handbook_window.locked_note != null and desktop.handbook_window.locked_note.text == "Meet this case to unlock", "a locked card says Meet this case to unlock")
 	check(int(game.status().minutes) == minutes_before and int(game.status().energy) == 3, "the Handbook cost no time and no Energy")

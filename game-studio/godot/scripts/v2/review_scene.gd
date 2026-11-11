@@ -210,7 +210,7 @@ func _render_step() -> void:
 	var is_analysis := analysis_step and step == 5
 	for node in tab_nodes:
 		if is_instance_valid(node):
-			node.get_parent().remove_child(node)
+			if node.get_parent() != null: node.get_parent().remove_child(node)
 			node.queue_free()
 	tab_nodes.clear()
 	tab_buttons.clear()
@@ -219,7 +219,7 @@ func _render_step() -> void:
 	tip_nodes.clear()
 	header_label.size.x = 608
 	if celebration != null and is_instance_valid(celebration):
-		celebration.get_parent().remove_child(celebration)
+		if celebration.get_parent() != null: celebration.get_parent().remove_child(celebration)
 		celebration.queue_free()
 	celebration = null
 	header_label.text = "%d/%d  %s" % [step + 1, step_count(), strings.data_ui.review.step if is_analysis else strings.review.steps[logical]]
