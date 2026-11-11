@@ -281,21 +281,23 @@ func _build_taskbar() -> void:
 	taskbar.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(taskbar)
 	var i := 0
+	# T-035: six windows share the 448 px left of the clock until some are closed.
+	var first_pitch := mini(112, 448 / maxi(1, windows.size()))
 	for id in windows:
 		var task := Button.new()
 		task.theme = theme
-		task.custom_minimum_size = Vector2(108, 14)
+		task.custom_minimum_size = Vector2(first_pitch - 4, 14)
 		task.clip_contents = true
 		task.add_theme_font_size_override("font_size", 8)
 		task.text = strings.windows[id]
-		task.position = Vector2(4 + i * 112, 1)
-		task.size = Vector2(108, 14)
+		task.position = Vector2(4 + i * first_pitch, 1)
+		task.size = Vector2(first_pitch - 4, 14)
 		task.toggle_mode = true
 		task.button_pressed = false
 		task.visible = false
 		task.pressed.connect(toggle_window.bind(id))
 		taskbar.add_child(task)
-		task.size = Vector2(108, 14)
+		task.size = Vector2(first_pitch - 4, 14)
 		task_buttons[id] = task
 		i += 1
 	clock = TooltipLabel.new()

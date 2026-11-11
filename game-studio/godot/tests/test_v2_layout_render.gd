@@ -39,7 +39,7 @@ func inspect(desktop: Control, stage: String) -> void:
 	for button in desktop.task_buttons.values():
 		var rect: Rect2 = button.get_global_rect()
 		print("render task ", button.text, " rect=", rect, " minimum=", button.get_combined_minimum_size(), " font=", button.get_theme_font_size("font_size"))
-		check(rect.position.y == 345 and rect.size.y == 14 and rect.size.x >= 85 and rect.size.x <= 108, "task button 85..108 x 14 at y345 (T-034: five windows share the taskbar)")
+		check(rect.position.y == 345 and rect.size.y == 14 and rect.size.x >= 70 and rect.size.x <= 108, "task button 70..108 x 14 at y345 (T-034/T-035: five or six windows share the taskbar)")
 		check(Rect2(0, 344, 640, 16).encloses(rect), "task button within taskbar")
 		var font: Font = button.get_theme_font("font")
 		for state in ["normal", "pressed", "hover", "disabled", "focus"]:
