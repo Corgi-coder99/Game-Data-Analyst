@@ -5,6 +5,7 @@ extends Control
 const UI = preload("res://scripts/v2/data/ui_kit.gd")
 const Canvas = preload("res://scripts/v2/data/chart_canvas.gd")
 const Palette = preload("res://scripts/v2/palette.gd")
+const HintPopup = preload("res://scripts/v2/learn/hint_popup.gd")
 signal closed
 signal edited
 var session: RefCounted
@@ -25,6 +26,7 @@ func build(p_session: RefCounted, p_texts: Dictionary, p_locked: bool) -> void:
 	var done := UI.button(self, texts.mail.done, Rect2(364, 2, 66, 16))
 	done.name = "AnalysisDone"
 	done.pressed.connect(func(): closed.emit())
+	HintPopup.add_button(self, self, Rect2(290, 2, 70, 16), session, func(): return session.hint_file())
 	_build_attachments()
 	_build_findings()
 
@@ -66,6 +68,7 @@ func _rebuild() -> void:
 	edited.emit()
 
 func _statement(id: String) -> String:
+	if texts.mail.has("st_" + id): return texts.mail["st_" + id]
 	match id:
 		"metric_change": return texts.mail.metric
 		"spike_error": return texts.mail.spike

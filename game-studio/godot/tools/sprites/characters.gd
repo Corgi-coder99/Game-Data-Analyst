@@ -38,6 +38,7 @@ const STYLES := {
 	"glasses": {8: "..OvGeGvvGeGvO..", 9: "..OvGGGvvGGGvO.."},
 	"cap": {1: "....OOOOOOOO....", 2: "...OCCCCCCCCO...", 3: "..OCCCCCCCCCCO..", 4: "..OCCCCCCCCCCCO.", 5: "..OHHHvvvvvHhO.."},
 	"clip": {3: "..OLLHHHHHHHkO.."},
+	"mentor": {7: "..OHvvvvvvvvHO..", 8: "..OHGeGvvGeGHO..", 9: "..OHGGGvvGGGHO..", 10: "..OHbvvmmvvbHO..", 11: "...OHvvvvvvHO...", 13: "...OSSSvvSSSO...", 14: "..OSlSSSSSSSsO..", 15: "..OSlSSSSSSSsO..", 16: "..OvSSSSSSSSvO.."},
 	"tie": {13: "...OSSSvtSSSO...", 14: "..OSlSSStSSSsO..", 15: "..OSlSSStSSSsO.."}}
 # Name -> look. Colors are palette v4 indices.
 const LOOKS := {
@@ -56,6 +57,7 @@ const LOOKS := {
 	"ngoc": {"hair": [65, 66, 99], "skin": [32, 50, 105], "shirt": [85, 87, 86], "pants": [66, 65], "style": "long"},
 	"ops": {"hair": [108, 66, 109], "skin": [50, 107, 105], "shirt": [6, 5, 7], "pants": [111, 83], "style": "glasses"},
 	"lead": {"hair": [99, 66, 100], "skin": [106, 104, 85], "shirt": [80, 79, 81], "pants": [83, 111], "style": "tie"},
+	"drlinh": {"hair": [66, 65, 100], "skin": [106, 104, 85], "shirt": [64, 61, 41], "pants": [84, 79], "style": "mentor"},
 	"intern": {"hair": [110, 97, 89], "skin": [32, 50, 105], "shirt": [89, 97, 110], "pants": [84, 79], "style": "short"},
 	"kai": {"hair": [65, 66, 99], "skin": [31, 107, 105], "shirt": [87, 88, 85], "pants": [83, 111], "style": "short"},
 	"mei": {"hair": [108, 66, 109], "skin": [106, 104, 85], "shirt": [93, 81, 82], "pants": [108, 66], "style": "long"},

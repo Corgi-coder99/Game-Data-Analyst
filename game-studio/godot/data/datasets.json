@@ -98,5 +98,22 @@
  },
  "data":{"minutes_per_file":10,"minutes_per_chart":10,"max_pinned":4,"max_attached":3,"analysis_bonus":1.0,"analysis_good":0.6,"analysis_wrong_penalty":0.0,"analysis_wrong_below":0.3},
  "charts":{"bar_max_categories":12,"pie_max_slices":5,"unsorted_min_categories":4,"smoothing_min_window":3,"spike_z":3.0,"spike_min_points":5},
+ "learn":{
+  "hint_energy":1,
+  "hint_levels":3,
+  "starter_cards":["hb_audit_first","hb_plan","hb_report_findings"],
+  "skills":{
+   "levels":[0,20,50,90,140],
+   "xp":{"entry_fixed":6,"chart_clean":8,"chart_flagged":2,"finding_right":8,"finding_close":3,"right_high":8,"right_other":4,"wrong_low":6,"wrong_mid":3,"partial_mid":6,"partial_other":3}
+  },
+  "ramp":{
+   "from_day":3,
+   "dirt":[[1.0,0],[3.5,1],[4.5,2]],
+   "scale":[[1.0,1.0],[3.5,1.1],[4.5,1.2]],
+   "min_dirt":1,
+   "max_dirt":7
+  },
+  "tutorial":{"days":5,"solved":0.75}
+ },
  "grader":{"weights":{"cleaning":0.4,"findings":0.4,"chart":0.2},"chart_flag_penalty":0.25,"wrong_penalty":0.5,"adjacent_band":0.5,"direction_only":0.4}
 }

@@ -161,6 +161,15 @@ func spend_minutes(minutes: int) -> Dictionary:
 	_minutes += maxi(0, minutes)
 	return {"ok":true, "minutes":_minutes, "band":band()}
 
+# T-035: a hint costs analysis Energy from the same daily pool as verification (config learn.hint_energy).
+# Time is not spent. Returns ok=false (nothing spent) when the day is closed or the pool is too low.
+# Unused, it changes nothing: the pool and every result are exactly as before.
+func spend_analysis_energy(amount: int) -> Dictionary:
+	if not _open or _submitted: return {"ok":false, "error":"day_closed"}
+	if amount < 0 or _analysis_energy < amount: return {"ok":false, "error":"no_analysis_energy"}
+	_analysis_energy -= amount
+	return {"ok":true, "energy_left":_analysis_energy}
+
 # T-034: optional hook set by the flow. Called as (day, analysis) -> float, a signed adjustment of the report delta.
 # Without an `analysis` in the report the hook is never called, so existing results are unchanged.
 var analysis_scorer: Callable = Callable()

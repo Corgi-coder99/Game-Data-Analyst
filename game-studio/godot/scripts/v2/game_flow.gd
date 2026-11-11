@@ -22,6 +22,9 @@ const WallScene = preload("res://scripts/v2/wall_scene.gd")
 const SettingsScene = preload("res://scripts/v2/settings_scene.gd")
 const LeaveScene = preload("res://scripts/v2/leave_scene.gd")
 const Toast = preload("res://scripts/v2/toast.gd")
+# T-035: the learning layer (state in the profile, first-run choice, daily settlement of XP and cards).
+const LearnState = preload("res://scripts/learn/learn_state.gd")
+const TutorialChoice = preload("res://scripts/v2/learn/tutorial_choice.gd")
 const HUD_STATES := ["MORNING", "TRANSPORT", "COMMUTE", "SHOP", "DAY_START", "WORK", "OVERTIME", "EVENING"]
 const HORIZON := 10
 const FADE_STEP := 0.035
@@ -63,6 +66,10 @@ var meta_enabled := true
 var run_mode := "run"
 var pre_run_queue: Array = []
 var meta_view: Control
+var learn_state: RefCounted
+var learn_outcome: Dictionary = {}
+var tutorial_choice_enabled := false
+var choice_view: Control
 var toast_layer: CanvasLayer
 var toast_view: Control
 var toast_log: Array = []
@@ -101,7 +108,9 @@ func _ready() -> void:
 	add_child(toast_layer)
 	toast_view = Toast.new()
 	toast_layer.add_child(toast_view)
-	if autostart and meta_enabled and meta == null: meta = Meta.new()
+	if autostart and meta_enabled and meta == null:
+		meta = Meta.new()
+		tutorial_choice_enabled = true
 	if autostart: preload("res://scripts/audio/audio_manager.gd").install(self)
 	announce_rollover()
 	if autostart: start_title()
@@ -232,6 +241,9 @@ func begin_run(mode: String) -> void:
 
 func _next_pre_run() -> void:
 	if pre_run_queue.is_empty():
+		if tutorial_choice_enabled and meta != null and str(meta.profile.data.learn.tutorial) == "":
+			_enter_tutorial_choice()
+			return
 		new_game(meta.daily_seed() if run_mode == "daily" else -1, {})
 		return
 	var screen: Dictionary = pre_run_queue.pop_front()
@@ -241,6 +253,21 @@ func _next_pre_run() -> void:
 		_swap(meta_view)
 		meta_view.open(screen)
 		meta_view.finished.connect(_next_pre_run, CONNECT_ONE_SHOT))
+
+# T-035: the first-run choice: guided tutorial days 1-5 or skip. Remembered in the profile.
+func _enter_tutorial_choice() -> void:
+	_set_state("TUTORIAL_CHOICE")
+	_show(func():
+		choice_view = TutorialChoice.new()
+		_swap(choice_view)
+		choice_view.open(strings.learn.choice)
+		choice_view.chosen.connect(_on_tutorial_chosen, CONNECT_ONE_SHOT))
+
+func _on_tutorial_chosen(mode: String) -> void:
+	if state != "TUTORIAL_CHOICE": return
+	meta.profile.data.learn.tutorial = mode
+	meta.profile.save()
+	new_game(meta.daily_seed() if run_mode == "daily" else -1, {})
 
 func open_meta_view(which: String) -> void:
 	if meta == null: return
@@ -274,6 +301,10 @@ func start_with_game(value: RefCounted) -> void:
 	last_message = ""
 	game = value
 	life = LifeGame.new(seed_used)
+	# T-035: the profile learn block when there is a profile; a transient state otherwise (tests may preset one).
+	if meta != null: learn_state = LearnState.new(meta.profile.data.learn)
+	elif learn_state == null: learn_state = LearnState.new()
+	learn_outcome = {}
 	focus_info = {"bonus": 0, "reason": "neutral"}
 	if daily_active():
 		life.enable_daily()
@@ -460,6 +491,8 @@ func _build_desktop() -> void:
 	if desktop == null:
 		desktop = DesktopScene.instantiate()
 		desktop.data_seed = seed_used
+		desktop.learn = learn_state
+		desktop.cards_unlocked.connect(func(ids): toast(strings.learn.skills.unlocked % ids.size()))
 		desktop.setup(game)
 		desktop.tool_used.connect(_on_tool_used)
 		desktop.time_changed.connect(_on_time_changed)
@@ -513,7 +546,11 @@ func _build_review(day: int) -> void:
 	review_view.life_text = strings.life.review_line % [life.projected_net_worth(game.status()), life.mood]
 	if life.vitals != null and life.vitals.hr_warning and life.vitals.sick_today: review_view.life_note = strings.daily.hr_line
 	# T-034: the data core's review (cleaning, findings, chart) is read only here, after the day ended.
-	if desktop != null and desktop.data_session != null: review_view.data_game = desktop.data_session.data
+	if desktop != null and desktop.data_session != null:
+		review_view.data_game = desktop.data_session.data
+		review_view.learn_state = learn_state
+		review_view.hints_by_file = desktop.data_session.hints_by_file()
+		review_view.tutorial_day = desktop.data_session.tutorial_today()
 	review_view.show_review(game, day, submission, before_status)
 
 # Used by tests and scripts: one press of Continue.
@@ -522,6 +559,7 @@ func continue_review() -> void:
 
 func _after_review() -> void:
 	if state != "REVIEW": return
+	_learn_toasts()
 	_record_day()
 	if bool(game.status().finished): _enter_ending()
 	elif daily_active() and overtime_enabled: _enter_overtime()
@@ -529,6 +567,15 @@ func _after_review() -> void:
 	else: _close_day()
 
 # T-030: the finished day goes to the ScoreSink (public parts only); achievements appear as toasts.
+# T-035: level-ups, new Handbook cards and the tutorial graduation of the finished day, as toasts.
+func _learn_toasts() -> void:
+	# The review scene settled the day (XP, cards, events) while it was built; the profile is saved with the day.
+	learn_outcome = review_view.learn_outcome if review_view != null else {}
+	if meta != null and not learn_outcome.is_empty(): meta.profile.save()
+	for up in learn_outcome.get("levelups", []): toast(strings.learn.skills.levelup % [strings.learn.handbook.skills[up.skill], int(up.to)])
+	if not learn_outcome.get("new_cards", []).is_empty(): toast(strings.learn.skills.unlocked % learn_outcome.new_cards.size())
+	if bool(learn_outcome.get("graduated", false)): toast(strings.learn.tutorial.graduate)
+
 func _record_day() -> void:
 	if meta == null or game == null: return
 	var after: Dictionary = game.status()

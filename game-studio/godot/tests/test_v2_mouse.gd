@@ -201,6 +201,7 @@ func run() -> void:
 	check(flow.state == "REVIEW", "the report is sent by mouse: " + flow.state)
 	check(flow.submission.forecast == "giam" and flow.submission.confidence == "thap" and flow.submission.evidence == [uid], "the sent report has the chosen content")
 	# 7. Review by mouse until day 2 starts.
+	var wallet_before_pay: int = flow.life.wallet
 	var guard := 0
 	while flow.state == "REVIEW" and guard < 40:
 		flow.review_view.advance(0.5)
@@ -211,7 +212,9 @@ func run() -> void:
 	check(flow.state == "EVENING", "the review leads to the Evening scene: " + flow.state)
 	var evening: Control = flow.evening_view
 	var life: RefCounted = flow.life
-	check(evening.is_visible_in_tree() and life.wallet >= 100, "the evening shows the wallet with the day's pay")
+	# T-035: the pay is added to the wallet, so the evening wallet is at least what it was before the review
+	# (the old fixed bound of 100 failed on seeds such as 11 and 90210 where the day's spending was higher).
+	check(evening.is_visible_in_tree() and life.wallet >= wallet_before_pay, "the evening shows the wallet with the day's pay (wallet %d, before %d)" % [life.wallet, wallet_before_pay])
 	await shot_life("evening-start")
 	var wallet_before: int = life.wallet
 	var mood_before: int = life.mood

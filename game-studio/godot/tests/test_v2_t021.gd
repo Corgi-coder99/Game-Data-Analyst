@@ -38,8 +38,8 @@ func texts_of(node: Node, out: Array) -> void:
 	for child in node.get_children(): texts_of(child, out)
 
 func test_icons(desktop: Control) -> void:
-	check(desktop.icon_buttons.keys() == ["news", "files", "sheet", "charts", "report", "company", "tools", "help"], "eight desktop icons (T-034 adds Files, Sheet, Charts)")
-	var captions := {"news":"Browser", "report":"Mail", "company":"Dashboard", "tools":"Code Pad", "help":"Help", "files":"Files", "sheet":"Sheet", "charts":"Charts"}
+	check(desktop.icon_buttons.keys() == ["news", "files", "sheet", "charts", "report", "company", "tools", "handbook", "help"], "nine desktop icons (T-034 adds Files, Sheet, Charts; T-035 adds Handbook)")
+	var captions := {"news":"Browser", "report":"Mail", "company":"Dashboard", "tools":"Code Pad", "help":"Help", "files":"Files", "sheet":"Sheet", "charts":"Charts", "handbook":"Handbook"}
 	for id in captions:
 		var tile: Button = desktop.icon_buttons[id]
 		var caption := ""

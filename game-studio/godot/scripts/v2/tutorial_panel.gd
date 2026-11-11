@@ -22,6 +22,8 @@ var flags: Dictionary = {}
 var goals: Dictionary = {}
 var goals_enabled := true
 var collapsed := false
+# T-035: in tutorial mode the case coach replaces this bubble and the goals list.
+var suppressed := false
 var bubble: Panel
 var step_label: Label
 var text_label: Label
@@ -153,14 +155,14 @@ func _refresh_goals() -> void:
 
 func layout() -> void:
 	if bubble == null: return
-	bubble.visible = active
-	goals_panel.visible = goals_enabled
+	bubble.visible = active and not suppressed
+	goals_panel.visible = goals_enabled and not suppressed
 	_refresh_goals()
 	goals_panel.position = Vector2(0, BUBBLE_HEIGHT + 4 if active else 0)
 	var rows_visible := not collapsed
 	goals_panel.size = Vector2(AREA.size.x, 18 + GOALS.size() * 13 + 2 if rows_visible else 16)
 	for id in GOALS: goal_rows[id].holder.visible = rows_visible
-	overlay.visible = active
+	overlay.visible = active and not suppressed
 	if active:
 		var current: Dictionary = steps[step]
 		if current.id == "deadline": step_label.text = strings.tutorial.name + " · " + strings.tutorial.deadline_label

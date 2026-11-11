@@ -5,6 +5,7 @@ const UI = preload("res://scripts/v2/data/ui_kit.gd")
 const Canvas = preload("res://scripts/v2/data/chart_canvas.gd")
 const Palette = preload("res://scripts/v2/palette.gd")
 const DS = preload("res://scripts/data/dataset.gd")
+const HintPopup = preload("res://scripts/v2/learn/hint_popup.gd")
 const TYPES := ["bar", "line", "scatter", "histogram", "pie"]
 const AGGS := ["sum", "mean", "median", "count", "min", "max"]
 const SORTS := ["none", "asc", "desc", "x"]
@@ -21,6 +22,7 @@ var flag_box: Control
 var teach_label: Label
 var pin_button: Button
 var pin_note: Label
+var hint_button: Button
 var flags: Array = []
 var flag_index := 0
 var fields: Dictionary = {}
@@ -45,7 +47,8 @@ func build(p_session: RefCounted, p_texts: Dictionary, all_strings: Dictionary) 
 	pin_button = UI.button(self, texts.charts.pin, Rect2(150, 238, 130, 16), "Save this chart so Mail can attach it")
 	pin_button.name = "PinChart"
 	pin_button.pressed.connect(pin)
-	pin_note = UI.label(self, "", Rect2(284, 240, 150, 12), 7)
+	pin_note = UI.label(self, "", Rect2(284, 240, 72, 12), 7)
+	hint_button = HintPopup.add_button(self, self, Rect2(360, 238, 74, 16), session, func(): return file_id if file_id != "" else session.hint_file())
 	reset_spec()
 	render()
 

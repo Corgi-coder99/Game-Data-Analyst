@@ -74,7 +74,7 @@ Defects: one entry error (1520 on 03-09, neighbours 150 and 152). Not a defect: 
 
 Expected steps:
 1. Line chart of value by date.
-2. Flag outliers by IQR: Q1 = 150, Q3 = 171, IQR = 21, upper fence = 202.5, lower fence = 118.5. Only 1520 is flagged. (Quartiles use the median-of-halves method; see note below.)
+2. Flag outliers by IQR (the Sheet Outliers step, k = 1.5): Q1 = 150.25, Q3 = 171, IQR = 20.75, upper fence = 202.1, lower fence = 119.1. Only 1520 is flagged. (T-035: the engine uses linear-interpolation quartiles, not median-of-halves; see the note at the end.)
 3. Decide: 1520 is exactly 10x its neighbours and appears once: fix to 152 (or mark missing and fill with previous value).
 4. Keep 03-13 onward (171 to 173): not flagged and persistent.
 5. Recompute the mean or chart again.
@@ -83,7 +83,7 @@ Expected findings:
 - The 03-09 value 1520 is a data-entry error (about 10x neighbours), corrected to 152. Raw mean 255.9 versus 158.1 after the fix.
 - The steel index rose from about 150.8 (first 9 days, corrected) to about 171.4 (last 5 days): 13.7% higher.
 - Forecast direction for the tutorial: up (the level shift is recent; say confidence is moderate, since five days is a short history).
-- Note: if the Sheet uses another quartile method the fences may differ slightly, but 1520 must be the only flagged value. Test this in T-035.
+- T-035 implementation: the game scores the Outliers step with action remove, so the graded clean table drops the 1520 row (13 rows, mean 158.6) instead of fixing it to 152 (mean 158.1). The finding "level change" is the last 7 days against the 7 days before (171.4 against 151.75, +12.95 percent, band 10..20, up). `test_t035_logic` checks that exactly one value is flagged.
 
 ## Day 3: The half-finished Friday (funnel and late-arriving data)
 
@@ -227,6 +227,6 @@ Expected findings:
 - Correct statement: do not call A the winner on the overall rate; B is better within each device. Also note that traffic was not allocated evenly, so confirm how users were assigned before trusting any comparison.
 
 ## Notes for T-035
-- Quartile method used for IQR in these tutorials: median of the lower half and median of the upper half (the median is excluded from both halves when the count is odd). Use the same method in `ops.gd` or adjust the expected fences.
+- Quartile method (fixed in T-035): the engine's `ops.gd` uses linear interpolation (type 7), so day 2 shows Q1 = 150.25, Q3 = 171, fences 119.1 and 202.1. The old median-of-halves numbers (150 / 171 / 118.5 / 202.5) give the same single outlier. The doc was changed, not the engine, because the generator tunes its fences to this method.
 - All datasets are tiny on purpose so the player can read every row.
 - Day 4 and Day 5 each have two valid report wordings; the grader should accept either as long as it avoids the wrong paths.

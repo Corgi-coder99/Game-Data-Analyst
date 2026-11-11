@@ -372,7 +372,11 @@ func test_achievements_and_hall() -> void:
 	var run_out: Dictionary = meta.finish_run({"ending": "survived"})
 	check(run_out.toasts.has("Achievement: Survived 10 Days") and meta.profile.data.stats.runs_survived == 1, "Survived 10 Days at the end of a run")
 	check(meta.finish_run({"ending": "survived"}).toasts.is_empty(), "and only once")
-	check(meta.profile.data.achievements.size() == meta.cfg.achievements.size(), "all seven earned")
+	# T-035 added 8 learning achievements (earned from the learning layer, not by this scripted play).
+	var classic := 0
+	for entry in meta.cfg.achievements:
+		if entry.rule != "learn_event" and meta.profile.data.achievements.has(entry.id): classic += 1
+	check(classic == 7 and meta.profile.data.achievements.size() == 7, "all seven classic achievements earned")
 	# The hall of awards.
 	var hall: Array = Awards.hall(meta.profile.data, meta.cfg)
 	var by_id := {}

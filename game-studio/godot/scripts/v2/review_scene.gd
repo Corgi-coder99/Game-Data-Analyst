@@ -49,6 +49,25 @@ var built := false
 var data_game: RefCounted
 var analysis_step := false
 const AnalysisReview = preload("res://scripts/data/analysis_review.gd")
+# T-035: coaching page, skill bars, hint tag and the case-solved popup of the step "Your analysis".
+const Coaching = preload("res://scripts/learn/coaching.gd")
+const Content = preload("res://scripts/learn/content.gd")
+const UIKit = preload("res://scripts/v2/data/ui_kit.gd")
+const LearnSettle = preload("res://scripts/learn/learn_settle.gd")
+const MENTOR_SPRITES := {"hanh": "hanh", "khoi": "khoi", "linh": "drlinh"}
+var learn_state: RefCounted
+var learn_outcome: Dictionary = {}
+var hints_by_file: Dictionary = {}
+var tutorial_day := false
+var analysis_page := "results"
+var tip_index := 0
+var tab_nodes: Array = []
+var tab_buttons: Dictionary = {}
+var tip_buttons: Dictionary = {}
+var skill_rows: Dictionary = {}
+var tip_nodes: Dictionary = {}
+var celebration: Control
+var celebration_done := false
 
 func _ready() -> void:
 	_build()
@@ -128,6 +147,11 @@ func show_review(value: RefCounted, ended_day: int, report: Dictionary, status_b
 	data = game.review(day)
 	if data.has("error"): return false
 	analysis_step = submission.has("analysis") and data_game != null
+	# T-035: XP, Handbook cards, events and tutorial progress of this day, once, from the graded analysis.
+	learn_outcome = {}
+	if analysis_step and learn_state != null:
+		var analysis_record: Dictionary = data_game.analysis_review(day)
+		if analysis_record.get("ok", false): learn_outcome = LearnSettle.settle(learn_state, analysis_record, data.result, submission, day, tutorial_day)
 	status = game.status()
 	lines_shown.clear()
 	title_label.text = strings.review.title + " · " + strings.ui.day % [day, int(status.horizon)]
@@ -184,6 +208,20 @@ func _render_step() -> void:
 	sweep_root = null
 	var logical := step - 1 if analysis_step and step >= 6 else step
 	var is_analysis := analysis_step and step == 5
+	for node in tab_nodes:
+		if is_instance_valid(node):
+			if node.get_parent() != null: node.get_parent().remove_child(node)
+			node.queue_free()
+	tab_nodes.clear()
+	tab_buttons.clear()
+	tip_buttons.clear()
+	skill_rows.clear()
+	tip_nodes.clear()
+	header_label.size.x = 608
+	if celebration != null and is_instance_valid(celebration):
+		if celebration.get_parent() != null: celebration.get_parent().remove_child(celebration)
+		celebration.queue_free()
+	celebration = null
 	header_label.text = "%d/%d  %s" % [step + 1, step_count(), strings.data_ui.review.step if is_analysis else strings.review.steps[logical]]
 	var last := step == step_count() - 1
 	continue_button.text = strings.review["continue"] if not last else (strings.review.to_ending if bool(status.finished) else strings.review.next_day)
@@ -201,8 +239,38 @@ func _render_step() -> void:
 		5: _step_career()
 
 # T-034: cleaning, findings, chart warnings and the reference steps in plain words (from DataGame.review).
+func hint_total() -> int:
+	var total := 0
+	for id in hints_by_file: total += int(hints_by_file[id])
+	return total
+
+func show_page(page: String) -> void:
+	analysis_page = page
+	tip_index = 0
+	if analysis_step and step == 5: _render_step()
+
+func _tab(text: String, page: String, x: int) -> void:
+	var b := button(panel, text, Rect2(x, 2, 78, 14))
+	b.toggle_mode = true
+	b.button_pressed = analysis_page == page
+	b.focus_mode = Control.FOCUS_NONE
+	b.name = "Tab_" + page
+	b.pressed.connect(show_page.bind(page))
+	tab_nodes.append(b)
+	tab_buttons[page] = b
+
 func _step_analysis() -> void:
 	var review: Dictionary = data_game.analysis_review(day)
+	var texts: Dictionary = strings.learn
+	header_label.size.x = 430
+	if hint_total() > 0: header_label.text += "  (" + str(texts.hint_tag) + ")"
+	_tab(texts.coaching.tab_results, "results", 448)
+	_tab(texts.coaching.tab_coaching, "coaching", 530)
+	if analysis_page == "coaching": _analysis_coaching(review)
+	else: _analysis_results(review)
+	_celebrate()
+
+func _analysis_results(review: Dictionary) -> void:
 	var bonus := float(data.result.get("analysis", 0.0))
 	var lines: Dictionary = AnalysisReview.build(review, submission, strings.data_ui, bonus)
 	var y := 0
@@ -213,6 +281,126 @@ func _step_analysis() -> void:
 	for item in lines.right:
 		_text(body, item.text, Rect2(308, y, 300, 12), item.color)
 		y += 13
+
+func coaching_tips(review: Dictionary) -> Array:
+	var out: Array = []
+	for f in review.files:
+		out.append_array(Coaching.tips(f, day, int(hints_by_file.get(f.id, 0)), strings.learn, tutorial_day, out.size(), strings.data_ui))
+	return out
+
+# Page 2 of the step: one tip at a time (the mentor line for the outcome, what the data said, a correct
+# approach in plain words, the Handbook card) and the five skill bars with this day gains.
+func _analysis_coaching(review: Dictionary) -> void:
+	var texts: Dictionary = strings.learn
+	var tips := coaching_tips(review)
+	tip_index = clampi(tip_index, 0, maxi(0, tips.size() - 1))
+	if tips.is_empty():
+		_text(body, texts.coaching.no_tips, Rect2(0, 0, 420, 12), 7)
+	else:
+		var tip: Dictionary = tips[tip_index]
+		var c: Dictionary = texts.coaching
+		var color := 24 if tip.outcome == "praise" else (26 if tip.outcome == "wrong_fix" else 28)
+		_text(body, "%s  -  %s  -  %s" % [c.tip_of % [tip_index + 1, tips.size()], c.mentor[tip.voice], c.outcome[tip.outcome]], Rect2(0, 0, 420, 12), color)
+		tip_nodes["line"] = _wrapped(body, str(tip.text), Rect2(0, 14, 420, 44), 22, 4)
+		tip_nodes["said"] = _wrapped(body, c.said % tip.said, Rect2(0, 60, 420, 36), 7, 3)
+		var case_entry: Dictionary = Content.case_by_id(str(tip.case_id))
+		var y := 100
+		if not case_entry.is_empty():
+			_text(body, c.steps, Rect2(0, y, 420, 12), 21)
+			y += 13
+			for i in mini(4, case_entry.reference_steps.size()):
+				_text(body, "%d. %s" % [i + 1, case_entry.reference_steps[i]], Rect2(8, y, 410, 12), 22)
+				y += 12
+		var card: Dictionary = Content.card_by_id(str(tip.card_id))
+		if not card.is_empty():
+			tip_nodes["card"] = _text(body, c.card % card.title, Rect2(0, y + 4, 420, 12), 20)
+		var portrait := TextureRect.new()
+		portrait.texture = sprites.frame(MENTOR_SPRITES[tip.voice])
+		portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		portrait.stretch_mode = TextureRect.STRETCH_SCALE
+		portrait.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		portrait.position = Vector2(436, 0)
+		portrait.size = Vector2(32, 48)
+		portrait.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		body.add_child(portrait)
+		tip_nodes["portrait"] = portrait
+		_text(body, c.mentor[tip.voice], Rect2(472, 4, 130, 12), 28)
+		var prev := UIKit.button(body, c.prev, Rect2(0, 198, 18, 14))
+		var nxt := UIKit.button(body, c.next, Rect2(22, 198, 18, 14))
+		prev.disabled = tip_index <= 0
+		nxt.disabled = tip_index >= tips.size() - 1
+		prev.pressed.connect(func():
+			tip_index -= 1
+			_render_step())
+		nxt.pressed.connect(func():
+			tip_index += 1
+			_render_step())
+		tip_buttons["prev"] = prev
+		tip_buttons["next"] = nxt
+	_skill_bars(Rect2(432, 66, 176, 140))
+
+func _skill_bars(area: Rect2) -> void:
+	if learn_state == null: return
+	var texts: Dictionary = strings.learn
+	_text(body, texts.skills.title, Rect2(area.position.x, area.position.y - 12, 100, 11), 91)
+	var gains: Dictionary = learn_outcome.get("gains", {})
+	var ups := {}
+	for u in learn_outcome.get("levelups", []): ups[u.skill] = u
+	for i in Content.SKILLS.size():
+		var skill: String = Content.SKILLS[i]
+		var y := area.position.y + i * 28.0
+		var up: bool = ups.has(skill)
+		var label_text := "%s  %s" % [texts.handbook.skills[skill], texts.skills.level % learn_state.level(skill)]
+		var name_label := _text(body, label_text + ("  UP!" if up else ""), Rect2(area.position.x, y, 128, 11), 28 if up else 22)
+		var gain := int(gains.get(skill, 0))
+		var gain_label := _text(body, texts.skills.gain % gain if gain > 0 else "", Rect2(area.position.x + 130, y, 44, 11), 24)
+		gain_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		var back := ColorRect.new()
+		back.color = Palette.color(3)
+		back.position = Vector2(area.position.x, y + 12)
+		back.size = Vector2(174, 6)
+		back.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		body.add_child(back)
+		var fill := ColorRect.new()
+		var p: Dictionary = learn_state.progress(skill)
+		var ratio: float = 1.0 if int(p.need) == 0 else clampf(float(p.have) / float(p.need), 0.0, 1.0)
+		fill.color = Palette.color(24 if up else 23)
+		fill.position = Vector2(0, 0)
+		fill.size = Vector2(maxf(1.0, 174.0 * ratio), 6)
+		fill.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		back.add_child(fill)
+		skill_rows[skill] = {"name": name_label, "gain": gain_label, "fill": fill, "ratio": ratio}
+
+# The case-solved popup of a tutorial day (once per review).
+func _celebrate() -> void:
+	if not tutorial_day or learn_outcome.is_empty() or celebration_done: return
+	var t: Dictionary = strings.learn.tutorial
+	var solved: bool = bool(learn_outcome.get("solved", false))
+	celebration = Control.new()
+	celebration.name = "Celebration"
+	celebration.set_meta("overlay", true)
+	celebration.position = Vector2(120, 60)
+	celebration.size = Vector2(368, 100)
+	celebration.z_index = 40
+	body.add_child(celebration)
+	UIKit.panel(celebration, Rect2(0, 0, 368, 100), 83, 24 if solved else 28)
+	var portrait := TextureRect.new()
+	portrait.texture = sprites.frame("drlinh")
+	portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	portrait.stretch_mode = TextureRect.STRETCH_SCALE
+	portrait.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	portrait.position = Vector2(8, 10)
+	portrait.size = Vector2(32, 48)
+	portrait.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	celebration.add_child(portrait)
+	UIKit.label(celebration, t.solved_title if solved else t.closed_title, Rect2(52, 8, 300, 16), 24 if solved else 28, 12)
+	UIKit.wrapped(celebration, t.solved_text if solved else t.closed_text, Rect2(52, 28, 306, 34), 22, 3)
+	if bool(learn_outcome.get("graduated", false)): UIKit.wrapped(celebration, t.graduate, Rect2(52, 64, 306, 12), 21, 1)
+	var ok := UIKit.button(celebration, t.ok, Rect2(150, 80, 68, 16))
+	ok.name = "CelebrationOk"
+	ok.pressed.connect(func():
+		celebration_done = true
+		celebration.visible = false)
 
 func _step_reaction() -> void:
 	var category := reaction_category()

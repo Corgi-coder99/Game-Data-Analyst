@@ -16,6 +16,8 @@ func _init(p_cfg: Dictionary = {}) -> void:
 
 # ---------- reference / baseline pipelines ----------
 func steps(file: Dictionary) -> Array:
+	# T-035: hand-built tutorial files carry their own reference steps.
+	if file.has("ref_steps"): return file.ref_steps.duplicate(true)
 	var r: Dictionary = file.recipe
 	var name: String = r.name
 	var out: Array = []
@@ -156,6 +158,7 @@ func _window_rows(file: Dictionary, ds: RefCounted) -> Array:
 # All truth statements of a file, computed from the table `ds` (the reference table for the real truth,
 # or any player's/naive table to see what that table would say).
 func truth(file: Dictionary, ds: RefCounted, spike: String = "") -> Array:
+	if file.has("truth_list"): return file.truth_list.duplicate(true)
 	var name: String = file.name
 	var out: Array = []
 	if name != "ab_test_log":
@@ -221,6 +224,7 @@ func truth(file: Dictionary, ds: RefCounted, spike: String = "") -> Array:
 
 # The entry-error label the reference pipeline removes (largest absolute value flagged), for spike_error.
 func spike_label(file: Dictionary) -> String:
+	if file.has("ref_steps"): return ""
 	var r: Dictionary = file.recipe
 	if not r.defects.has("outliers") or not LABEL_COL.has(file.name): return ""
 	var list := steps(file)
@@ -251,6 +255,7 @@ func evaluate_reference(file: Dictionary) -> Dictionary:
 
 # Choices offered to the player for each finding (no truth inside).
 func options(file: Dictionary) -> Array:
+	if file.has("options"): return file.options.duplicate(true)
 	var out: Array = []
 	var name: String = file.name
 	if name != "ab_test_log": out.append({"id":"metric_change", "directions":["tang", "giam", "ngang"], "bands":bands()})

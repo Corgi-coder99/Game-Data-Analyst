@@ -34,6 +34,7 @@ const ICONS := {
 "app_help":["..oooo..",".oYYYYo.","oYYoooYo","oYYYYoYo","oYYYooYo","oYYYYYYo",".oYYoYo.","..oooo.."],
 "app_files":["........",".yyy....","yYYYYYYy","yYYYYYYy","yYYYYYYy","yYYYYYYy","yyyyyyyy","........"],
 "app_sheet":["oooooooo","oGGoGGGo","oooooooo","oWWoWWWo","oooooooo","oWWoWWWo","oooooooo","oooooooo"],
+"app_handbook":[".oooooo.","oBBBBBBo","oBWWWWBo","oBWwWWBo","oBWWWRBo","oBWWWRBo","oBBBBBBo",".oooooo."],
 "app_charts":["oooooooo","oWWWWWWo","oWWWWBWo","oWWBWBWo","oWBBWBWo","oWBBBBWo","oooooooo","........"]}
 static func definitions() -> Dictionary:
 	var out := {}

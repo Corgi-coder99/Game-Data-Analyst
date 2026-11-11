@@ -3,6 +3,9 @@ extends "res://scripts/life/daily_base.gd"
 # and the achievements list. Offline: the only candidate is the local profile. Locked plaques stay empty.
 const Awards = preload("res://scripts/meta/awards.gd")
 const Clock = preload("res://scripts/meta/clock.gd")
+const LearnState = preload("res://scripts/learn/learn_state.gd")
+const Content = preload("res://scripts/learn/content.gd")
+var skill_nodes: Dictionary = {}
 signal back_requested
 const WINNERS_PER_PAGE := 4
 var meta: RefCounted
@@ -90,24 +93,50 @@ func render() -> void:
 	var awards: Array = Awards.hall(data, cfg)
 	for i in awards.size():
 		_award_plaque(Rect2(10 + i * 125, 134, 120, 62), awards[i])
+	_skills_section(data)
 	var earned := 0
 	for entry in cfg.achievements:
 		if data.achievements.has(entry.id): earned += 1
-	_label("ACHIEVEMENTS  %d/%d" % [earned, cfg.achievements.size()], Rect2(10, 202, 300, 12), 91)
+	_label("ACHIEVEMENTS  %d/%d" % [earned, cfg.achievements.size()], Rect2(10, 236, 300, 12), 91)
+	# T-035: 15 achievements in three columns of one line each; the description is the tooltip.
 	for i in cfg.achievements.size():
 		var entry: Dictionary = cfg.achievements[i]
 		var owned: bool = data.achievements.has(entry.id)
-		var x: int = 10 + (i % 2) * 316
-		var y: int = 216 + (i / 2) * 26
+		var x: int = 10 + (i % 3) * 208
+		var y: int = 250 + (i / 3) * 14
 		var mark := icon(self, "check" if owned else "lock", Vector2(x, y + 2))
 		mark.set_meta("overlay", true)
 		dynamic.append(mark)
-		var name_label := _label(str(entry.name), Rect2(x + 12, y, 296, 12), 89 if owned else 100)
+		var name_label := _label(str(entry.name), Rect2(x + 12, y, 190, 12), 89 if owned else 100)
 		var desc: String = str(entry.desc) + ("  (" + str(data.achievements[entry.id]) + ")" if owned else "")
-		_label(desc, Rect2(x + 12, y + 12, 296, 12), 7 if owned else 99)
+		name_label.tooltip_text = desc
+		name_label.mouse_filter = Control.MOUSE_FILTER_PASS
 		plaque_nodes["ach_" + str(entry.id)] = name_label
 	var stats: Dictionary = data.stats
 	_label("Reputation %d   Streak %d (best %d)   Days worked %d   Leave freezes %d" % [int(data.reputation), int(data.streak), int(data.best_streak), int(stats.days_total), int(data.freezes)], Rect2(10, 335, 510, 12), 7)
+
+# T-035: the five skills with level and a small XP bar (profile.learn).
+func _skills_section(data: Dictionary) -> void:
+	var learn := LearnState.new(data.learn)
+	_label("SKILLS", Rect2(10, 202, 300, 12), 91)
+	skill_nodes.clear()
+	for i in Content.SKILLS.size():
+		var skill: String = Content.SKILLS[i]
+		var x: int = 10 + i * 125
+		var names := {"data_cleaning": "Data cleaning", "charts": "Charts", "statistics": "Statistics", "causality": "Causality", "communication": "Communication"}
+		var level: int = learn.level(skill)
+		var label := _label("%s  Lv %d" % [names[skill], level], Rect2(x, 215, 120, 12), 89 if level >= 3 else 22)
+		var p: Dictionary = learn.progress(skill)
+		var ratio: float = 1.0 if int(p.need) == 0 else clampf(float(p.have) / float(p.need), 0.0, 1.0)
+		var back := _rect(self, 3, Rect2(x, 228, 118, 5))
+		back.set_meta("overlay", true)
+		_add(back)
+		var fill := _rect(self, 23, Rect2(x, 228, maxf(1.0, 118.0 * ratio), 5))
+		fill.set_meta("overlay", true)
+		_add(fill)
+		label.tooltip_text = "%d XP" % learn.xp(skill)
+		label.mouse_filter = Control.MOUSE_FILTER_PASS
+		skill_nodes[skill] = {"label": label, "fill": fill, "ratio": ratio, "level": level}
 
 func _avatar(id: String, at: Vector2, locked: bool) -> void:
 	var sprite := _sprite(self, id if not locked else "player", 0, at, 2)
