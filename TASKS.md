@@ -815,3 +815,7 @@ Kết quả chạy thật (worktree, Godot 4.7.2 console):
 
 ### T-037-PROFILE | Codex | 2026-11-11 | Done (đã nằm trong T-037)
 - Đề xuất mở rộng phạm vi T-037 cho `game-studio/godot/scripts/meta/profile.gd`: thêm defaults Master 70, Music 40, SFX 70, Mute false và giữ các trường này qua save/load, tương thích profile cũ. Cần chủ dự án/Claude xác nhận phạm vi; Codex chưa sửa file này.
+
+
+### T-036 | Claude subagent | 2026-11-11 | In progress
+- Cân bằng lõi dữ liệu: file liên quan câu hỏi, bot phân tích trung thực (clean/sloppy/slow/misleader), thưởng phạt, chi phí thời gian, độ khó theo ngày, nhịp XP. Spec docs/SPEC-T-036.md, worktree ai-company-t036, nhánh codex/T-036. Handoff: docs/HANDOFF-T-036.md.
