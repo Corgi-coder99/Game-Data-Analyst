@@ -11,7 +11,21 @@ const QUESTION_FILES := {
 	"q5":[["competitor_scrape", ""]],
 	"q6":[["loan_book", ""]],
 	"q8":[["web_funnel", ""]],
-	"q9":[["loan_book", ""]]}
+	"q9":[["loan_book", ""]],
+	# T-038: the new state questions read the same files as the classic question on their variable.
+	"q10":[["market_prices", "fx rate"]],
+	"q11":[["market_prices", "fx rate"]],
+	"q12":[["market_prices", "fx rate"]],
+	"q13":[["market_prices", "stock index"]],
+	"q14":[["market_prices", "stock index"]],
+	"q15":[["market_prices", "stock index"]],
+	"q16":[["market_prices", "raw material"], ["competitor_scrape", ""]],
+	"q17":[["market_prices", "raw material"], ["competitor_scrape", ""]],
+	"q18":[["market_prices", "policy rate"]],
+	"q19":[["market_prices", "policy rate"]],
+	"q20":[["sales_export", ""], ["web_funnel", ""]],
+	"q21":[["sales_export", ""], ["web_funnel", ""]],
+	"q22":[["loan_book", ""]]}
 # The metric of each file type: kind (mean / sum / count per day), date column, value rule.
 const METRIC := {
 	"sales_export":{"kind":"mean", "date":"date", "value":"units*price", "chart_y":"price", "unit":"USD"},

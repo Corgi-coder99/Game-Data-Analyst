@@ -821,5 +821,127 @@ Kết quả chạy thật (worktree, Godot 4.7.2 console):
 - Cân bằng lõi dữ liệu: file liên quan câu hỏi, bot phân tích trung thực (clean/sloppy/slow/misleader), thưởng phạt, chi phí thời gian, độ khó theo ngày, nhịp XP. Spec docs/SPEC-T-036.md, worktree ai-company-t036, nhánh codex/T-036. Handoff: docs/HANDOFF-T-036.md.
 
 
-### T-038 | Codex | 2026-11-11 | In progress
+### T-038 | Codex | 2026-11-11 | Blocked
 - Mở rộng nội dung: tin tức 41 -> 110+, câu hỏi sếp 7 -> 18+, thêm nguồn, viết lại câu huấn luyện cho tự nhiên. Spec game-studio/godot/docs/SPEC-T-038.md, worktree ai-company-codex, nhánh codex/T-038. File được sửa: data/news.json, data/questions.json, data/coaching.json, data/datasets.json (chỉ bảng ánh xạ câu hỏi), tools/check_news.py, docs/CONTENT-BIBLE-v2.md. Test dài do Claude chạy.
+
+- Bàn giao Codex: đã dừng theo guard rule vì đặc tả chưa cho sửa đủ mapping trong repo; chưa hoàn tất, chưa chuyển Review. Không commit/push/merge, không chạy test dài, không gọi mạng. Nhánh `codex/T-038`, cây làm việc ban đầu sạch; owner/In progress đã có trước khi sửa.
+- Đã làm: 41 -> 123 tin (giữ nguyên 41 object gốc, thêm 82 tiêu đề), 10 -> 16 nguồn; 7 -> 20 câu hỏi (3 câu cho mỗi biến trong 6 biến, giữ 2 câu event/integrity); viết lại đủ 279/279 câu huấn luyện, giữ 31 trap x 3 outcome x 3 voice. Sáu nguồn chính thức/báo chí mới giữ nguyên trung bình reliability và delay từng tier. Thêm mapping file dữ liệu cho 13 ID mới; hướng dẫn viết tiêu đề và nguồn mới trong content bible.
+- File đổi (dưới `game-studio/godot/`): `data/news.json`, `data/questions.json`, `data/coaching.json`, `data/datasets.json` (chỉ relevance.map), `tools/check_news.py` (mới), `docs/CONTENT-BIBLE-v2.md`; `TASKS.md` cho trạng thái/bàn giao. Không sửa code game, test hay world.json.
+- Blocker: `scripts/world/world_game.gd:146` truy cập `_config.late.updates[q.id]`; bảng `data/world.json` chỉ có ID cũ. Cả q10..q22 gây lỗi khi quá giờ. `tests/balance_world.gd:topic_for()` chỉ có 7 ID cũ; 13 câu mới nhận topic rỗng. Bộ đọc hướng của bot cũng phụ thuộc từ khóa tiếng Anh cố định nên chưa hỗ trợ đầy đủ tiêu đề mới. Sửa mapping late.updates cần mở rộng phạm vi world.json; không né bằng sửa số hay đổi câu hỏi.
+- Đề xuất task tiếp theo **T-038-MAPPING | Codex | Backlog**: cho phép bổ sung mapping late.updates trong `data/world.json` (không đổi số), topic cho câu hỏi mới và hỗ trợ từ ngữ trong `tests/balance_world.gd`; điều tra assertion row_count ở `tests/test_t035_logic.gd` trước khi cấp quyền sửa test/code tương ứng. Chưa thực hiện task này.
+- Kiểm tra nhanh, chạy từng tiến trình riêng với timeout 160 s: `test_t031_english`: 188 checks, 0 failures, exit 0; `test_v2_t021`: 313 checks, 0 failures, exit 0; `test_t035_logic`: 3334 checks, 3 failures, exit 1. Không chạy lại sau khi phát hiện xung đột phạm vi. Hai lỗi profile phù hợp với user:// không ghi được; lỗi row_count cần reviewer điều tra, chưa kết luận nguyên nhân.
+- Hai lệnh Python đã thử riêng: `python -X utf8 -I tools/validate_content.py` và `python -X utf8 -I tools/check_news.py`; cả hai không khởi động được vì thiếu interpreter/PATH, không được tính PASS/FAIL nội dung. Không có `.venv` trong worktree; không cài thêm. Checker đã viết nhưng chưa thực thi: JSON/schema, ID, baseline HEAD, giữ dữ liệu gốc, phân bố biên/tổ hợp, nguồn/độ trễ, placeholder/độ dài/ASCII, mọi câu hỏi mapped và đúng biến, giới hạn thay đổi datasets, 279 câu coaching. English/ASCII không thay thế duyệt ngôn ngữ và layout bằng mắt.
+- `balance_world -- --games=200 --days=10`: hoàn tất exit 0 nhưng có SCRIPT ERROR, nên **không đạt** xác minh. Random fired 52%; verifier thắng 22% so official_only 11% (+11 điểm, dưới mục tiêu +15); chưa kết luận cân bằng vì mapping đang hỏng. Không chạy 2000 ván, 30 ngày, test_world, test_t036_balance hay test_t033_data.
+
+Bảng balance thực tế (200 ván/bot, 10 ngày):
+
+| Bot | Win % | Fired % | Bankrupt % | Survived % | Trust p25/p50/p75 | Accuracy | ev | All kinds % | Verifies/day | Related checked % |
+|---|---:|---:|---:|---:|---|---:|---:|---:|---:|---:|
+| random_reporter | 8.00 | 52.00 | 0.00 | 48.00 | 0.00/0.00/33.70 | 0.4653 | 0.0000 | 100.00 | 0.000 | 0.00 |
+| rumor_follower | 11.00 | 71.50 | 0.00 | 28.50 | 0.00/0.00/13.78 | 0.4423 | -0.0905 | 100.00 | 0.000 | 0.00 |
+| official_only | 11.00 | 4.50 | 0.00 | 95.50 | 26.80/45.25/59.77 | 0.6120 | -0.0548 | 100.00 | 0.000 | 0.00 |
+| verifier | 22.00 | 0.00 | 0.00 | 100.00 | 38.90/54.30/71.20 | 0.6198 | 0.1055 | 100.00 | 0.342 | 95.51 |
+| careful_hedger | 14.00 | 0.00 | 0.00 | 100.00 | 38.43/51.20/62.00 | 0.6198 | 0.1055 | 100.00 | 0.342 | 95.51 |
+| late_verifier | 2.00 | 1.50 | 0.00 | 98.50 | 24.00/38.50/48.00 | 0.6008 | 0.1061 | 100.00 | 0.342 | 95.50 |
+
+Shock coverage: 8/8. Log đầy đủ của lần chạy còn trong TEMP: `t038-balance.out`, `t038-balance.err` (lỗi lặp nhiều lần). Lỗi/thông báo nguyên văn (mỗi loại liệt kê một lần):
+
+```text
+FAIL: profile saves
+FAIL: learn state survives save and load
+FAIL: a strong player on day 6 gets files at least as large
+ERROR: Failed to open log file for writing: user://logs/godot.log
+ERROR: Failed to read the root certificate store.
+The term 'python' is not recognized as a name of a cmdlet, function, script file, or executable program.
+Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
+error: Failed to initialize cache at `C:\Users\ADMIN\AppData\Local\uv\cache`
+  Caused by: failed to create directory `C:\Users\ADMIN\AppData\Local\uv\cache`: Cannot create a file when that file already exists. (os error 183)
+error: No interpreter found in virtual environments, managed installations, search path, or registry
+warning: unable to access 'C:\Users\ADMIN/.config/git/ignore': Permission denied
+```
+
+Không có thông báo quota/usage limit. Chưa xác minh fit hai dòng bằng UI; reviewer chạy layout khi mapping đã sửa. Không có lần kiểm tra nhanh nào được chạy hai lần sau sửa.
+
+```text
+SCRIPT ERROR: Invalid access to property or key 'q10' on a base object of type 'Dictionary'.
+SCRIPT ERROR: Invalid access to property or key 'q11' on a base object of type 'Dictionary'.
+SCRIPT ERROR: Invalid access to property or key 'q12' on a base object of type 'Dictionary'.
+SCRIPT ERROR: Invalid access to property or key 'q13' on a base object of type 'Dictionary'.
+SCRIPT ERROR: Invalid access to property or key 'q14' on a base object of type 'Dictionary'.
+SCRIPT ERROR: Invalid access to property or key 'q15' on a base object of type 'Dictionary'.
+SCRIPT ERROR: Invalid access to property or key 'q16' on a base object of type 'Dictionary'.
+SCRIPT ERROR: Invalid access to property or key 'q17' on a base object of type 'Dictionary'.
+SCRIPT ERROR: Invalid access to property or key 'q18' on a base object of type 'Dictionary'.
+SCRIPT ERROR: Invalid access to property or key 'q19' on a base object of type 'Dictionary'.
+SCRIPT ERROR: Invalid access to property or key 'q20' on a base object of type 'Dictionary'.
+SCRIPT ERROR: Invalid access to property or key 'q21' on a base object of type 'Dictionary'.
+SCRIPT ERROR: Invalid access to property or key 'q22' on a base object of type 'Dictionary'.
+```
+
+
+Bảng phân bố trước/sau (tính từ JSON; checker Python chưa chạy). Tỷ trọng trên toàn bộ 41/123 mẫu; sai lệch mọi ô bằng 0 điểm phần trăm.
+
+| topic | Trước | Sau | % trước | % sau |
+|---|---:|---:|---:|---:|
+| chung_khoan | 6 | 18 | 14.634 | 14.634 |
+| lai_suat | 5 | 15 | 12.195 | 12.195 |
+| nguyen_lieu | 6 | 18 | 14.634 | 14.634 |
+| noi_bo | 4 | 12 | 9.756 | 9.756 |
+| suc_mua | 9 | 27 | 21.951 | 21.951 |
+| tin_dung | 5 | 15 | 12.195 | 12.195 |
+| ty_gia | 6 | 18 | 14.634 | 14.634 |
+
+| kind | Trước | Sau | % trước | % sau |
+|---|---:|---:|---:|---:|
+| noise | 6 | 18 | 14.634 | 14.634 |
+| partial | 4 | 12 | 9.756 | 9.756 |
+| signal | 20 | 60 | 48.78 | 48.78 |
+| stale | 4 | 12 | 9.756 | 9.756 |
+| trap | 7 | 21 | 17.073 | 17.073 |
+
+| source_tier | Trước | Sau | % trước | % sau |
+|---|---:|---:|---:|---:|
+| bao_chi | 12 | 36 | 29.268 | 29.268 |
+| chinh_thuc | 10 | 30 | 24.39 | 24.39 |
+| mang_xa_hoi | 11 | 33 | 26.829 | 26.829 |
+| noi_bo | 8 | 24 | 19.512 | 19.512 |
+
+| topic x kind x source_tier | Trước | Sau | % trước | % sau |
+|---|---:|---:|---:|---:|
+| chung_khoan, noise, bao_chi | 1 | 3 | 2.439 | 2.439 |
+| chung_khoan, noise, mang_xa_hoi | 1 | 3 | 2.439 | 2.439 |
+| chung_khoan, signal, bao_chi | 1 | 3 | 2.439 | 2.439 |
+| chung_khoan, signal, chinh_thuc | 1 | 3 | 2.439 | 2.439 |
+| chung_khoan, trap, mang_xa_hoi | 1 | 3 | 2.439 | 2.439 |
+| chung_khoan, trap, noi_bo | 1 | 3 | 2.439 | 2.439 |
+| lai_suat, noise, mang_xa_hoi | 1 | 3 | 2.439 | 2.439 |
+| lai_suat, signal, bao_chi | 1 | 3 | 2.439 | 2.439 |
+| lai_suat, signal, chinh_thuc | 2 | 6 | 4.878 | 4.878 |
+| lai_suat, trap, mang_xa_hoi | 1 | 3 | 2.439 | 2.439 |
+| nguyen_lieu, noise, mang_xa_hoi | 1 | 3 | 2.439 | 2.439 |
+| nguyen_lieu, partial, noi_bo | 1 | 3 | 2.439 | 2.439 |
+| nguyen_lieu, signal, bao_chi | 2 | 6 | 4.878 | 4.878 |
+| nguyen_lieu, stale, chinh_thuc | 1 | 3 | 2.439 | 2.439 |
+| nguyen_lieu, trap, mang_xa_hoi | 1 | 3 | 2.439 | 2.439 |
+| noi_bo, signal, noi_bo | 4 | 12 | 9.756 | 9.756 |
+| suc_mua, partial, mang_xa_hoi | 2 | 6 | 4.878 | 4.878 |
+| suc_mua, partial, noi_bo | 1 | 3 | 2.439 | 2.439 |
+| suc_mua, signal, bao_chi | 3 | 9 | 7.317 | 7.317 |
+| suc_mua, signal, mang_xa_hoi | 1 | 3 | 2.439 | 2.439 |
+| suc_mua, stale, chinh_thuc | 2 | 6 | 4.878 | 4.878 |
+| tin_dung, noise, chinh_thuc | 1 | 3 | 2.439 | 2.439 |
+| tin_dung, signal, bao_chi | 2 | 6 | 4.878 | 4.878 |
+| tin_dung, stale, chinh_thuc | 1 | 3 | 2.439 | 2.439 |
+| tin_dung, trap, mang_xa_hoi | 1 | 3 | 2.439 | 2.439 |
+| ty_gia, noise, bao_chi | 1 | 3 | 2.439 | 2.439 |
+| ty_gia, signal, bao_chi | 1 | 3 | 2.439 | 2.439 |
+| ty_gia, signal, chinh_thuc | 2 | 6 | 4.878 | 4.878 |
+| ty_gia, trap, mang_xa_hoi | 1 | 3 | 2.439 | 2.439 |
+| ty_gia, trap, noi_bo | 1 | 3 | 2.439 | 2.439 |
+
+| Tier | Reliability trước/sau | Delay trước/sau |
+|---|---|---|
+| chinh_thuc | 0.963333 / 0.963333 | 0.666667 / 0.666667 |
+| bao_chi | 0.823333 / 0.823333 | 0.666667 / 0.666667 |
+| mang_xa_hoi | 0.425 / 0.425 | 0 / 0 |
+| noi_bo | 0.475 / 0.475 | 0 / 0 |

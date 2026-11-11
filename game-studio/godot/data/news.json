@@ -1,814 +1,2300 @@
 {
- "version": 1,
- "note": "All sources, companies, tickers and figures in this file are FICTIONAL. Not real market data, not investment advice.",
- "tiers": {
-  "chinh_thuc": "Official source: trustworthy, often late",
-  "bao_chi": "Press: fairly reliable, rarely wrong",
-  "mang_xa_hoi": "Social media: fast but noisy",
-  "noi_bo": "Insider tips: anonymous ones are often traps, colleagues are moderately reliable"
- },
- "sources": [
-  {
-   "id": "cuc_thong_ke",
-   "name": "Tan Lac Statistics Office",
-   "tier": "chinh_thuc",
-   "reliability": 0.95,
-   "delay_days": 2
+  "version": 1,
+  "note": "All sources, companies, tickers and figures in this file are FICTIONAL. Not real market data, not investment advice.",
+  "tiers": {
+    "chinh_thuc": "Official source: trustworthy, often late",
+    "bao_chi": "Press: fairly reliable, rarely wrong",
+    "mang_xa_hoi": "Social media: fast but noisy",
+    "noi_bo": "Insider tips: anonymous ones are often traps, colleagues are moderately reliable"
   },
-  {
-   "id": "ngan_hang_tw",
-   "name": "Tan Lac Central Bank",
-   "tier": "chinh_thuc",
-   "reliability": 0.97,
-   "delay_days": 0
+  "sources": [
+    {
+      "id": "cuc_thong_ke",
+      "name": "Tan Lac Statistics Office",
+      "tier": "chinh_thuc",
+      "reliability": 0.95,
+      "delay_days": 2
+    },
+    {
+      "id": "ngan_hang_tw",
+      "name": "Tan Lac Central Bank",
+      "tier": "chinh_thuc",
+      "reliability": 0.97,
+      "delay_days": 0
+    },
+    {
+      "id": "so_giao_dich",
+      "name": "Tan Lac Exchange",
+      "tier": "chinh_thuc",
+      "reliability": 0.97,
+      "delay_days": 0
+    },
+    {
+      "id": "nhat_bao",
+      "name": "Tan Lac Daily",
+      "tier": "bao_chi",
+      "reliability": 0.82,
+      "delay_days": 1
+    },
+    {
+      "id": "ban_tin_sang",
+      "name": "Morning Finance Bulletin",
+      "tier": "bao_chi",
+      "reliability": 0.8,
+      "delay_days": 0
+    },
+    {
+      "id": "dai_duong",
+      "name": "Ocean News Agency",
+      "tier": "bao_chi",
+      "reliability": 0.85,
+      "delay_days": 1
+    },
+    {
+      "id": "dien_dan_an_danh",
+      "name": "Anonymous Investors Forum",
+      "tier": "mang_xa_hoi",
+      "reliability": 0.4,
+      "delay_days": 0
+    },
+    {
+      "id": "tam_chuyen",
+      "name": "Gossip Net",
+      "tier": "mang_xa_hoi",
+      "reliability": 0.45,
+      "delay_days": 0
+    },
+    {
+      "id": "noi_bo_nac_danh",
+      "name": "Insider tip (anonymous)",
+      "tier": "noi_bo",
+      "reliability": 0.35,
+      "delay_days": 0
+    },
+    {
+      "id": "dong_nghiep",
+      "name": "Colleague at the company",
+      "tier": "noi_bo",
+      "reliability": 0.6,
+      "delay_days": 0
+    },
+    {
+      "name": "Tan Lac Trade Register",
+      "id": "trade_register",
+      "reliability": 0.95,
+      "delay_days": 2,
+      "tier": "chinh_thuc"
+    },
+    {
+      "name": "Tan Lac Settlement Office",
+      "id": "settlement_office",
+      "reliability": 0.97,
+      "delay_days": 0,
+      "tier": "chinh_thuc"
+    },
+    {
+      "name": "Tan Lac Market Registry",
+      "id": "market_registry",
+      "reliability": 0.97,
+      "delay_days": 0,
+      "tier": "chinh_thuc"
+    },
+    {
+      "name": "Harbor Ledger",
+      "id": "harbor_ledger",
+      "reliability": 0.82,
+      "delay_days": 1,
+      "tier": "bao_chi"
+    },
+    {
+      "name": "Courtyard Dispatch",
+      "id": "courtyard_dispatch",
+      "reliability": 0.8,
+      "delay_days": 0,
+      "tier": "bao_chi"
+    },
+    {
+      "name": "Canal Review",
+      "id": "canal_review",
+      "reliability": 0.85,
+      "delay_days": 1,
+      "tier": "bao_chi"
+    }
+  ],
+  "schema_note": "direction = direction of change of the quantity named in the headline. state_direction = direction of the matching hidden state variable (lai_suat up = loans cost more; ty_gia up = pressure on importers, i.e. the lac weakens; nguyen_lieu up = costlier inputs; suc_mua up = better demand; chung_khoan up = index rises; tin_dung up = easier borrowing, down = harder). link = state:<variable> or event:<event id> or null. exaggerates = the item overstates, so it can be a trap even when the direction is right.",
+  "kinds": {
+    "signal": "reflects the true state or a real shock",
+    "trap": "false or exaggerated, easy to misread",
+    "partial": "partly true, magnitude missing or wrong",
+    "stale": "true but out of date",
+    "noise": "unrelated to the company"
   },
-  {
-   "id": "so_giao_dich",
-   "name": "Tan Lac Exchange",
-   "tier": "chinh_thuc",
-   "reliability": 0.97,
-   "delay_days": 0
-  },
-  {
-   "id": "nhat_bao",
-   "name": "Tan Lac Daily",
-   "tier": "bao_chi",
-   "reliability": 0.82,
-   "delay_days": 1
-  },
-  {
-   "id": "ban_tin_sang",
-   "name": "Morning Finance Bulletin",
-   "tier": "bao_chi",
-   "reliability": 0.8,
-   "delay_days": 0
-  },
-  {
-   "id": "dai_duong",
-   "name": "Ocean News Agency",
-   "tier": "bao_chi",
-   "reliability": 0.85,
-   "delay_days": 1
-  },
-  {
-   "id": "dien_dan_an_danh",
-   "name": "Anonymous Investors Forum",
-   "tier": "mang_xa_hoi",
-   "reliability": 0.4,
-   "delay_days": 0
-  },
-  {
-   "id": "tam_chuyen",
-   "name": "Gossip Net",
-   "tier": "mang_xa_hoi",
-   "reliability": 0.45,
-   "delay_days": 0
-  },
-  {
-   "id": "noi_bo_nac_danh",
-   "name": "Insider tip (anonymous)",
-   "tier": "noi_bo",
-   "reliability": 0.35,
-   "delay_days": 0
-  },
-  {
-   "id": "dong_nghiep",
-   "name": "Colleague at the company",
-   "tier": "noi_bo",
-   "reliability": 0.6,
-   "delay_days": 0
-  }
- ],
- "schema_note": "direction = direction of change of the quantity named in the headline. state_direction = direction of the matching hidden state variable (lai_suat up = loans cost more; ty_gia up = pressure on importers, i.e. the lac weakens; nguyen_lieu up = costlier inputs; suc_mua up = better demand; chung_khoan up = index rises; tin_dung up = easier borrowing, down = harder). link = state:<variable> or event:<event id> or null. exaggerates = the item overstates, so it can be a trap even when the direction is right.",
- "kinds": {
-  "signal": "reflects the true state or a real shock",
-  "trap": "false or exaggerated, easy to misread",
-  "partial": "partly true, magnitude missing or wrong",
-  "stale": "true but out of date",
-  "noise": "unrelated to the company"
- },
- "news": [
-  {
-   "id": "lai_suat_nhtw_tang",
-   "topic": "lai_suat",
-   "source_id": "ngan_hang_tw",
-   "source_tier": "chinh_thuc",
-   "headline": "Tan Lac Central Bank raises its policy rate by {pct} points",
-   "direction": "tang",
-   "kind": "signal",
-   "truth": "dung",
-   "link": "state:lai_suat",
-   "verify_with": [
-    "doi_chieu_nguon",
-    "truy_van_lich_su"
-   ],
-   "state_direction": "tang",
-   "exaggerates": false,
-   "magnitude_pct": {
-    "low": 1,
-    "mid": 3,
-    "high": 6
-   }
-  },
-  {
-   "id": "lai_suat_du_bao_tang",
-   "topic": "lai_suat",
-   "source_id": "ban_tin_sang",
-   "source_tier": "bao_chi",
-   "headline": "Analysts: business loan rates may rise next week",
-   "direction": "tang",
-   "kind": "signal",
-   "truth": "dung",
-   "link": "state:lai_suat",
-   "verify_with": [
-    "doi_chieu_nguon",
-    "truy_van_lich_su"
-   ],
-   "state_direction": "tang",
-   "exaggerates": false
-  },
-  {
-   "id": "lai_suat_don_tang_manh",
-   "topic": "lai_suat",
-   "source_id": "tam_chuyen",
-   "source_tier": "mang_xa_hoi",
-   "headline": "Heard the bank is about to hike rates like crazy. Repay your loans now!",
-   "direction": "tang",
-   "kind": "trap",
-   "truth": "sai",
-   "link": "state:lai_suat",
-   "verify_with": [
-    "doi_chieu_nguon",
-    "truy_van_lich_su"
-   ],
-   "state_direction": "tang",
-   "exaggerates": true
-  },
-  {
-   "id": "lai_suat_nhtw_giu",
-   "topic": "lai_suat",
-   "source_id": "ngan_hang_tw",
-   "source_tier": "chinh_thuc",
-   "headline": "Central Bank holds its policy rate steady",
-   "direction": "ngang",
-   "kind": "signal",
-   "truth": "dung",
-   "link": "state:lai_suat",
-   "verify_with": [
-    "doi_chieu_nguon",
-    "truy_van_lich_su"
-   ],
-   "state_direction": "ngang",
-   "exaggerates": false
-  },
-  {
-   "id": "lai_suat_hai_chuyen_gia",
-   "topic": "lai_suat",
-   "source_id": "dien_dan_an_danh",
-   "source_tier": "mang_xa_hoi",
-   "headline": "Expert A says rates will fall, expert B says they will rise",
-   "direction": "ngang",
-   "kind": "noise",
-   "truth": "khong_lien_quan",
-   "link": null,
-   "verify_with": [
-    "doi_chieu_nguon",
-    "truy_van_lich_su"
-   ],
-   "state_direction": null,
-   "exaggerates": false
-  },
-  {
-   "id": "ty_gia_mat_gia",
-   "topic": "ty_gia",
-   "source_id": "so_giao_dich",
-   "source_tier": "chinh_thuc",
-   "headline": "The lac loses {pct}% against the world dollar in today's session",
-   "direction": "giam",
-   "kind": "signal",
-   "truth": "dung",
-   "link": "state:ty_gia",
-   "verify_with": [
-    "doi_chieu_nguon",
-    "truy_van_lich_su"
-   ],
-   "state_direction": "tang",
-   "exaggerates": false,
-   "magnitude_pct": {
-    "low": 1,
-    "mid": 2,
-    "high": 5
-   }
-  },
-  {
-   "id": "ty_gia_nhap_khau_dat",
-   "topic": "ty_gia",
-   "source_id": "nhat_bao",
-   "source_tier": "bao_chi",
-   "headline": "Imports get pricier as the exchange rate climbs; distributors feel the squeeze",
-   "direction": "tang",
-   "kind": "signal",
-   "truth": "dung",
-   "link": "state:ty_gia",
-   "verify_with": [
-    "doi_chieu_nguon",
-    "truy_van_lich_su"
-   ],
-   "state_direction": "tang",
-   "exaggerates": false
-  },
-  {
-   "id": "ty_gia_don_sup",
-   "topic": "ty_gia",
-   "source_id": "tam_chuyen",
-   "source_tier": "mang_xa_hoi",
-   "headline": "The lac is about to collapse. Swap everything into foreign cash!",
-   "direction": "giam",
-   "kind": "trap",
-   "truth": "sai",
-   "link": "state:ty_gia",
-   "verify_with": [
-    "doi_chieu_nguon",
-    "truy_van_lich_su"
-   ],
-   "state_direction": "tang",
-   "exaggerates": true
-  },
-  {
-   "id": "ty_gia_noi_bo_can_thiep",
-   "topic": "ty_gia",
-   "source_id": "noi_bo_nac_danh",
-   "source_tier": "noi_bo",
-   "headline": "Bank insider: heavy intervention this afternoon to ease exchange-rate pressure",
-   "direction": "giam",
-   "kind": "trap",
-   "truth": "sai",
-   "link": "state:ty_gia",
-   "verify_with": [
-    "doi_chieu_nguon",
-    "truy_van_lich_su"
-   ],
-   "state_direction": "giam",
-   "exaggerates": false
-  },
-  {
-   "id": "ty_gia_on_dinh",
-   "topic": "ty_gia",
-   "source_id": "ngan_hang_tw",
-   "source_tier": "chinh_thuc",
-   "headline": "Exchange rate steady within the allowed band",
-   "direction": "ngang",
-   "kind": "signal",
-   "truth": "dung",
-   "link": "state:ty_gia",
-   "verify_with": [
-    "doi_chieu_nguon",
-    "truy_van_lich_su"
-   ],
-   "state_direction": "ngang",
-   "exaggerates": false
-  },
-  {
-   "id": "ty_gia_hoi_nghi",
-   "topic": "ty_gia",
-   "source_id": "dai_duong",
-   "source_tier": "bao_chi",
-   "headline": "Regional economic summit discusses trade cooperation",
-   "direction": "ngang",
-   "kind": "noise",
-   "truth": "khong_lien_quan",
-   "link": null,
-   "verify_with": [
-    "doi_chieu_nguon",
-    "truy_van_lich_su"
-   ],
-   "state_direction": null,
-   "exaggerates": false
-  },
-  {
-   "id": "nguyen_lieu_chi_so_tang",
-   "topic": "nguyen_lieu",
-   "source_id": "cuc_thong_ke",
-   "source_tier": "chinh_thuc",
-   "headline": "Last month's imported materials price index rose {pct}%",
-   "direction": "tang",
-   "kind": "stale",
-   "truth": "cu",
-   "link": "state:nguyen_lieu",
-   "verify_with": [
-    "truy_van_lich_su",
-    "kiem_dinh_gia_thuyet"
-   ],
-   "state_direction": "tang",
-   "exaggerates": false,
-   "magnitude_pct": {
-    "low": 1,
-    "mid": 3,
-    "high": 6
-   }
-  },
-  {
-   "id": "nguyen_lieu_nhua_thep_tang",
-   "topic": "nguyen_lieu",
-   "source_id": "ban_tin_sang",
-   "source_tier": "bao_chi",
-   "headline": "Plastic and steel prices up {pct}% as supply tightens",
-   "direction": "tang",
-   "kind": "signal",
-   "truth": "dung",
-   "link": "state:nguyen_lieu",
-   "verify_with": [
-    "truy_van_lich_su",
-    "kiem_dinh_gia_thuyet"
-   ],
-   "state_direction": "tang",
-   "exaggerates": false,
-   "magnitude_pct": {
-    "low": 1,
-    "mid": 3,
-    "high": 6
-   }
-  },
-  {
-   "id": "nguyen_lieu_don_gap_doi",
-   "topic": "nguyen_lieu",
-   "source_id": "dien_dan_an_danh",
-   "source_tier": "mang_xa_hoi",
-   "headline": "Plastic prices doubled! Stock up now before it runs out",
-   "direction": "tang",
-   "kind": "trap",
-   "truth": "sai",
-   "link": "state:nguyen_lieu",
-   "verify_with": [
-    "truy_van_lich_su",
-    "kiem_dinh_gia_thuyet"
-   ],
-   "state_direction": "tang",
-   "exaggerates": true
-  },
-  {
-   "id": "nguyen_lieu_ha_nhiet",
-   "topic": "nguyen_lieu",
-   "source_id": "dai_duong",
-   "source_tier": "bao_chi",
-   "headline": "Materials prices cool off after two weeks of steady gains",
-   "direction": "giam",
-   "kind": "signal",
-   "truth": "dung",
-   "link": "state:nguyen_lieu",
-   "verify_with": [
-    "truy_van_lich_su",
-    "kiem_dinh_gia_thuyet"
-   ],
-   "state_direction": "giam",
-   "exaggerates": false
-  },
-  {
-   "id": "nguyen_lieu_nha_cung_cap",
-   "topic": "nguyen_lieu",
-   "source_id": "noi_bo_nac_danh",
-   "source_tier": "noi_bo",
-   "headline": "Suppliers quietly warn the next shipment will cost more",
-   "direction": "tang",
-   "kind": "partial",
-   "truth": "mot_phan",
-   "link": "state:nguyen_lieu",
-   "verify_with": [
-    "truy_van_lich_su",
-    "kiem_dinh_gia_thuyet"
-   ],
-   "state_direction": "tang",
-   "exaggerates": false
-  },
-  {
-   "id": "nguyen_lieu_cho_dia_phuong",
-   "topic": "nguyen_lieu",
-   "source_id": "tam_chuyen",
-   "source_tier": "mang_xa_hoi",
-   "headline": "Coffee prices tick up slightly at one local market",
-   "direction": "tang",
-   "kind": "noise",
-   "truth": "khong_lien_quan",
-   "link": null,
-   "verify_with": [
-    "truy_van_lich_su",
-    "kiem_dinh_gia_thuyet"
-   ],
-   "state_direction": null,
-   "exaggerates": false
-  },
-  {
-   "id": "suc_mua_ban_le_giam",
-   "topic": "suc_mua",
-   "source_id": "cuc_thong_ke",
-   "source_tier": "chinh_thuc",
-   "headline": "Last quarter's retail sales fell {pct}% year on year",
-   "direction": "giam",
-   "kind": "stale",
-   "truth": "cu",
-   "link": "state:suc_mua",
-   "verify_with": [
-    "truy_van_lich_su",
-    "kiem_dinh_gia_thuyet"
-   ],
-   "state_direction": "giam",
-   "exaggerates": false,
-   "magnitude_pct": {
-    "low": 1,
-    "mid": 3,
-    "high": 6
-   }
-  },
-  {
-   "id": "suc_mua_thiet_yeu",
-   "topic": "suc_mua",
-   "source_id": "nhat_bao",
-   "source_tier": "bao_chi",
-   "headline": "Shoppers shift to essentials; household goods struggle to draw crowds",
-   "direction": "giam",
-   "kind": "signal",
-   "truth": "dung",
-   "link": "event:trend_shift",
-   "verify_with": [
-    "truy_van_lich_su",
-    "kiem_dinh_gia_thuyet"
-   ],
-   "state_direction": null,
-   "exaggerates": false
-  },
-  {
-   "id": "suc_mua_pho_vang",
-   "topic": "suc_mua",
-   "source_id": "tam_chuyen",
-   "source_tier": "mang_xa_hoi",
-   "headline": "Whole street empty, household goods gathering dust",
-   "direction": "giam",
-   "kind": "partial",
-   "truth": "mot_phan",
-   "link": "state:suc_mua",
-   "verify_with": [
-    "truy_van_lich_su",
-    "kiem_dinh_gia_thuyet"
-   ],
-   "state_direction": "giam",
-   "exaggerates": false
-  },
-  {
-   "id": "suc_mua_mua_le",
-   "topic": "suc_mua",
-   "source_id": "dai_duong",
-   "source_tier": "bao_chi",
-   "headline": "Holiday season lifts spending slightly in big cities",
-   "direction": "tang",
-   "kind": "signal",
-   "truth": "dung",
-   "link": "state:suc_mua",
-   "verify_with": [
-    "truy_van_lich_su",
-    "kiem_dinh_gia_thuyet"
-   ],
-   "state_direction": "tang",
-   "exaggerates": false
-  },
-  {
-   "id": "suc_mua_doi_thu_giam_gia",
-   "topic": "suc_mua",
-   "source_id": "ban_tin_sang",
-   "source_tier": "bao_chi",
-   "headline": "Major rival launches a deep year-end discount",
-   "direction": "giam",
-   "kind": "signal",
-   "truth": "dung",
-   "link": "event:competitor_discount",
-   "verify_with": [
-    "truy_van_lich_su",
-    "kiem_dinh_gia_thuyet"
-   ],
-   "state_direction": null,
-   "exaggerates": false
-  },
-  {
-   "id": "suc_mua_giam_gia_quang_cao",
-   "topic": "suc_mua",
-   "source_id": "tam_chuyen",
-   "source_tier": "mang_xa_hoi",
-   "headline": "Rival's 70% discount? Turns out it was just a publicity stunt",
-   "direction": "ngang",
-   "kind": "partial",
-   "truth": "mot_phan",
-   "link": "event:competitor_discount",
-   "verify_with": [
-    "truy_van_lich_su",
-    "kiem_dinh_gia_thuyet"
-   ],
-   "state_direction": null,
-   "exaggerates": false
-  },
-  {
-   "id": "suc_mua_khach_phan_nan_gia",
-   "topic": "suc_mua",
-   "source_id": "tam_chuyen",
-   "source_tier": "mang_xa_hoi",
-   "headline": "Customers complain household goods prices rose too much",
-   "direction": "giam",
-   "kind": "signal",
-   "truth": "dung",
-   "link": "event:price_fatigue",
-   "verify_with": [
-    "truy_van_lich_su",
-    "kiem_dinh_gia_thuyet"
-   ],
-   "state_direction": null,
-   "exaggerates": false
-  },
-  {
-   "id": "suc_mua_dong_nghiep_dong",
-   "topic": "suc_mua",
-   "source_id": "dong_nghiep",
-   "source_tier": "noi_bo",
-   "headline": "Sales colleague says customers are buying more than any year",
-   "direction": "tang",
-   "kind": "partial",
-   "truth": "mot_phan",
-   "link": "state:suc_mua",
-   "verify_with": [
-    "truy_van_lich_su",
-    "kiem_dinh_gia_thuyet"
-   ],
-   "state_direction": "tang",
-   "exaggerates": false
-  },
-  {
-   "id": "suc_mua_chi_so_niem_tin",
-   "topic": "suc_mua",
-   "source_id": "cuc_thong_ke",
-   "source_tier": "chinh_thuc",
-   "headline": "Last quarter's consumer confidence index has just been updated",
-   "direction": "ngang",
-   "kind": "stale",
-   "truth": "cu",
-   "link": "state:suc_mua",
-   "verify_with": [
-    "truy_van_lich_su",
-    "kiem_dinh_gia_thuyet"
-   ],
-   "state_direction": "ngang",
-   "exaggerates": false
-  },
-  {
-   "id": "chung_khoan_tlx_giam",
-   "topic": "chung_khoan",
-   "source_id": "so_giao_dich",
-   "source_tier": "chinh_thuc",
-   "headline": "TLX-30 index closes down {pct}%",
-   "direction": "giam",
-   "kind": "signal",
-   "truth": "dung",
-   "link": "state:chung_khoan",
-   "verify_with": [
-    "doi_chieu_nguon",
-    "truy_van_lich_su"
-   ],
-   "state_direction": "giam",
-   "exaggerates": false,
-   "magnitude_pct": {
-    "low": 1,
-    "mid": 3,
-    "high": 6
-   }
-  },
-  {
-   "id": "chung_khoan_phan_phoi_ban_thao",
-   "topic": "chung_khoan",
-   "source_id": "ban_tin_sang",
-   "source_tier": "bao_chi",
-   "headline": "Distribution stocks sold off on capital cost worries",
-   "direction": "giam",
-   "kind": "signal",
-   "truth": "dung",
-   "link": "state:chung_khoan",
-   "verify_with": [
-    "doi_chieu_nguon",
-    "truy_van_lich_su"
-   ],
-   "state_direction": "giam",
-   "exaggerates": false
-  },
-  {
-   "id": "chung_khoan_don_bay_50",
-   "topic": "chung_khoan",
-   "source_id": "dien_dan_an_danh",
-   "source_tier": "mang_xa_hoi",
-   "headline": "LCD stock about to jump 50%, buy now or miss out!",
-   "direction": "tang",
-   "kind": "trap",
-   "truth": "sai",
-   "link": "state:chung_khoan",
-   "verify_with": [
-    "doi_chieu_nguon",
-    "truy_van_lich_su"
-   ],
-   "state_direction": "tang",
-   "exaggerates": true
-  },
-  {
-   "id": "chung_khoan_quy_gom",
-   "topic": "chung_khoan",
-   "source_id": "noi_bo_nac_danh",
-   "source_tier": "noi_bo",
-   "headline": "A big fund is quietly buying distribution stocks",
-   "direction": "tang",
-   "kind": "trap",
-   "truth": "sai",
-   "link": "state:chung_khoan",
-   "verify_with": [
-    "doi_chieu_nguon",
-    "truy_van_lich_su"
-   ],
-   "state_direction": "tang",
-   "exaggerates": false
-  },
-  {
-   "id": "chung_khoan_cong_nghe",
-   "topic": "chung_khoan",
-   "source_id": "dai_duong",
-   "source_tier": "bao_chi",
-   "headline": "An unrelated tech company unveils a new product",
-   "direction": "tang",
-   "kind": "noise",
-   "truth": "khong_lien_quan",
-   "link": null,
-   "verify_with": [
-    "doi_chieu_nguon",
-    "truy_van_lich_su"
-   ],
-   "state_direction": null,
-   "exaggerates": false
-  },
-  {
-   "id": "chung_khoan_so_may_man",
-   "topic": "chung_khoan",
-   "source_id": "tam_chuyen",
-   "source_tier": "mang_xa_hoi",
-   "headline": "Guess the lucky number for tomorrow's index",
-   "direction": "ngang",
-   "kind": "noise",
-   "truth": "khong_lien_quan",
-   "link": null,
-   "verify_with": [
-    "doi_chieu_nguon",
-    "truy_van_lich_su"
-   ],
-   "state_direction": null,
-   "exaggerates": false
-  },
-  {
-   "id": "tin_dung_siet_cho_vay",
-   "topic": "tin_dung",
-   "source_id": "nhat_bao",
-   "source_tier": "bao_chi",
-   "headline": "Banks tighten lending terms for small and mid-sized businesses",
-   "direction": "giam",
-   "kind": "signal",
-   "truth": "dung",
-   "link": "state:tin_dung",
-   "verify_with": [
-    "doi_chieu_nguon"
-   ],
-   "state_direction": "giam",
-   "exaggerates": false
-  },
-  {
-   "id": "tin_dung_no_xau",
-   "topic": "tin_dung",
-   "source_id": "cuc_thong_ke",
-   "source_tier": "chinh_thuc",
-   "headline": "Banking sector bad debt rose slightly last quarter",
-   "direction": "tang",
-   "kind": "stale",
-   "truth": "cu",
-   "link": "state:tin_dung",
-   "verify_with": [
-    "doi_chieu_nguon"
-   ],
-   "state_direction": "giam",
-   "exaggerates": false
-  },
-  {
-   "id": "tin_dung_don_pha_san",
-   "topic": "tin_dung",
-   "source_id": "tam_chuyen",
-   "source_tier": "mang_xa_hoi",
-   "headline": "A bank is about to go bust, withdraw your money fast!",
-   "direction": "giam",
-   "kind": "trap",
-   "truth": "sai",
-   "link": "state:tin_dung",
-   "verify_with": [
-    "doi_chieu_nguon"
-   ],
-   "state_direction": "giam",
-   "exaggerates": true
-  },
-  {
-   "id": "tin_dung_bao_tri_thanh_toan",
-   "topic": "tin_dung",
-   "source_id": "ban_tin_sang",
-   "source_tier": "bao_chi",
-   "headline": "Payment partner doing system maintenance, transactions may be slow",
-   "direction": "ngang",
-   "kind": "signal",
-   "truth": "dung",
-   "link": "event:checkout_outage",
-   "verify_with": [
-    "doi_chieu_nguon"
-   ],
-   "state_direction": null,
-   "exaggerates": false
-  },
-  {
-   "id": "tin_dung_thong_bao_bao_tri",
-   "topic": "tin_dung",
-   "source_id": "cuc_thong_ke",
-   "source_tier": "chinh_thuc",
-   "headline": "Regulator's web portal announces scheduled maintenance",
-   "direction": "ngang",
-   "kind": "noise",
-   "truth": "khong_lien_quan",
-   "link": null,
-   "verify_with": [
-    "doi_chieu_nguon"
-   ],
-   "state_direction": null,
-   "exaggerates": false
-  },
-  {
-   "id": "noi_bo_cong_dat_hang_loi",
-   "topic": "noi_bo",
-   "source_id": "dong_nghiep",
-   "source_tier": "noi_bo",
-   "headline": "Dealers complain the ordering portal errors out on first open",
-   "direction": "giam",
-   "kind": "signal",
-   "truth": "dung",
-   "link": "event:app_bug",
-   "verify_with": [
-    "lam_sach_du_lieu",
-    "truy_van_lich_su"
-   ],
-   "state_direction": null,
-   "exaggerates": false
-  },
-  {
-   "id": "noi_bo_kho_cham",
-   "topic": "noi_bo",
-   "source_id": "dong_nghiep",
-   "source_tier": "noi_bo",
-   "headline": "Warehouse reports the system lags at peak hours",
-   "direction": "giam",
-   "kind": "signal",
-   "truth": "dung",
-   "link": "event:server_outage",
-   "verify_with": [
-    "lam_sach_du_lieu",
-    "truy_van_lich_su"
-   ],
-   "state_direction": null,
-   "exaggerates": false
-  },
-  {
-   "id": "noi_bo_bang_so_trung",
-   "topic": "noi_bo",
-   "source_id": "dong_nghiep",
-   "source_tier": "noi_bo",
-   "headline": "The weekly report table has many duplicate rows",
-   "direction": "giam",
-   "kind": "signal",
-   "truth": "dung",
-   "link": "event:logging_error",
-   "verify_with": [
-    "lam_sach_du_lieu",
-    "truy_van_lich_su"
-   ],
-   "state_direction": null,
-   "exaggerates": false
-  },
-  {
-   "id": "noi_bo_quang_cao_it_don",
-   "topic": "noi_bo",
-   "source_id": "dong_nghiep",
-   "source_tier": "noi_bo",
-   "headline": "New ad campaign brings lots of views but few orders",
-   "direction": "giam",
-   "kind": "signal",
-   "truth": "dung",
-   "link": "event:bad_traffic",
-   "verify_with": [
-    "lam_sach_du_lieu",
-    "truy_van_lich_su"
-   ],
-   "state_direction": null,
-   "exaggerates": false
-  }
- ]
+  "news": [
+    {
+      "id": "lai_suat_nhtw_tang",
+      "topic": "lai_suat",
+      "source_id": "ngan_hang_tw",
+      "source_tier": "chinh_thuc",
+      "headline": "Tan Lac Central Bank raises its policy rate by {pct} points",
+      "direction": "tang",
+      "kind": "signal",
+      "truth": "dung",
+      "link": "state:lai_suat",
+      "verify_with": [
+        "doi_chieu_nguon",
+        "truy_van_lich_su"
+      ],
+      "state_direction": "tang",
+      "exaggerates": false,
+      "magnitude_pct": {
+        "low": 1,
+        "mid": 3,
+        "high": 6
+      }
+    },
+    {
+      "id": "lai_suat_du_bao_tang",
+      "topic": "lai_suat",
+      "source_id": "ban_tin_sang",
+      "source_tier": "bao_chi",
+      "headline": "Analysts: business loan rates may rise next week",
+      "direction": "tang",
+      "kind": "signal",
+      "truth": "dung",
+      "link": "state:lai_suat",
+      "verify_with": [
+        "doi_chieu_nguon",
+        "truy_van_lich_su"
+      ],
+      "state_direction": "tang",
+      "exaggerates": false
+    },
+    {
+      "id": "lai_suat_don_tang_manh",
+      "topic": "lai_suat",
+      "source_id": "tam_chuyen",
+      "source_tier": "mang_xa_hoi",
+      "headline": "Heard the bank is about to hike rates like crazy. Repay your loans now!",
+      "direction": "tang",
+      "kind": "trap",
+      "truth": "sai",
+      "link": "state:lai_suat",
+      "verify_with": [
+        "doi_chieu_nguon",
+        "truy_van_lich_su"
+      ],
+      "state_direction": "tang",
+      "exaggerates": true
+    },
+    {
+      "id": "lai_suat_nhtw_giu",
+      "topic": "lai_suat",
+      "source_id": "ngan_hang_tw",
+      "source_tier": "chinh_thuc",
+      "headline": "Central Bank holds its policy rate steady",
+      "direction": "ngang",
+      "kind": "signal",
+      "truth": "dung",
+      "link": "state:lai_suat",
+      "verify_with": [
+        "doi_chieu_nguon",
+        "truy_van_lich_su"
+      ],
+      "state_direction": "ngang",
+      "exaggerates": false
+    },
+    {
+      "id": "lai_suat_hai_chuyen_gia",
+      "topic": "lai_suat",
+      "source_id": "dien_dan_an_danh",
+      "source_tier": "mang_xa_hoi",
+      "headline": "Expert A says rates will fall, expert B says they will rise",
+      "direction": "ngang",
+      "kind": "noise",
+      "truth": "khong_lien_quan",
+      "link": null,
+      "verify_with": [
+        "doi_chieu_nguon",
+        "truy_van_lich_su"
+      ],
+      "state_direction": null,
+      "exaggerates": false
+    },
+    {
+      "id": "ty_gia_mat_gia",
+      "topic": "ty_gia",
+      "source_id": "so_giao_dich",
+      "source_tier": "chinh_thuc",
+      "headline": "The lac loses {pct}% against the world dollar in today's session",
+      "direction": "giam",
+      "kind": "signal",
+      "truth": "dung",
+      "link": "state:ty_gia",
+      "verify_with": [
+        "doi_chieu_nguon",
+        "truy_van_lich_su"
+      ],
+      "state_direction": "tang",
+      "exaggerates": false,
+      "magnitude_pct": {
+        "low": 1,
+        "mid": 2,
+        "high": 5
+      }
+    },
+    {
+      "id": "ty_gia_nhap_khau_dat",
+      "topic": "ty_gia",
+      "source_id": "nhat_bao",
+      "source_tier": "bao_chi",
+      "headline": "Imports get pricier as the exchange rate climbs; distributors feel the squeeze",
+      "direction": "tang",
+      "kind": "signal",
+      "truth": "dung",
+      "link": "state:ty_gia",
+      "verify_with": [
+        "doi_chieu_nguon",
+        "truy_van_lich_su"
+      ],
+      "state_direction": "tang",
+      "exaggerates": false
+    },
+    {
+      "id": "ty_gia_don_sup",
+      "topic": "ty_gia",
+      "source_id": "tam_chuyen",
+      "source_tier": "mang_xa_hoi",
+      "headline": "The lac is about to collapse. Swap everything into foreign cash!",
+      "direction": "giam",
+      "kind": "trap",
+      "truth": "sai",
+      "link": "state:ty_gia",
+      "verify_with": [
+        "doi_chieu_nguon",
+        "truy_van_lich_su"
+      ],
+      "state_direction": "tang",
+      "exaggerates": true
+    },
+    {
+      "id": "ty_gia_noi_bo_can_thiep",
+      "topic": "ty_gia",
+      "source_id": "noi_bo_nac_danh",
+      "source_tier": "noi_bo",
+      "headline": "Bank insider: heavy intervention this afternoon to ease exchange-rate pressure",
+      "direction": "giam",
+      "kind": "trap",
+      "truth": "sai",
+      "link": "state:ty_gia",
+      "verify_with": [
+        "doi_chieu_nguon",
+        "truy_van_lich_su"
+      ],
+      "state_direction": "giam",
+      "exaggerates": false
+    },
+    {
+      "id": "ty_gia_on_dinh",
+      "topic": "ty_gia",
+      "source_id": "ngan_hang_tw",
+      "source_tier": "chinh_thuc",
+      "headline": "Exchange rate steady within the allowed band",
+      "direction": "ngang",
+      "kind": "signal",
+      "truth": "dung",
+      "link": "state:ty_gia",
+      "verify_with": [
+        "doi_chieu_nguon",
+        "truy_van_lich_su"
+      ],
+      "state_direction": "ngang",
+      "exaggerates": false
+    },
+    {
+      "id": "ty_gia_hoi_nghi",
+      "topic": "ty_gia",
+      "source_id": "dai_duong",
+      "source_tier": "bao_chi",
+      "headline": "Regional economic summit discusses trade cooperation",
+      "direction": "ngang",
+      "kind": "noise",
+      "truth": "khong_lien_quan",
+      "link": null,
+      "verify_with": [
+        "doi_chieu_nguon",
+        "truy_van_lich_su"
+      ],
+      "state_direction": null,
+      "exaggerates": false
+    },
+    {
+      "id": "nguyen_lieu_chi_so_tang",
+      "topic": "nguyen_lieu",
+      "source_id": "cuc_thong_ke",
+      "source_tier": "chinh_thuc",
+      "headline": "Last month's imported materials price index rose {pct}%",
+      "direction": "tang",
+      "kind": "stale",
+      "truth": "cu",
+      "link": "state:nguyen_lieu",
+      "verify_with": [
+        "truy_van_lich_su",
+        "kiem_dinh_gia_thuyet"
+      ],
+      "state_direction": "tang",
+      "exaggerates": false,
+      "magnitude_pct": {
+        "low": 1,
+        "mid": 3,
+        "high": 6
+      }
+    },
+    {
+      "id": "nguyen_lieu_nhua_thep_tang",
+      "topic": "nguyen_lieu",
+      "source_id": "ban_tin_sang",
+      "source_tier": "bao_chi",
+      "headline": "Plastic and steel prices up {pct}% as supply tightens",
+      "direction": "tang",
+      "kind": "signal",
+      "truth": "dung",
+      "link": "state:nguyen_lieu",
+      "verify_with": [
+        "truy_van_lich_su",
+        "kiem_dinh_gia_thuyet"
+      ],
+      "state_direction": "tang",
+      "exaggerates": false,
+      "magnitude_pct": {
+        "low": 1,
+        "mid": 3,
+        "high": 6
+      }
+    },
+    {
+      "id": "nguyen_lieu_don_gap_doi",
+      "topic": "nguyen_lieu",
+      "source_id": "dien_dan_an_danh",
+      "source_tier": "mang_xa_hoi",
+      "headline": "Plastic prices doubled! Stock up now before it runs out",
+      "direction": "tang",
+      "kind": "trap",
+      "truth": "sai",
+      "link": "state:nguyen_lieu",
+      "verify_with": [
+        "truy_van_lich_su",
+        "kiem_dinh_gia_thuyet"
+      ],
+      "state_direction": "tang",
+      "exaggerates": true
+    },
+    {
+      "id": "nguyen_lieu_ha_nhiet",
+      "topic": "nguyen_lieu",
+      "source_id": "dai_duong",
+      "source_tier": "bao_chi",
+      "headline": "Materials prices cool off after two weeks of steady gains",
+      "direction": "giam",
+      "kind": "signal",
+      "truth": "dung",
+      "link": "state:nguyen_lieu",
+      "verify_with": [
+        "truy_van_lich_su",
+        "kiem_dinh_gia_thuyet"
+      ],
+      "state_direction": "giam",
+      "exaggerates": false
+    },
+    {
+      "id": "nguyen_lieu_nha_cung_cap",
+      "topic": "nguyen_lieu",
+      "source_id": "noi_bo_nac_danh",
+      "source_tier": "noi_bo",
+      "headline": "Suppliers quietly warn the next shipment will cost more",
+      "direction": "tang",
+      "kind": "partial",
+      "truth": "mot_phan",
+      "link": "state:nguyen_lieu",
+      "verify_with": [
+        "truy_van_lich_su",
+        "kiem_dinh_gia_thuyet"
+      ],
+      "state_direction": "tang",
+      "exaggerates": false
+    },
+    {
+      "id": "nguyen_lieu_cho_dia_phuong",
+      "topic": "nguyen_lieu",
+      "source_id": "tam_chuyen",
+      "source_tier": "mang_xa_hoi",
+      "headline": "Coffee prices tick up slightly at one local market",
+      "direction": "tang",
+      "kind": "noise",
+      "truth": "khong_lien_quan",
+      "link": null,
+      "verify_with": [
+        "truy_van_lich_su",
+        "kiem_dinh_gia_thuyet"
+      ],
+      "state_direction": null,
+      "exaggerates": false
+    },
+    {
+      "id": "suc_mua_ban_le_giam",
+      "topic": "suc_mua",
+      "source_id": "cuc_thong_ke",
+      "source_tier": "chinh_thuc",
+      "headline": "Last quarter's retail sales fell {pct}% year on year",
+      "direction": "giam",
+      "kind": "stale",
+      "truth": "cu",
+      "link": "state:suc_mua",
+      "verify_with": [
+        "truy_van_lich_su",
+        "kiem_dinh_gia_thuyet"
+      ],
+      "state_direction": "giam",
+      "exaggerates": false,
+      "magnitude_pct": {
+        "low": 1,
+        "mid": 3,
+        "high": 6
+      }
+    },
+    {
+      "id": "suc_mua_thiet_yeu",
+      "topic": "suc_mua",
+      "source_id": "nhat_bao",
+      "source_tier": "bao_chi",
+      "headline": "Shoppers shift to essentials; household goods struggle to draw crowds",
+      "direction": "giam",
+      "kind": "signal",
+      "truth": "dung",
+      "link": "event:trend_shift",
+      "verify_with": [
+        "truy_van_lich_su",
+        "kiem_dinh_gia_thuyet"
+      ],
+      "state_direction": null,
+      "exaggerates": false
+    },
+    {
+      "id": "suc_mua_pho_vang",
+      "topic": "suc_mua",
+      "source_id": "tam_chuyen",
+      "source_tier": "mang_xa_hoi",
+      "headline": "Whole street empty, household goods gathering dust",
+      "direction": "giam",
+      "kind": "partial",
+      "truth": "mot_phan",
+      "link": "state:suc_mua",
+      "verify_with": [
+        "truy_van_lich_su",
+        "kiem_dinh_gia_thuyet"
+      ],
+      "state_direction": "giam",
+      "exaggerates": false
+    },
+    {
+      "id": "suc_mua_mua_le",
+      "topic": "suc_mua",
+      "source_id": "dai_duong",
+      "source_tier": "bao_chi",
+      "headline": "Holiday season lifts spending slightly in big cities",
+      "direction": "tang",
+      "kind": "signal",
+      "truth": "dung",
+      "link": "state:suc_mua",
+      "verify_with": [
+        "truy_van_lich_su",
+        "kiem_dinh_gia_thuyet"
+      ],
+      "state_direction": "tang",
+      "exaggerates": false
+    },
+    {
+      "id": "suc_mua_doi_thu_giam_gia",
+      "topic": "suc_mua",
+      "source_id": "ban_tin_sang",
+      "source_tier": "bao_chi",
+      "headline": "Major rival launches a deep year-end discount",
+      "direction": "giam",
+      "kind": "signal",
+      "truth": "dung",
+      "link": "event:competitor_discount",
+      "verify_with": [
+        "truy_van_lich_su",
+        "kiem_dinh_gia_thuyet"
+      ],
+      "state_direction": null,
+      "exaggerates": false
+    },
+    {
+      "id": "suc_mua_giam_gia_quang_cao",
+      "topic": "suc_mua",
+      "source_id": "tam_chuyen",
+      "source_tier": "mang_xa_hoi",
+      "headline": "Rival's 70% discount? Turns out it was just a publicity stunt",
+      "direction": "ngang",
+      "kind": "partial",
+      "truth": "mot_phan",
+      "link": "event:competitor_discount",
+      "verify_with": [
+        "truy_van_lich_su",
+        "kiem_dinh_gia_thuyet"
+      ],
+      "state_direction": null,
+      "exaggerates": false
+    },
+    {
+      "id": "suc_mua_khach_phan_nan_gia",
+      "topic": "suc_mua",
+      "source_id": "tam_chuyen",
+      "source_tier": "mang_xa_hoi",
+      "headline": "Customers complain household goods prices rose too much",
+      "direction": "giam",
+      "kind": "signal",
+      "truth": "dung",
+      "link": "event:price_fatigue",
+      "verify_with": [
+        "truy_van_lich_su",
+        "kiem_dinh_gia_thuyet"
+      ],
+      "state_direction": null,
+      "exaggerates": false
+    },
+    {
+      "id": "suc_mua_dong_nghiep_dong",
+      "topic": "suc_mua",
+      "source_id": "dong_nghiep",
+      "source_tier": "noi_bo",
+      "headline": "Sales colleague says customers are buying more than any year",
+      "direction": "tang",
+      "kind": "partial",
+      "truth": "mot_phan",
+      "link": "state:suc_mua",
+      "verify_with": [
+        "truy_van_lich_su",
+        "kiem_dinh_gia_thuyet"
+      ],
+      "state_direction": "tang",
+      "exaggerates": false
+    },
+    {
+      "id": "suc_mua_chi_so_niem_tin",
+      "topic": "suc_mua",
+      "source_id": "cuc_thong_ke",
+      "source_tier": "chinh_thuc",
+      "headline": "Last quarter's consumer confidence index has just been updated",
+      "direction": "ngang",
+      "kind": "stale",
+      "truth": "cu",
+      "link": "state:suc_mua",
+      "verify_with": [
+        "truy_van_lich_su",
+        "kiem_dinh_gia_thuyet"
+      ],
+      "state_direction": "ngang",
+      "exaggerates": false
+    },
+    {
+      "id": "chung_khoan_tlx_giam",
+      "topic": "chung_khoan",
+      "source_id": "so_giao_dich",
+      "source_tier": "chinh_thuc",
+      "headline": "TLX-30 index closes down {pct}%",
+      "direction": "giam",
+      "kind": "signal",
+      "truth": "dung",
+      "link": "state:chung_khoan",
+      "verify_with": [
+        "doi_chieu_nguon",
+        "truy_van_lich_su"
+      ],
+      "state_direction": "giam",
+      "exaggerates": false,
+      "magnitude_pct": {
+        "low": 1,
+        "mid": 3,
+        "high": 6
+      }
+    },
+    {
+      "id": "chung_khoan_phan_phoi_ban_thao",
+      "topic": "chung_khoan",
+      "source_id": "ban_tin_sang",
+      "source_tier": "bao_chi",
+      "headline": "Distribution stocks sold off on capital cost worries",
+      "direction": "giam",
+      "kind": "signal",
+      "truth": "dung",
+      "link": "state:chung_khoan",
+      "verify_with": [
+        "doi_chieu_nguon",
+        "truy_van_lich_su"
+      ],
+      "state_direction": "giam",
+      "exaggerates": false
+    },
+    {
+      "id": "chung_khoan_don_bay_50",
+      "topic": "chung_khoan",
+      "source_id": "dien_dan_an_danh",
+      "source_tier": "mang_xa_hoi",
+      "headline": "LCD stock about to jump 50%, buy now or miss out!",
+      "direction": "tang",
+      "kind": "trap",
+      "truth": "sai",
+      "link": "state:chung_khoan",
+      "verify_with": [
+        "doi_chieu_nguon",
+        "truy_van_lich_su"
+      ],
+      "state_direction": "tang",
+      "exaggerates": true
+    },
+    {
+      "id": "chung_khoan_quy_gom",
+      "topic": "chung_khoan",
+      "source_id": "noi_bo_nac_danh",
+      "source_tier": "noi_bo",
+      "headline": "A big fund is quietly buying distribution stocks",
+      "direction": "tang",
+      "kind": "trap",
+      "truth": "sai",
+      "link": "state:chung_khoan",
+      "verify_with": [
+        "doi_chieu_nguon",
+        "truy_van_lich_su"
+      ],
+      "state_direction": "tang",
+      "exaggerates": false
+    },
+    {
+      "id": "chung_khoan_cong_nghe",
+      "topic": "chung_khoan",
+      "source_id": "dai_duong",
+      "source_tier": "bao_chi",
+      "headline": "An unrelated tech company unveils a new product",
+      "direction": "tang",
+      "kind": "noise",
+      "truth": "khong_lien_quan",
+      "link": null,
+      "verify_with": [
+        "doi_chieu_nguon",
+        "truy_van_lich_su"
+      ],
+      "state_direction": null,
+      "exaggerates": false
+    },
+    {
+      "id": "chung_khoan_so_may_man",
+      "topic": "chung_khoan",
+      "source_id": "tam_chuyen",
+      "source_tier": "mang_xa_hoi",
+      "headline": "Guess the lucky number for tomorrow's index",
+      "direction": "ngang",
+      "kind": "noise",
+      "truth": "khong_lien_quan",
+      "link": null,
+      "verify_with": [
+        "doi_chieu_nguon",
+        "truy_van_lich_su"
+      ],
+      "state_direction": null,
+      "exaggerates": false
+    },
+    {
+      "id": "tin_dung_siet_cho_vay",
+      "topic": "tin_dung",
+      "source_id": "nhat_bao",
+      "source_tier": "bao_chi",
+      "headline": "Banks tighten lending terms for small and mid-sized businesses",
+      "direction": "giam",
+      "kind": "signal",
+      "truth": "dung",
+      "link": "state:tin_dung",
+      "verify_with": [
+        "doi_chieu_nguon"
+      ],
+      "state_direction": "giam",
+      "exaggerates": false
+    },
+    {
+      "id": "tin_dung_no_xau",
+      "topic": "tin_dung",
+      "source_id": "cuc_thong_ke",
+      "source_tier": "chinh_thuc",
+      "headline": "Banking sector bad debt rose slightly last quarter",
+      "direction": "tang",
+      "kind": "stale",
+      "truth": "cu",
+      "link": "state:tin_dung",
+      "verify_with": [
+        "doi_chieu_nguon"
+      ],
+      "state_direction": "giam",
+      "exaggerates": false
+    },
+    {
+      "id": "tin_dung_don_pha_san",
+      "topic": "tin_dung",
+      "source_id": "tam_chuyen",
+      "source_tier": "mang_xa_hoi",
+      "headline": "A bank is about to go bust, withdraw your money fast!",
+      "direction": "giam",
+      "kind": "trap",
+      "truth": "sai",
+      "link": "state:tin_dung",
+      "verify_with": [
+        "doi_chieu_nguon"
+      ],
+      "state_direction": "giam",
+      "exaggerates": true
+    },
+    {
+      "id": "tin_dung_bao_tri_thanh_toan",
+      "topic": "tin_dung",
+      "source_id": "ban_tin_sang",
+      "source_tier": "bao_chi",
+      "headline": "Payment partner doing system maintenance, transactions may be slow",
+      "direction": "ngang",
+      "kind": "signal",
+      "truth": "dung",
+      "link": "event:checkout_outage",
+      "verify_with": [
+        "doi_chieu_nguon"
+      ],
+      "state_direction": null,
+      "exaggerates": false
+    },
+    {
+      "id": "tin_dung_thong_bao_bao_tri",
+      "topic": "tin_dung",
+      "source_id": "cuc_thong_ke",
+      "source_tier": "chinh_thuc",
+      "headline": "Regulator's web portal announces scheduled maintenance",
+      "direction": "ngang",
+      "kind": "noise",
+      "truth": "khong_lien_quan",
+      "link": null,
+      "verify_with": [
+        "doi_chieu_nguon"
+      ],
+      "state_direction": null,
+      "exaggerates": false
+    },
+    {
+      "id": "noi_bo_cong_dat_hang_loi",
+      "topic": "noi_bo",
+      "source_id": "dong_nghiep",
+      "source_tier": "noi_bo",
+      "headline": "Dealers complain the ordering portal errors out on first open",
+      "direction": "giam",
+      "kind": "signal",
+      "truth": "dung",
+      "link": "event:app_bug",
+      "verify_with": [
+        "lam_sach_du_lieu",
+        "truy_van_lich_su"
+      ],
+      "state_direction": null,
+      "exaggerates": false
+    },
+    {
+      "id": "noi_bo_kho_cham",
+      "topic": "noi_bo",
+      "source_id": "dong_nghiep",
+      "source_tier": "noi_bo",
+      "headline": "Warehouse reports the system lags at peak hours",
+      "direction": "giam",
+      "kind": "signal",
+      "truth": "dung",
+      "link": "event:server_outage",
+      "verify_with": [
+        "lam_sach_du_lieu",
+        "truy_van_lich_su"
+      ],
+      "state_direction": null,
+      "exaggerates": false
+    },
+    {
+      "id": "noi_bo_bang_so_trung",
+      "topic": "noi_bo",
+      "source_id": "dong_nghiep",
+      "source_tier": "noi_bo",
+      "headline": "The weekly report table has many duplicate rows",
+      "direction": "giam",
+      "kind": "signal",
+      "truth": "dung",
+      "link": "event:logging_error",
+      "verify_with": [
+        "lam_sach_du_lieu",
+        "truy_van_lich_su"
+      ],
+      "state_direction": null,
+      "exaggerates": false
+    },
+    {
+      "id": "noi_bo_quang_cao_it_don",
+      "topic": "noi_bo",
+      "source_id": "dong_nghiep",
+      "source_tier": "noi_bo",
+      "headline": "New ad campaign brings lots of views but few orders",
+      "direction": "giam",
+      "kind": "signal",
+      "truth": "dung",
+      "link": "event:bad_traffic",
+      "verify_with": [
+        "lam_sach_du_lieu",
+        "truy_van_lich_su"
+      ],
+      "state_direction": null,
+      "exaggerates": false
+    },
+    {
+      "id": "lai_suat_nhtw_tang_t038_1",
+      "topic": "lai_suat",
+      "source_id": "ngan_hang_tw",
+      "source_tier": "chinh_thuc",
+      "headline": "Policy rate rises by {pct} points after the scheduled review",
+      "direction": "tang",
+      "kind": "signal",
+      "truth": "dung",
+      "link": "state:lai_suat",
+      "verify_with": [
+        "doi_chieu_nguon",
+        "truy_van_lich_su"
+      ],
+      "state_direction": "tang",
+      "exaggerates": false,
+      "magnitude_pct": {
+        "low": 1,
+        "mid": 3,
+        "high": 6
+      }
+    },
+    {
+      "id": "lai_suat_nhtw_tang_t038_2",
+      "topic": "lai_suat",
+      "source_id": "settlement_office",
+      "source_tier": "chinh_thuc",
+      "headline": "Tan Lac rate decision lifts the borrowing benchmark by {pct} points",
+      "direction": "tang",
+      "kind": "signal",
+      "truth": "dung",
+      "link": "state:lai_suat",
+      "verify_with": [
+        "doi_chieu_nguon",
+        "truy_van_lich_su"
+      ],
+      "state_direction": "tang",
+      "exaggerates": false,
+      "magnitude_pct": {
+        "low": 1,
+        "mid": 3,
+        "high": 6
+      }
+    },
+    {
+      "id": "lai_suat_du_bao_tang_t038_1",
+      "topic": "lai_suat",
+      "source_id": "ban_tin_sang",
+      "source_tier": "bao_chi",
+      "headline": "Lenders weigh a rise in business loan rates for next week",
+      "direction": "tang",
+      "kind": "signal",
+      "truth": "dung",
+      "link": "state:lai_suat",
+      "verify_with": [
+        "doi_chieu_nguon",
+        "truy_van_lich_su"
+      ],
+      "state_direction": "tang",
+      "exaggerates": false
+    },
+    {
+      "id": "lai_suat_du_bao_tang_t038_2",
+      "topic": "lai_suat",
+      "source_id": "courtyard_dispatch",
+      "source_tier": "bao_chi",
+      "headline": "Rate watchers expect new business loans to cost more",
+      "direction": "tang",
+      "kind": "signal",
+      "truth": "dung",
+      "link": "state:lai_suat",
+      "verify_with": [
+        "doi_chieu_nguon",
+        "truy_van_lich_su"
+      ],
+      "state_direction": "tang",
+      "exaggerates": false
+    },
+    {
+      "id": "lai_suat_don_tang_manh_t038_1",
+      "topic": "lai_suat",
+      "source_id": "tam_chuyen",
+      "source_tier": "mang_xa_hoi",
+      "headline": "Word is loan rates are heading for a huge jump tonight",
+      "direction": "tang",
+      "kind": "trap",
+      "truth": "sai",
+      "link": "state:lai_suat",
+      "verify_with": [
+        "doi_chieu_nguon",
+        "truy_van_lich_su"
+      ],
+      "state_direction": "tang",
+      "exaggerates": true
+    },
+    {
+      "id": "lai_suat_don_tang_manh_t038_2",
+      "topic": "lai_suat",
+      "source_id": "tam_chuyen",
+      "source_tier": "mang_xa_hoi",
+      "headline": "People in the loan queue say rates could jump through the roof",
+      "direction": "tang",
+      "kind": "trap",
+      "truth": "sai",
+      "link": "state:lai_suat",
+      "verify_with": [
+        "doi_chieu_nguon",
+        "truy_van_lich_su"
+      ],
+      "state_direction": "tang",
+      "exaggerates": true
+    },
+    {
+      "id": "lai_suat_nhtw_giu_t038_1",
+      "topic": "lai_suat",
+      "source_id": "ngan_hang_tw",
+      "source_tier": "chinh_thuc",
+      "headline": "Policy review leaves the benchmark rate unchanged",
+      "direction": "ngang",
+      "kind": "signal",
+      "truth": "dung",
+      "link": "state:lai_suat",
+      "verify_with": [
+        "doi_chieu_nguon",
+        "truy_van_lich_su"
+      ],
+      "state_direction": "ngang",
+      "exaggerates": false
+    },
+    {
+      "id": "lai_suat_nhtw_giu_t038_2",
+      "topic": "lai_suat",
+      "source_id": "settlement_office",
+      "source_tier": "chinh_thuc",
+      "headline": "No adjustment to the policy rate in the latest notice",
+      "direction": "ngang",
+      "kind": "signal",
+      "truth": "dung",
+      "link": "state:lai_suat",
+      "verify_with": [
+        "doi_chieu_nguon",
+        "truy_van_lich_su"
+      ],
+      "state_direction": "ngang",
+      "exaggerates": false
+    },
+    {
+      "id": "lai_suat_hai_chuyen_gia_t038_1",
+      "topic": "lai_suat",
+      "source_id": "dien_dan_an_danh",
+      "source_tier": "mang_xa_hoi",
+      "headline": "Will rates fall or rise? The forum debate drifts off to lucky numbers",
+      "direction": "ngang",
+      "kind": "noise",
+      "truth": "khong_lien_quan",
+      "link": null,
+      "verify_with": [
+        "doi_chieu_nguon",
+        "truy_van_lich_su"
+      ],
+      "state_direction": null,
+      "exaggerates": false
+    },
+    {
+      "id": "lai_suat_hai_chuyen_gia_t038_2",
+      "topic": "lai_suat",
+      "source_id": "dien_dan_an_danh",
+      "source_tier": "mang_xa_hoi",
+      "headline": "Two forum guests split on whether rates fall or rise, then argue about the weather",
+      "direction": "ngang",
+      "kind": "noise",
+      "truth": "khong_lien_quan",
+      "link": null,
+      "verify_with": [
+        "doi_chieu_nguon",
+        "truy_van_lich_su"
+      ],
+      "state_direction": null,
+      "exaggerates": false
+    },
+    {
+      "id": "ty_gia_mat_gia_t038_1",
+      "topic": "ty_gia",
+      "source_id": "so_giao_dich",
+      "source_tier": "chinh_thuc",
+      "headline": "Lac closes {pct}% lower against the world dollar",
+      "direction": "giam",
+      "kind": "signal",
+      "truth": "dung",
+      "link": "state:ty_gia",
+      "verify_with": [
+        "doi_chieu_nguon",
+        "truy_van_lich_su"
+      ],
+      "state_direction": "tang",
+      "exaggerates": false,
+      "magnitude_pct": {
+        "low": 1,
+        "mid": 2,
+        "high": 5
+      }
+    },
+    {
+      "id": "ty_gia_mat_gia_t038_2",
+      "topic": "ty_gia",
+      "source_id": "market_registry",
+      "source_tier": "chinh_thuc",
+      "headline": "Exchange bulletin records the lac losing {pct}% in the session",
+      "direction": "giam",
+      "kind": "signal",
+      "truth": "dung",
+      "link": "state:ty_gia",
+      "verify_with": [
+        "doi_chieu_nguon",
+        "truy_van_lich_su"
+      ],
+      "state_direction": "tang",
+      "exaggerates": false,
+      "magnitude_pct": {
+        "low": 1,
+        "mid": 2,
+        "high": 5
+      }
+    },
+    {
+      "id": "ty_gia_nhap_khau_dat_t038_1",
+      "topic": "ty_gia",
+      "source_id": "nhat_bao",
+      "source_tier": "bao_chi",
+      "headline": "A weaker lac raises the cost of replenishing imported stock",
+      "direction": "tang",
+      "kind": "signal",
+      "truth": "dung",
+      "link": "state:ty_gia",
+      "verify_with": [
+        "doi_chieu_nguon",
+        "truy_van_lich_su"
+      ],
+      "state_direction": "tang",
+      "exaggerates": false
+    },
+    {
+      "id": "ty_gia_nhap_khau_dat_t038_2",
+      "topic": "ty_gia",
+      "source_id": "harbor_ledger",
+      "source_tier": "bao_chi",
+      "headline": "Distributors say import bills cost more as exchange pressure builds",
+      "direction": "tang",
+      "kind": "signal",
+      "truth": "dung",
+      "link": "state:ty_gia",
+      "verify_with": [
+        "doi_chieu_nguon",
+        "truy_van_lich_su"
+      ],
+      "state_direction": "tang",
+      "exaggerates": false
+    },
+    {
+      "id": "ty_gia_don_sup_t038_1",
+      "topic": "ty_gia",
+      "source_id": "tam_chuyen",
+      "source_tier": "mang_xa_hoi",
+      "headline": "Someone says the lac will collapse and lose almost all its value overnight",
+      "direction": "giam",
+      "kind": "trap",
+      "truth": "sai",
+      "link": "state:ty_gia",
+      "verify_with": [
+        "doi_chieu_nguon",
+        "truy_van_lich_su"
+      ],
+      "state_direction": "tang",
+      "exaggerates": true
+    },
+    {
+      "id": "ty_gia_don_sup_t038_2",
+      "topic": "ty_gia",
+      "source_id": "tam_chuyen",
+      "source_tier": "mang_xa_hoi",
+      "headline": "Forum talk has the lac heading for a near-total collapse",
+      "direction": "giam",
+      "kind": "trap",
+      "truth": "sai",
+      "link": "state:ty_gia",
+      "verify_with": [
+        "doi_chieu_nguon",
+        "truy_van_lich_su"
+      ],
+      "state_direction": "tang",
+      "exaggerates": true
+    },
+    {
+      "id": "ty_gia_noi_bo_can_thiep_t038_1",
+      "topic": "ty_gia",
+      "source_id": "noi_bo_nac_danh",
+      "source_tier": "noi_bo",
+      "headline": "Quiet word from a bank desk: intervention may ease exchange-rate pressure",
+      "direction": "giam",
+      "kind": "trap",
+      "truth": "sai",
+      "link": "state:ty_gia",
+      "verify_with": [
+        "doi_chieu_nguon",
+        "truy_van_lich_su"
+      ],
+      "state_direction": "giam",
+      "exaggerates": false
+    },
+    {
+      "id": "ty_gia_noi_bo_can_thiep_t038_2",
+      "topic": "ty_gia",
+      "source_id": "noi_bo_nac_danh",
+      "source_tier": "noi_bo",
+      "headline": "A dealing room contact expects exchange pressure to ease",
+      "direction": "giam",
+      "kind": "trap",
+      "truth": "sai",
+      "link": "state:ty_gia",
+      "verify_with": [
+        "doi_chieu_nguon",
+        "truy_van_lich_su"
+      ],
+      "state_direction": "giam",
+      "exaggerates": false
+    },
+    {
+      "id": "ty_gia_on_dinh_t038_1",
+      "topic": "ty_gia",
+      "source_id": "ngan_hang_tw",
+      "source_tier": "chinh_thuc",
+      "headline": "Reference exchange band unchanged in the latest notice",
+      "direction": "ngang",
+      "kind": "signal",
+      "truth": "dung",
+      "link": "state:ty_gia",
+      "verify_with": [
+        "doi_chieu_nguon",
+        "truy_van_lich_su"
+      ],
+      "state_direction": "ngang",
+      "exaggerates": false
+    },
+    {
+      "id": "ty_gia_on_dinh_t038_2",
+      "topic": "ty_gia",
+      "source_id": "settlement_office",
+      "source_tier": "chinh_thuc",
+      "headline": "Exchange bulletin reports no movement outside the current band",
+      "direction": "ngang",
+      "kind": "signal",
+      "truth": "dung",
+      "link": "state:ty_gia",
+      "verify_with": [
+        "doi_chieu_nguon",
+        "truy_van_lich_su"
+      ],
+      "state_direction": "ngang",
+      "exaggerates": false
+    },
+    {
+      "id": "ty_gia_hoi_nghi_t038_1",
+      "topic": "ty_gia",
+      "source_id": "dai_duong",
+      "source_tier": "bao_chi",
+      "headline": "Trade delegates discuss a joint cultural exhibition",
+      "direction": "ngang",
+      "kind": "noise",
+      "truth": "khong_lien_quan",
+      "link": null,
+      "verify_with": [
+        "doi_chieu_nguon",
+        "truy_van_lich_su"
+      ],
+      "state_direction": null,
+      "exaggerates": false
+    },
+    {
+      "id": "ty_gia_hoi_nghi_t038_2",
+      "topic": "ty_gia",
+      "source_id": "canal_review",
+      "source_tier": "bao_chi",
+      "headline": "Regional trade meeting closes with plans for a ceremonial dinner",
+      "direction": "ngang",
+      "kind": "noise",
+      "truth": "khong_lien_quan",
+      "link": null,
+      "verify_with": [
+        "doi_chieu_nguon",
+        "truy_van_lich_su"
+      ],
+      "state_direction": null,
+      "exaggerates": false
+    },
+    {
+      "id": "nguyen_lieu_chi_so_tang_t038_1",
+      "topic": "nguyen_lieu",
+      "source_id": "cuc_thong_ke",
+      "source_tier": "chinh_thuc",
+      "headline": "Prior month's materials index rose {pct}%",
+      "direction": "tang",
+      "kind": "stale",
+      "truth": "cu",
+      "link": "state:nguyen_lieu",
+      "verify_with": [
+        "truy_van_lich_su",
+        "kiem_dinh_gia_thuyet"
+      ],
+      "state_direction": "tang",
+      "exaggerates": false,
+      "magnitude_pct": {
+        "low": 1,
+        "mid": 3,
+        "high": 6
+      }
+    },
+    {
+      "id": "nguyen_lieu_chi_so_tang_t038_2",
+      "topic": "nguyen_lieu",
+      "source_id": "trade_register",
+      "source_tier": "chinh_thuc",
+      "headline": "Archived monthly bulletin shows materials prices rose {pct}%",
+      "direction": "tang",
+      "kind": "stale",
+      "truth": "cu",
+      "link": "state:nguyen_lieu",
+      "verify_with": [
+        "truy_van_lich_su",
+        "kiem_dinh_gia_thuyet"
+      ],
+      "state_direction": "tang",
+      "exaggerates": false,
+      "magnitude_pct": {
+        "low": 1,
+        "mid": 3,
+        "high": 6
+      }
+    },
+    {
+      "id": "nguyen_lieu_nhua_thep_tang_t038_1",
+      "topic": "nguyen_lieu",
+      "source_id": "ban_tin_sang",
+      "source_tier": "bao_chi",
+      "headline": "Plastic and steel quotes climb {pct}% as supply bottlenecks tighten",
+      "direction": "tang",
+      "kind": "signal",
+      "truth": "dung",
+      "link": "state:nguyen_lieu",
+      "verify_with": [
+        "truy_van_lich_su",
+        "kiem_dinh_gia_thuyet"
+      ],
+      "state_direction": "tang",
+      "exaggerates": false,
+      "magnitude_pct": {
+        "low": 1,
+        "mid": 3,
+        "high": 6
+      }
+    },
+    {
+      "id": "nguyen_lieu_nhua_thep_tang_t038_2",
+      "topic": "nguyen_lieu",
+      "source_id": "courtyard_dispatch",
+      "source_tier": "bao_chi",
+      "headline": "Materials suppliers raise quotes {pct}% as deliveries tighten",
+      "direction": "tang",
+      "kind": "signal",
+      "truth": "dung",
+      "link": "state:nguyen_lieu",
+      "verify_with": [
+        "truy_van_lich_su",
+        "kiem_dinh_gia_thuyet"
+      ],
+      "state_direction": "tang",
+      "exaggerates": false,
+      "magnitude_pct": {
+        "low": 1,
+        "mid": 3,
+        "high": 6
+      }
+    },
+    {
+      "id": "nguyen_lieu_don_gap_doi_t038_1",
+      "topic": "nguyen_lieu",
+      "source_id": "dien_dan_an_danh",
+      "source_tier": "mang_xa_hoi",
+      "headline": "Everyone is saying plastic prices have doubled since breakfast",
+      "direction": "tang",
+      "kind": "trap",
+      "truth": "sai",
+      "link": "state:nguyen_lieu",
+      "verify_with": [
+        "truy_van_lich_su",
+        "kiem_dinh_gia_thuyet"
+      ],
+      "state_direction": "tang",
+      "exaggerates": true
+    },
+    {
+      "id": "nguyen_lieu_don_gap_doi_t038_2",
+      "topic": "nguyen_lieu",
+      "source_id": "dien_dan_an_danh",
+      "source_tier": "mang_xa_hoi",
+      "headline": "Forum talk says plastic prices doubled, with no ceiling in sight",
+      "direction": "tang",
+      "kind": "trap",
+      "truth": "sai",
+      "link": "state:nguyen_lieu",
+      "verify_with": [
+        "truy_van_lich_su",
+        "kiem_dinh_gia_thuyet"
+      ],
+      "state_direction": "tang",
+      "exaggerates": true
+    },
+    {
+      "id": "nguyen_lieu_ha_nhiet_t038_1",
+      "topic": "nguyen_lieu",
+      "source_id": "dai_duong",
+      "source_tier": "bao_chi",
+      "headline": "Input quotes cool off following a fortnight of increases",
+      "direction": "giam",
+      "kind": "signal",
+      "truth": "dung",
+      "link": "state:nguyen_lieu",
+      "verify_with": [
+        "truy_van_lich_su",
+        "kiem_dinh_gia_thuyet"
+      ],
+      "state_direction": "giam",
+      "exaggerates": false
+    },
+    {
+      "id": "nguyen_lieu_ha_nhiet_t038_2",
+      "topic": "nguyen_lieu",
+      "source_id": "canal_review",
+      "source_tier": "bao_chi",
+      "headline": "Materials market loses some heat as supplier quotes come down",
+      "direction": "giam",
+      "kind": "signal",
+      "truth": "dung",
+      "link": "state:nguyen_lieu",
+      "verify_with": [
+        "truy_van_lich_su",
+        "kiem_dinh_gia_thuyet"
+      ],
+      "state_direction": "giam",
+      "exaggerates": false
+    },
+    {
+      "id": "nguyen_lieu_nha_cung_cap_t038_1",
+      "topic": "nguyen_lieu",
+      "source_id": "noi_bo_nac_danh",
+      "source_tier": "noi_bo",
+      "headline": "A supplier contact hints the next load will cost more",
+      "direction": "tang",
+      "kind": "partial",
+      "truth": "mot_phan",
+      "link": "state:nguyen_lieu",
+      "verify_with": [
+        "truy_van_lich_su",
+        "kiem_dinh_gia_thuyet"
+      ],
+      "state_direction": "tang",
+      "exaggerates": false
+    },
+    {
+      "id": "nguyen_lieu_nha_cung_cap_t038_2",
+      "topic": "nguyen_lieu",
+      "source_id": "noi_bo_nac_danh",
+      "source_tier": "noi_bo",
+      "headline": "Quiet warning from purchasing: the next materials invoice will cost more",
+      "direction": "tang",
+      "kind": "partial",
+      "truth": "mot_phan",
+      "link": "state:nguyen_lieu",
+      "verify_with": [
+        "truy_van_lich_su",
+        "kiem_dinh_gia_thuyet"
+      ],
+      "state_direction": "tang",
+      "exaggerates": false
+    },
+    {
+      "id": "nguyen_lieu_cho_dia_phuong_t038_1",
+      "topic": "nguyen_lieu",
+      "source_id": "tam_chuyen",
+      "source_tier": "mang_xa_hoi",
+      "headline": "Someone posted a whole thread about coffee prices going up at one stall",
+      "direction": "tang",
+      "kind": "noise",
+      "truth": "khong_lien_quan",
+      "link": null,
+      "verify_with": [
+        "truy_van_lich_su",
+        "kiem_dinh_gia_thuyet"
+      ],
+      "state_direction": null,
+      "exaggerates": false
+    },
+    {
+      "id": "nguyen_lieu_cho_dia_phuong_t038_2",
+      "topic": "nguyen_lieu",
+      "source_id": "tam_chuyen",
+      "source_tier": "mang_xa_hoi",
+      "headline": "Local chat says bean prices are up at two neighborhood cafes",
+      "direction": "tang",
+      "kind": "noise",
+      "truth": "khong_lien_quan",
+      "link": null,
+      "verify_with": [
+        "truy_van_lich_su",
+        "kiem_dinh_gia_thuyet"
+      ],
+      "state_direction": null,
+      "exaggerates": false
+    },
+    {
+      "id": "suc_mua_ban_le_giam_t038_1",
+      "topic": "suc_mua",
+      "source_id": "cuc_thong_ke",
+      "source_tier": "chinh_thuc",
+      "headline": "Previous quarter's retail turnover fell {pct}% from a year earlier",
+      "direction": "giam",
+      "kind": "stale",
+      "truth": "cu",
+      "link": "state:suc_mua",
+      "verify_with": [
+        "truy_van_lich_su",
+        "kiem_dinh_gia_thuyet"
+      ],
+      "state_direction": "giam",
+      "exaggerates": false,
+      "magnitude_pct": {
+        "low": 1,
+        "mid": 3,
+        "high": 6
+      }
+    },
+    {
+      "id": "suc_mua_ban_le_giam_t038_2",
+      "topic": "suc_mua",
+      "source_id": "trade_register",
+      "source_tier": "chinh_thuc",
+      "headline": "Archived retail release shows sales fell {pct}% on the year",
+      "direction": "giam",
+      "kind": "stale",
+      "truth": "cu",
+      "link": "state:suc_mua",
+      "verify_with": [
+        "truy_van_lich_su",
+        "kiem_dinh_gia_thuyet"
+      ],
+      "state_direction": "giam",
+      "exaggerates": false,
+      "magnitude_pct": {
+        "low": 1,
+        "mid": 3,
+        "high": 6
+      }
+    },
+    {
+      "id": "suc_mua_thiet_yeu_t038_1",
+      "topic": "suc_mua",
+      "source_id": "nhat_bao",
+      "source_tier": "bao_chi",
+      "headline": "Retailers report household goods sales fall as buyers favor essentials",
+      "direction": "giam",
+      "kind": "signal",
+      "truth": "dung",
+      "link": "event:trend_shift",
+      "verify_with": [
+        "truy_van_lich_su",
+        "kiem_dinh_gia_thuyet"
+      ],
+      "state_direction": null,
+      "exaggerates": false
+    },
+    {
+      "id": "suc_mua_thiet_yeu_t038_2",
+      "topic": "suc_mua",
+      "source_id": "harbor_ledger",
+      "source_tier": "bao_chi",
+      "headline": "Household goods sales fall as shoppers prioritize basics",
+      "direction": "giam",
+      "kind": "signal",
+      "truth": "dung",
+      "link": "event:trend_shift",
+      "verify_with": [
+        "truy_van_lich_su",
+        "kiem_dinh_gia_thuyet"
+      ],
+      "state_direction": null,
+      "exaggerates": false
+    },
+    {
+      "id": "suc_mua_pho_vang_t038_1",
+      "topic": "suc_mua",
+      "source_id": "tam_chuyen",
+      "source_tier": "mang_xa_hoi",
+      "headline": "Apparently every household goods stall on one street is empty",
+      "direction": "giam",
+      "kind": "partial",
+      "truth": "mot_phan",
+      "link": "state:suc_mua",
+      "verify_with": [
+        "truy_van_lich_su",
+        "kiem_dinh_gia_thuyet"
+      ],
+      "state_direction": "giam",
+      "exaggerates": false
+    },
+    {
+      "id": "suc_mua_pho_vang_t038_2",
+      "topic": "suc_mua",
+      "source_id": "tam_chuyen",
+      "source_tier": "mang_xa_hoi",
+      "headline": "A shopkeeper says household goods shops on their block sit empty",
+      "direction": "giam",
+      "kind": "partial",
+      "truth": "mot_phan",
+      "link": "state:suc_mua",
+      "verify_with": [
+        "truy_van_lich_su",
+        "kiem_dinh_gia_thuyet"
+      ],
+      "state_direction": "giam",
+      "exaggerates": false
+    },
+    {
+      "id": "suc_mua_mua_le_t038_1",
+      "topic": "suc_mua",
+      "source_id": "dai_duong",
+      "source_tier": "bao_chi",
+      "headline": "City retailers see demand recover modestly during the holiday period",
+      "direction": "tang",
+      "kind": "signal",
+      "truth": "dung",
+      "link": "state:suc_mua",
+      "verify_with": [
+        "truy_van_lich_su",
+        "kiem_dinh_gia_thuyet"
+      ],
+      "state_direction": "tang",
+      "exaggerates": false
+    },
+    {
+      "id": "suc_mua_mua_le_t038_2",
+      "topic": "suc_mua",
+      "source_id": "canal_review",
+      "source_tier": "bao_chi",
+      "headline": "Holiday trade lifts household spending a little",
+      "direction": "tang",
+      "kind": "signal",
+      "truth": "dung",
+      "link": "state:suc_mua",
+      "verify_with": [
+        "truy_van_lich_su",
+        "kiem_dinh_gia_thuyet"
+      ],
+      "state_direction": "tang",
+      "exaggerates": false
+    },
+    {
+      "id": "suc_mua_doi_thu_giam_gia_t038_1",
+      "topic": "suc_mua",
+      "source_id": "ban_tin_sang",
+      "source_tier": "bao_chi",
+      "headline": "Competing distributor rolls out a steep seasonal discount",
+      "direction": "giam",
+      "kind": "signal",
+      "truth": "dung",
+      "link": "event:competitor_discount",
+      "verify_with": [
+        "truy_van_lich_su",
+        "kiem_dinh_gia_thuyet"
+      ],
+      "state_direction": null,
+      "exaggerates": false
+    },
+    {
+      "id": "suc_mua_doi_thu_giam_gia_t038_2",
+      "topic": "suc_mua",
+      "source_id": "courtyard_dispatch",
+      "source_tier": "bao_chi",
+      "headline": "Rival promotion puts a discount on household goods ahead of year-end",
+      "direction": "giam",
+      "kind": "signal",
+      "truth": "dung",
+      "link": "event:competitor_discount",
+      "verify_with": [
+        "truy_van_lich_su",
+        "kiem_dinh_gia_thuyet"
+      ],
+      "state_direction": null,
+      "exaggerates": false
+    },
+    {
+      "id": "suc_mua_giam_gia_quang_cao_t038_1",
+      "topic": "suc_mua",
+      "source_id": "tam_chuyen",
+      "source_tier": "mang_xa_hoi",
+      "headline": "That rival's giant discount seems to be mostly a banner campaign",
+      "direction": "ngang",
+      "kind": "partial",
+      "truth": "mot_phan",
+      "link": "event:competitor_discount",
+      "verify_with": [
+        "truy_van_lich_su",
+        "kiem_dinh_gia_thuyet"
+      ],
+      "state_direction": null,
+      "exaggerates": false
+    },
+    {
+      "id": "suc_mua_giam_gia_quang_cao_t038_2",
+      "topic": "suc_mua",
+      "source_id": "tam_chuyen",
+      "source_tier": "mang_xa_hoi",
+      "headline": "People checking the rival's big discount say the bargains are mostly posters",
+      "direction": "ngang",
+      "kind": "partial",
+      "truth": "mot_phan",
+      "link": "event:competitor_discount",
+      "verify_with": [
+        "truy_van_lich_su",
+        "kiem_dinh_gia_thuyet"
+      ],
+      "state_direction": null,
+      "exaggerates": false
+    },
+    {
+      "id": "suc_mua_khach_phan_nan_gia_t038_1",
+      "topic": "suc_mua",
+      "source_id": "tam_chuyen",
+      "source_tier": "mang_xa_hoi",
+      "headline": "Customers say another household goods price rise is wearing thin",
+      "direction": "giam",
+      "kind": "signal",
+      "truth": "dung",
+      "link": "event:price_fatigue",
+      "verify_with": [
+        "truy_van_lich_su",
+        "kiem_dinh_gia_thuyet"
+      ],
+      "state_direction": null,
+      "exaggerates": false
+    },
+    {
+      "id": "suc_mua_khach_phan_nan_gia_t038_2",
+      "topic": "suc_mua",
+      "source_id": "tam_chuyen",
+      "source_tier": "mang_xa_hoi",
+      "headline": "Shop chat is full of complaints that household prices rose again",
+      "direction": "giam",
+      "kind": "signal",
+      "truth": "dung",
+      "link": "event:price_fatigue",
+      "verify_with": [
+        "truy_van_lich_su",
+        "kiem_dinh_gia_thuyet"
+      ],
+      "state_direction": null,
+      "exaggerates": false
+    },
+    {
+      "id": "suc_mua_dong_nghiep_dong_t038_1",
+      "topic": "suc_mua",
+      "source_id": "dong_nghiep",
+      "source_tier": "noi_bo",
+      "headline": "Between us, a sales contact says customers are buying more than ever",
+      "direction": "tang",
+      "kind": "partial",
+      "truth": "mot_phan",
+      "link": "state:suc_mua",
+      "verify_with": [
+        "truy_van_lich_su",
+        "kiem_dinh_gia_thuyet"
+      ],
+      "state_direction": "tang",
+      "exaggerates": false
+    },
+    {
+      "id": "suc_mua_dong_nghiep_dong_t038_2",
+      "topic": "suc_mua",
+      "source_id": "dong_nghiep",
+      "source_tier": "noi_bo",
+      "headline": "One account manager quietly says customers are buying more than any previous year",
+      "direction": "tang",
+      "kind": "partial",
+      "truth": "mot_phan",
+      "link": "state:suc_mua",
+      "verify_with": [
+        "truy_van_lich_su",
+        "kiem_dinh_gia_thuyet"
+      ],
+      "state_direction": "tang",
+      "exaggerates": false
+    },
+    {
+      "id": "suc_mua_chi_so_niem_tin_t038_1",
+      "topic": "suc_mua",
+      "source_id": "cuc_thong_ke",
+      "source_tier": "chinh_thuc",
+      "headline": "Consumer confidence release covers the previous quarter",
+      "direction": "ngang",
+      "kind": "stale",
+      "truth": "cu",
+      "link": "state:suc_mua",
+      "verify_with": [
+        "truy_van_lich_su",
+        "kiem_dinh_gia_thuyet"
+      ],
+      "state_direction": "ngang",
+      "exaggerates": false
+    },
+    {
+      "id": "suc_mua_chi_so_niem_tin_t038_2",
+      "topic": "suc_mua",
+      "source_id": "trade_register",
+      "source_tier": "chinh_thuc",
+      "headline": "Historical confidence series updated for the last completed quarter",
+      "direction": "ngang",
+      "kind": "stale",
+      "truth": "cu",
+      "link": "state:suc_mua",
+      "verify_with": [
+        "truy_van_lich_su",
+        "kiem_dinh_gia_thuyet"
+      ],
+      "state_direction": "ngang",
+      "exaggerates": false
+    },
+    {
+      "id": "chung_khoan_tlx_giam_t038_1",
+      "topic": "chung_khoan",
+      "source_id": "so_giao_dich",
+      "source_tier": "chinh_thuc",
+      "headline": "Closing bulletin: TLX-30 is down {pct}%",
+      "direction": "giam",
+      "kind": "signal",
+      "truth": "dung",
+      "link": "state:chung_khoan",
+      "verify_with": [
+        "doi_chieu_nguon",
+        "truy_van_lich_su"
+      ],
+      "state_direction": "giam",
+      "exaggerates": false,
+      "magnitude_pct": {
+        "low": 1,
+        "mid": 3,
+        "high": 6
+      }
+    },
+    {
+      "id": "chung_khoan_tlx_giam_t038_2",
+      "topic": "chung_khoan",
+      "source_id": "market_registry",
+      "source_tier": "chinh_thuc",
+      "headline": "TLX-30 session ends down {pct}%",
+      "direction": "giam",
+      "kind": "signal",
+      "truth": "dung",
+      "link": "state:chung_khoan",
+      "verify_with": [
+        "doi_chieu_nguon",
+        "truy_van_lich_su"
+      ],
+      "state_direction": "giam",
+      "exaggerates": false,
+      "magnitude_pct": {
+        "low": 1,
+        "mid": 3,
+        "high": 6
+      }
+    },
+    {
+      "id": "chung_khoan_phan_phoi_ban_thao_t038_1",
+      "topic": "chung_khoan",
+      "source_id": "ban_tin_sang",
+      "source_tier": "bao_chi",
+      "headline": "Funding cost concerns weigh on distribution shares",
+      "direction": "giam",
+      "kind": "signal",
+      "truth": "dung",
+      "link": "state:chung_khoan",
+      "verify_with": [
+        "doi_chieu_nguon",
+        "truy_van_lich_su"
+      ],
+      "state_direction": "giam",
+      "exaggerates": false
+    },
+    {
+      "id": "chung_khoan_phan_phoi_ban_thao_t038_2",
+      "topic": "chung_khoan",
+      "source_id": "courtyard_dispatch",
+      "source_tier": "bao_chi",
+      "headline": "Distribution stocks retreat as investors reassess borrowing costs",
+      "direction": "giam",
+      "kind": "signal",
+      "truth": "dung",
+      "link": "state:chung_khoan",
+      "verify_with": [
+        "doi_chieu_nguon",
+        "truy_van_lich_su"
+      ],
+      "state_direction": "giam",
+      "exaggerates": false
+    },
+    {
+      "id": "chung_khoan_don_bay_50_t038_1",
+      "topic": "chung_khoan",
+      "source_id": "dien_dan_an_danh",
+      "source_tier": "mang_xa_hoi",
+      "headline": "Forum chat has LCD set to jump before the week is over",
+      "direction": "tang",
+      "kind": "trap",
+      "truth": "sai",
+      "link": "state:chung_khoan",
+      "verify_with": [
+        "doi_chieu_nguon",
+        "truy_van_lich_su"
+      ],
+      "state_direction": "tang",
+      "exaggerates": true
+    },
+    {
+      "id": "chung_khoan_don_bay_50_t038_2",
+      "topic": "chung_khoan",
+      "source_id": "dien_dan_an_danh",
+      "source_tier": "mang_xa_hoi",
+      "headline": "Someone claims LCD is headed for a spectacular overnight jump",
+      "direction": "tang",
+      "kind": "trap",
+      "truth": "sai",
+      "link": "state:chung_khoan",
+      "verify_with": [
+        "doi_chieu_nguon",
+        "truy_van_lich_su"
+      ],
+      "state_direction": "tang",
+      "exaggerates": true
+    },
+    {
+      "id": "chung_khoan_quy_gom_t038_1",
+      "topic": "chung_khoan",
+      "source_id": "noi_bo_nac_danh",
+      "source_tier": "noi_bo",
+      "headline": "A fund contact whispers that distribution shares are being accumulated",
+      "direction": "tang",
+      "kind": "trap",
+      "truth": "sai",
+      "link": "state:chung_khoan",
+      "verify_with": [
+        "doi_chieu_nguon",
+        "truy_van_lich_su"
+      ],
+      "state_direction": "tang",
+      "exaggerates": false
+    },
+    {
+      "id": "chung_khoan_quy_gom_t038_2",
+      "topic": "chung_khoan",
+      "source_id": "noi_bo_nac_danh",
+      "source_tier": "noi_bo",
+      "headline": "Word from a dealing desk: a large buyer is building a distribution position",
+      "direction": "tang",
+      "kind": "trap",
+      "truth": "sai",
+      "link": "state:chung_khoan",
+      "verify_with": [
+        "doi_chieu_nguon",
+        "truy_van_lich_su"
+      ],
+      "state_direction": "tang",
+      "exaggerates": false
+    },
+    {
+      "id": "chung_khoan_cong_nghe_t038_1",
+      "topic": "chung_khoan",
+      "source_id": "dai_duong",
+      "source_tier": "bao_chi",
+      "headline": "Cloud Heron Devices shows off a new desk ornament",
+      "direction": "tang",
+      "kind": "noise",
+      "truth": "khong_lien_quan",
+      "link": null,
+      "verify_with": [
+        "doi_chieu_nguon",
+        "truy_van_lich_su"
+      ],
+      "state_direction": null,
+      "exaggerates": false
+    },
+    {
+      "id": "chung_khoan_cong_nghe_t038_2",
+      "topic": "chung_khoan",
+      "source_id": "canal_review",
+      "source_tier": "bao_chi",
+      "headline": "Lantern Kite Labs introduces a pocket-sized puzzle toy",
+      "direction": "tang",
+      "kind": "noise",
+      "truth": "khong_lien_quan",
+      "link": null,
+      "verify_with": [
+        "doi_chieu_nguon",
+        "truy_van_lich_su"
+      ],
+      "state_direction": null,
+      "exaggerates": false
+    },
+    {
+      "id": "chung_khoan_so_may_man_t038_1",
+      "topic": "chung_khoan",
+      "source_id": "tam_chuyen",
+      "source_tier": "mang_xa_hoi",
+      "headline": "Forum opens a guessing contest for the next index close",
+      "direction": "ngang",
+      "kind": "noise",
+      "truth": "khong_lien_quan",
+      "link": null,
+      "verify_with": [
+        "doi_chieu_nguon",
+        "truy_van_lich_su"
+      ],
+      "state_direction": null,
+      "exaggerates": false
+    },
+    {
+      "id": "chung_khoan_so_may_man_t038_2",
+      "topic": "chung_khoan",
+      "source_id": "tam_chuyen",
+      "source_tier": "mang_xa_hoi",
+      "headline": "People pick tomorrow's index number from their birthdays",
+      "direction": "ngang",
+      "kind": "noise",
+      "truth": "khong_lien_quan",
+      "link": null,
+      "verify_with": [
+        "doi_chieu_nguon",
+        "truy_van_lich_su"
+      ],
+      "state_direction": null,
+      "exaggerates": false
+    },
+    {
+      "id": "tin_dung_siet_cho_vay_t038_1",
+      "topic": "tin_dung",
+      "source_id": "nhat_bao",
+      "source_tier": "bao_chi",
+      "headline": "Banks tighten lending conditions for small firms",
+      "direction": "giam",
+      "kind": "signal",
+      "truth": "dung",
+      "link": "state:tin_dung",
+      "verify_with": [
+        "doi_chieu_nguon"
+      ],
+      "state_direction": "giam",
+      "exaggerates": false
+    },
+    {
+      "id": "tin_dung_siet_cho_vay_t038_2",
+      "topic": "tin_dung",
+      "source_id": "harbor_ledger",
+      "source_tier": "bao_chi",
+      "headline": "Banks tighten access to working capital for smaller businesses",
+      "direction": "giam",
+      "kind": "signal",
+      "truth": "dung",
+      "link": "state:tin_dung",
+      "verify_with": [
+        "doi_chieu_nguon"
+      ],
+      "state_direction": "giam",
+      "exaggerates": false
+    },
+    {
+      "id": "tin_dung_no_xau_t038_1",
+      "topic": "tin_dung",
+      "source_id": "cuc_thong_ke",
+      "source_tier": "chinh_thuc",
+      "headline": "Prior-quarter banking bulletin shows bad debt rose modestly",
+      "direction": "tang",
+      "kind": "stale",
+      "truth": "cu",
+      "link": "state:tin_dung",
+      "verify_with": [
+        "doi_chieu_nguon"
+      ],
+      "state_direction": "giam",
+      "exaggerates": false
+    },
+    {
+      "id": "tin_dung_no_xau_t038_2",
+      "topic": "tin_dung",
+      "source_id": "trade_register",
+      "source_tier": "chinh_thuc",
+      "headline": "Archived credit report shows bad debts edged up last quarter",
+      "direction": "tang",
+      "kind": "stale",
+      "truth": "cu",
+      "link": "state:tin_dung",
+      "verify_with": [
+        "doi_chieu_nguon"
+      ],
+      "state_direction": "giam",
+      "exaggerates": false
+    },
+    {
+      "id": "tin_dung_don_pha_san_t038_1",
+      "topic": "tin_dung",
+      "source_id": "tam_chuyen",
+      "source_tier": "mang_xa_hoi",
+      "headline": "People say a neighborhood bank will go bust tonight",
+      "direction": "giam",
+      "kind": "trap",
+      "truth": "sai",
+      "link": "state:tin_dung",
+      "verify_with": [
+        "doi_chieu_nguon"
+      ],
+      "state_direction": "giam",
+      "exaggerates": true
+    },
+    {
+      "id": "tin_dung_don_pha_san_t038_2",
+      "topic": "tin_dung",
+      "source_id": "tam_chuyen",
+      "source_tier": "mang_xa_hoi",
+      "headline": "A forum thread claims a bank is about to collapse",
+      "direction": "giam",
+      "kind": "trap",
+      "truth": "sai",
+      "link": "state:tin_dung",
+      "verify_with": [
+        "doi_chieu_nguon"
+      ],
+      "state_direction": "giam",
+      "exaggerates": true
+    },
+    {
+      "id": "tin_dung_bao_tri_thanh_toan_t038_1",
+      "topic": "tin_dung",
+      "source_id": "ban_tin_sang",
+      "source_tier": "bao_chi",
+      "headline": "Payment processing slows during partner system maintenance",
+      "direction": "ngang",
+      "kind": "signal",
+      "truth": "dung",
+      "link": "event:checkout_outage",
+      "verify_with": [
+        "doi_chieu_nguon"
+      ],
+      "state_direction": null,
+      "exaggerates": false
+    },
+    {
+      "id": "tin_dung_bao_tri_thanh_toan_t038_2",
+      "topic": "tin_dung",
+      "source_id": "courtyard_dispatch",
+      "source_tier": "bao_chi",
+      "headline": "Partner maintenance disrupts the normal pace of payment processing",
+      "direction": "ngang",
+      "kind": "signal",
+      "truth": "dung",
+      "link": "event:checkout_outage",
+      "verify_with": [
+        "doi_chieu_nguon"
+      ],
+      "state_direction": null,
+      "exaggerates": false
+    },
+    {
+      "id": "tin_dung_thong_bao_bao_tri_t038_1",
+      "topic": "tin_dung",
+      "source_id": "cuc_thong_ke",
+      "source_tier": "chinh_thuc",
+      "headline": "Public portal notice schedules a routine service interruption",
+      "direction": "ngang",
+      "kind": "noise",
+      "truth": "khong_lien_quan",
+      "link": null,
+      "verify_with": [
+        "doi_chieu_nguon"
+      ],
+      "state_direction": null,
+      "exaggerates": false
+    },
+    {
+      "id": "tin_dung_thong_bao_bao_tri_t038_2",
+      "topic": "tin_dung",
+      "source_id": "trade_register",
+      "source_tier": "chinh_thuc",
+      "headline": "Website maintenance window posted for the regulator's portal",
+      "direction": "ngang",
+      "kind": "noise",
+      "truth": "khong_lien_quan",
+      "link": null,
+      "verify_with": [
+        "doi_chieu_nguon"
+      ],
+      "state_direction": null,
+      "exaggerates": false
+    },
+    {
+      "id": "noi_bo_cong_dat_hang_loi_t038_1",
+      "topic": "noi_bo",
+      "source_id": "dong_nghiep",
+      "source_tier": "noi_bo",
+      "headline": "A dealer quietly showed me an error on the first ordering screen",
+      "direction": "giam",
+      "kind": "signal",
+      "truth": "dung",
+      "link": "event:app_bug",
+      "verify_with": [
+        "lam_sach_du_lieu",
+        "truy_van_lich_su"
+      ],
+      "state_direction": null,
+      "exaggerates": false
+    },
+    {
+      "id": "noi_bo_cong_dat_hang_loi_t038_2",
+      "topic": "noi_bo",
+      "source_id": "dong_nghiep",
+      "source_tier": "noi_bo",
+      "headline": "Off the record, new agents cannot get past the portal's opening page",
+      "direction": "giam",
+      "kind": "signal",
+      "truth": "dung",
+      "link": "event:app_bug",
+      "verify_with": [
+        "lam_sach_du_lieu",
+        "truy_van_lich_su"
+      ],
+      "state_direction": null,
+      "exaggerates": false
+    },
+    {
+      "id": "noi_bo_kho_cham_t038_1",
+      "topic": "noi_bo",
+      "source_id": "dong_nghiep",
+      "source_tier": "noi_bo",
+      "headline": "Between us, warehouse screens freeze when the queue builds",
+      "direction": "giam",
+      "kind": "signal",
+      "truth": "dung",
+      "link": "event:server_outage",
+      "verify_with": [
+        "lam_sach_du_lieu",
+        "truy_van_lich_su"
+      ],
+      "state_direction": null,
+      "exaggerates": false
+    },
+    {
+      "id": "noi_bo_kho_cham_t038_2",
+      "topic": "noi_bo",
+      "source_id": "dong_nghiep",
+      "source_tier": "noi_bo",
+      "headline": "Someone on the loading desk says the system stalls at peak time",
+      "direction": "giam",
+      "kind": "signal",
+      "truth": "dung",
+      "link": "event:server_outage",
+      "verify_with": [
+        "lam_sach_du_lieu",
+        "truy_van_lich_su"
+      ],
+      "state_direction": null,
+      "exaggerates": false
+    },
+    {
+      "id": "noi_bo_bang_so_trung_t038_1",
+      "topic": "noi_bo",
+      "source_id": "dong_nghiep",
+      "source_tier": "noi_bo",
+      "headline": "Quiet heads-up: identical rows recur in the weekly export",
+      "direction": "giam",
+      "kind": "signal",
+      "truth": "dung",
+      "link": "event:logging_error",
+      "verify_with": [
+        "lam_sach_du_lieu",
+        "truy_van_lich_su"
+      ],
+      "state_direction": null,
+      "exaggerates": false
+    },
+    {
+      "id": "noi_bo_bang_so_trung_t038_2",
+      "topic": "noi_bo",
+      "source_id": "dong_nghiep",
+      "source_tier": "noi_bo",
+      "headline": "I checked the weekly file; several records seem to have been copied",
+      "direction": "giam",
+      "kind": "signal",
+      "truth": "dung",
+      "link": "event:logging_error",
+      "verify_with": [
+        "lam_sach_du_lieu",
+        "truy_van_lich_su"
+      ],
+      "state_direction": null,
+      "exaggerates": false
+    },
+    {
+      "id": "noi_bo_quang_cao_it_don_t038_1",
+      "topic": "noi_bo",
+      "source_id": "dong_nghiep",
+      "source_tier": "noi_bo",
+      "headline": "A campaign contact says the clicks are coming, but orders are not",
+      "direction": "giam",
+      "kind": "signal",
+      "truth": "dung",
+      "link": "event:bad_traffic",
+      "verify_with": [
+        "lam_sach_du_lieu",
+        "truy_van_lich_su"
+      ],
+      "state_direction": null,
+      "exaggerates": false
+    },
+    {
+      "id": "noi_bo_quang_cao_it_don_t038_2",
+      "topic": "noi_bo",
+      "source_id": "dong_nghiep",
+      "source_tier": "noi_bo",
+      "headline": "Between us, the new ad audience watches without placing orders",
+      "direction": "giam",
+      "kind": "signal",
+      "truth": "dung",
+      "link": "event:bad_traffic",
+      "verify_with": [
+        "lam_sach_du_lieu",
+        "truy_van_lich_su"
+      ],
+      "state_direction": null,
+      "exaggerates": false
+    }
+  ]
 }
