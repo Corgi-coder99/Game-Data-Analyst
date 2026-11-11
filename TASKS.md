@@ -945,3 +945,7 @@ Bảng phân bố trước/sau (tính từ JSON; checker Python chưa chạy). T
 | bao_chi | 0.823333 / 0.823333 | 0.666667 / 0.666667 |
 | mang_xa_hoi | 0.425 / 0.425 | 0 / 0 |
 | noi_bo | 0.475 / 0.475 | 0 / 0 |
+
+
+### T-039 | Claude subagent | 2026-11-11 | In progress
+- Font pixel vẽ bằng mã (không tải) và hiệu ứng (chuyển cảnh, cửa sổ, số chạy, confetti, rung màn hình), có công tắc Pixel font và Reduce motion. Spec game-studio/godot/docs/SPEC-T-039.md, worktree ai-company-t039, nhánh codex/T-039. Handoff: docs/HANDOFF-T-039.md.
