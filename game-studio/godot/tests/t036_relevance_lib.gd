@@ -7,31 +7,17 @@ const Game = preload("res://scripts/world/world_game.gd")
 const Generator = preload("res://scripts/data/generator.gd")
 const Reference = preload("res://scripts/data/reference.gd")
 const Loader = preload("res://scripts/data.gd")
+const Reading = preload("res://tests/t036_reading.gd")
 
 # Question -> what a relevant file must mirror. q5 is an event question (the rival's discount shows in the
 # competitor scrape); q8 (report integrity) has no data mirror.
 const TARGET := {"q1":"nguyen_lieu", "q3":"lai_suat", "q4":"suc_mua", "q5":"@competitor_scrape", "q6":"tin_dung", "q8":"@web_funnel", "q9":"tin_dung"}
-# Public reading thresholds (percent change of the file's metric, last 7 days vs the 7 before).
-const DEAD := 2.0
-const Q8_JUMP := 5.0
-const Q9_RISE := 10.0
-# Metric direction -> variable direction: the loan book's days past due move against credit health.
-const SIGN := {"loan_book":-1.0}
-
 static func is_relevant(file: Dictionary, qid: String) -> bool:
 	var t: String = TARGET.get(qid, "")
 	if t == "": return false
 	if t.begins_with("@"): return file.name == t.substr(1)
 	return file.name != "ab_test_log" and str(file.hidden.variable) == t
 
-# PUBLIC reading rule (documented in PLAY-v2): the 7-day change of the relevant file -> forecast.
-static func read_answer(qid: String, file_name: String, pct: float) -> String:
-	var v := pct * float(SIGN.get(file_name, 1.0))
-	match qid:
-		"q5": return "tang" if pct <= -DEAD else "ngang"
-		"q8": return "giam" if pct >= Q8_JUMP else "tang"
-		"q9": return "giam" if pct >= Q9_RISE else "ngang"
-	return "tang" if v >= DEAD else ("giam" if v <= -DEAD else "ngang")
 static func measure(first_seed: int, seeds: int, horizon: int) -> Dictionary:
 	var cfg: Dictionary = Loader.load_json("res://data/datasets.json")
 	var ref := Reference.new(cfg)
@@ -51,6 +37,7 @@ static func measure(first_seed: int, seeds: int, horizon: int) -> Dictionary:
 			row.days += 1
 			drow.days += 1
 			var relevant: Array = files.filter(func(f): return is_relevant(f, q.id))
+			relevant.sort_custom(func(a, b): return int(a.hidden.get("relevant", false)) > int(b.hidden.get("relevant", false)))
 			if not relevant.is_empty():
 				out.with_relevant += 1
 				row.with_relevant += 1
@@ -59,7 +46,7 @@ static func measure(first_seed: int, seeds: int, horizon: int) -> Dictionary:
 				var truth: Array = ref.evaluate_reference(f).truth
 				var read := ""
 				for t in truth:
-					if t.id == "metric_change" and t.value != null: read = read_answer(q.id, f.name, float(t.value.pct))
+					if t.id == "metric_change" and t.value != null: read = Reading.read_answer(q.id, f.name, float(t.value.pct))
 				var nrow: Dictionary = out.by_name.get(f.name, {"days":0, "agree":0})
 				nrow.days += 1
 				if read == answer:

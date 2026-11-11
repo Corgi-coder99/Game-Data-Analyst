@@ -150,6 +150,7 @@ func score_analysis(day: int, analysis: Dictionary) -> float:
 	var total := 0.0
 	var count := 0
 	var answered := 0
+	var flags := 0
 	for id in ids:
 		var f := _file(day, str(id))
 		if f.is_empty(): continue
@@ -159,14 +160,18 @@ func score_analysis(day: int, analysis: Dictionary) -> float:
 		var submission := {"pipeline":analysis.get("pipelines", {}).get(id, []), "chart":chart, "findings":analysis.get("findings", {}).get(id, {})}
 		submit_analysis(day, str(id), submission)
 		answered += submission.findings.size()
-		total += float(_grader.grade(f, _ref, _ref.evaluate_reference(f).truth, submission).total)
+		var graded: Dictionary = _grader.grade(f, _ref, _ref.evaluate_reference(f).truth, submission)
+		total += float(graded.total)
+		flags += graded.chart.flags.size()
 		count += 1
 	if count == 0: return 0.0
 	var grade := total / count
 	var cfg: Dictionary = _cfg_data
-	if grade >= float(cfg.get("analysis_good", 0.6)): return float(cfg.get("analysis_bonus", 1.0)) * grade
-	if answered > 0 and grade < float(cfg.get("analysis_wrong_below", 0.3)): return -float(cfg.get("analysis_wrong_penalty", 0.0))
-	return 0.0
+	# T-036: every quality flag on an attached chart costs a little trust (data.flag_penalty, capped).
+	var flag_cost := minf(float(cfg.get("flag_penalty", 0.0)) * flags, float(cfg.get("flag_penalty_max", 0.0)))
+	if grade >= float(cfg.get("analysis_good", 0.6)): return float(cfg.get("analysis_bonus", 1.0)) * grade - flag_cost
+	if answered > 0 and grade < float(cfg.get("analysis_wrong_below", 0.3)): return -float(cfg.get("analysis_wrong_penalty", 0.0)) - flag_cost
+	return -flag_cost
 
 # T-034: the review record for the "Your analysis" step; same gate as review().
 func analysis_review(day: int) -> Dictionary:
