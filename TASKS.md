@@ -821,7 +821,7 @@ Kết quả chạy thật (worktree, Godot 4.7.2 console):
 - Cân bằng lõi dữ liệu: file liên quan câu hỏi, bot phân tích trung thực (clean/sloppy/slow/misleader), thưởng phạt, chi phí thời gian, độ khó theo ngày, nhịp XP. Spec docs/SPEC-T-036.md, worktree ai-company-t036, nhánh codex/T-036. Handoff: docs/HANDOFF-T-036.md.
 
 
-### T-038 | Codex | 2026-11-11 | Blocked
+### T-038 | Codex | 2026-11-11 | Done (Claude làm nốt world.json late.updates, bảng bot, câu chữ 44 tiêu đề, seed test)
 - Mở rộng nội dung: tin tức 41 -> 110+, câu hỏi sếp 7 -> 18+, thêm nguồn, viết lại câu huấn luyện cho tự nhiên. Spec game-studio/godot/docs/SPEC-T-038.md, worktree ai-company-codex, nhánh codex/T-038. File được sửa: data/news.json, data/questions.json, data/coaching.json, data/datasets.json (chỉ bảng ánh xạ câu hỏi), tools/check_news.py, docs/CONTENT-BIBLE-v2.md. Test dài do Claude chạy.
 
 - Bàn giao Codex: đã dừng theo guard rule vì đặc tả chưa cho sửa đủ mapping trong repo; chưa hoàn tất, chưa chuyển Review. Không commit/push/merge, không chạy test dài, không gọi mạng. Nhánh `codex/T-038`, cây làm việc ban đầu sạch; owner/In progress đã có trước khi sửa.
