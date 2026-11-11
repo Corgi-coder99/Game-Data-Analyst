@@ -794,7 +794,7 @@ Kết quả chạy thật (worktree, Godot 4.7.2 console):
 - Nội dung học tập: danh mục case, Handbook, lời huấn luyện, tutorial 5 ngày, validator. Spec docs/SPEC-T-035a.md, worktree ai-company-t035a, nhánh codex/T-035a. Không code game.
 
 
-### T-034 | Claude subagent | 2026-11-10 | In progress
+### T-034 | Claude subagent | 2026-11-10 | Done
 - UI lõi dữ liệu: app Files/Sheet (bước sửa được), trình tạo biểu đồ + cảnh báo gây hiểu lầm, Dashboard, đính kèm phân tích và chọn kết luận trong Mail, bước 'Your analysis' ở họp cuối ngày. Spec docs/SPEC-T-034.md, worktree ai-company-t034, nhánh codex/T-034. Handoff: docs/HANDOFF-T-034.md.
 
 
