@@ -155,6 +155,16 @@ func wait_for_data(minutes: int = -1) -> Dictionary:
 	_minutes += int(_config.clock.wait_minutes) if minutes < 0 else maxi(0, minutes)
 	return {"ok":true, "minutes":_minutes, "band":band()}
 
+# T-034: time spent in the data apps (opening a file, pinning a chart). Time only; never Energy.
+func spend_minutes(minutes: int) -> Dictionary:
+	if not _open or _submitted: return {"ok":false, "error":"day_closed"}
+	_minutes += maxi(0, minutes)
+	return {"ok":true, "minutes":_minutes, "band":band()}
+
+# T-034: optional hook set by the flow. Called as (day, analysis) -> float, a signed adjustment of the report delta.
+# Without an `analysis` in the report the hook is never called, so existing results are unchanged.
+var analysis_scorer: Callable = Callable()
+
 func question_today() -> Dictionary:
 	if _day == 0: return {}
 	var q: Dictionary = _scenario._questions[_day - 1]
@@ -223,6 +233,12 @@ func end_day() -> Dictionary:
 	elif timing == "missed":
 		result = {"acc":0.0, "ev":0.0, "delta":-float(_config.late.missed_penalty), "label":"penalty"}
 	result["timing"] = timing
+	if timing != "missed" and _pending.get("analysis") is Dictionary and not analysis_scorer.is_null():
+		var adjust := float(analysis_scorer.call(_day, _pending.analysis))
+		result["analysis"] = adjust
+		if adjust != 0.0:
+			result.delta = snappedf(float(result.delta) + adjust, 0.1)
+			result.label = "reward" if result.delta > 0 else "penalty"
 	var career_result: Dictionary = _career.update(result)
 	var today: Array = _news._items.filter(func(n): return n.day == _day).duplicate(true)
 	var shocks: Array = _scenario._shocks.filter(func(s): return s.day == _day).duplicate(true)

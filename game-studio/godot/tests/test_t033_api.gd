@@ -222,11 +222,11 @@ func test_sources() -> void:
 			check(rng_call.search(line) == null, "%s uses no global RNG: %s" % [filename, line.strip_edges()])
 		var reads_hidden := source.contains("scenario._days") or source.contains("scenario._shocks") or source.contains("._answers") or source.contains("._questions")
 		check(reads_hidden == (filename == "generator.gd"), "%s: only generator.gd reads trajectory state" % filename)
-		check(source.contains("get(\"_scenario\")") == (filename == "data_game.gd"), "%s: only data_game.gd touches world._scenario" % filename)
+		check(source.contains("get(\"_scenario\")") == (filename in ["data_game.gd", "session.gd"]), "%s: only data_game.gd and session.gd (T-034) touch world._scenario" % filename)
 		check(not source.contains("randomize()"), "%s never randomizes" % filename)
 	for dir in ["res://scripts/v2", "res://scripts/v2/windows", "res://scripts/ui", "res://scripts/sim", "res://scripts/world", "res://scripts/life", "res://scripts/meta"]:
 		for filename in DirAccess.get_files_at(dir):
-			if filename.ends_with(".gd"): check(not FileAccess.get_file_as_string(dir + "/" + filename).contains("scripts/data/"), "%s/%s does not use the data engine yet" % [dir, filename])
+			if filename.ends_with(".gd"): check(not FileAccess.get_file_as_string(dir + "/" + filename).contains("scripts/data/") or filename in ["desktop.gd", "review_scene.gd"], "%s/%s does not use the data engine (T-034: only desktop.gd and review_scene.gd may)" % [dir, filename])
 	check(FileAccess.file_exists("res://data/datasets.json") and FileAccess.get_file_as_string("res://data/datasets.json").contains("suc_mua"), "config exists with the variable mapping")
 
 func _init() -> void:

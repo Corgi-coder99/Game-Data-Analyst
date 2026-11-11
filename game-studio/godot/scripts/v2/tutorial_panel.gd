@@ -9,7 +9,7 @@ const AREA := Rect2(504, 30, 132, 290)
 const BUBBLE_HEIGHT := 128
 const GOALS := ["read", "verify", "pin", "write", "send"]
 # Each step ends when the player does the matching action; "question" waits for Continue.
-const STEP_FLAGS := {"question":"", "browser":"opened_browser", "select":"selected", "codepad":"opened_tools", "check":"checked", "pin":"pinned", "mail":"opened_mail", "forecast":"composed", "send":"sent"}
+const STEP_FLAGS := {"question":"", "browser":"opened_browser", "select":"selected", "codepad":"opened_tools", "check":"checked", "pin":"pinned", "files":"opened_files", "sheet":"opened_sheet", "chart":"charted", "mail":"opened_mail", "forecast":"composed", "send":"sent"}
 var strings: Dictionary
 var sprites := Sprites.new()
 var steps: Array = []

@@ -8,6 +8,12 @@ const VERIFY_COLORS := {"xac_nhan":24, "bac_bo":26, "chua_du_can_cu":28, "cu":6,
 const AREA := Rect2(58, 30, 442, 290)
 const SLOTS := 3
 const CLOCK_COLORS := {"on_time":24, "late":28, "missed":26}
+const AnalysisPanel = preload("res://scripts/v2/windows/analysis_panel.gd")
+# T-034: optional data session (Analysis section). Without it Mail behaves exactly as before.
+var session: RefCounted
+var analysis_open := false
+var analysis_button: Button
+var analysis_panel: Control
 var strings: Dictionary
 var question_id := ""
 var subject := ""
@@ -63,7 +69,17 @@ func display(question: String, hand: Array, pinned: Array, limit: int, subject_t
 	while chosen.size() > max_actions: chosen.pop_back()
 	render()
 
+func attach_session(value: RefCounted) -> void:
+	session = value
+	if value != null: value.changed.connect(func(): if content != null and not confirming and not analysis_open: render())
+
+func open_analysis(value: bool) -> void:
+	if session == null: return
+	analysis_open = value
+	render()
+
 func reset() -> void:
+	analysis_open = false
 	forecast = ""
 	confidence = ""
 	chosen.clear()
@@ -126,7 +142,11 @@ func clear_all() -> bool:
 	return true
 
 func build_input() -> Dictionary:
-	return {"question_id":question_id, "forecast":forecast, "confidence":confidence, "evidence":evidence.map(func(item): return item.uid), "actions":chosen.duplicate()}
+	var input := {"question_id":question_id, "forecast":forecast, "confidence":confidence, "evidence":evidence.map(func(item): return item.uid), "actions":chosen.duplicate()}
+	if session != null:
+		var analysis: Dictionary = session.payload()
+		if not analysis.is_empty(): input["analysis"] = analysis
+	return input
 
 func request_submit() -> bool:
 	if not ready_to_submit() or confirming: return false
@@ -281,6 +301,20 @@ func render() -> void:
 	y_list += 13
 	if todo.is_empty() and not locked:
 		checklist_labels.append(label(content, strings.report.todo_ok, Rect2(0, y_list, 208, 12), 24))
+	analysis_button = null
+	analysis_panel = null
+	if session != null:
+		var count: int = session.attached.size()
+		analysis_button = button(content, strings.data_ui.mail.button % count, Rect2(322, 198, 112, 16))
+		analysis_button.name = "AnalysisButton"
+		analysis_button.tooltip_text = strings.data_ui.mail.findings
+		analysis_button.pressed.connect(func(): open_analysis(true))
+		if analysis_open:
+			analysis_panel = AnalysisPanel.new()
+			content.add_child(analysis_panel)
+			analysis_panel.build(session, strings.data_ui, locked)
+			analysis_panel.closed.connect(func(): open_analysis(false))
+			analysis_panel.edited.connect(draft_changed.emit)
 	confirm_panel = null
 	if confirming:
 		confirm_panel = Panel.new()
