@@ -21,7 +21,8 @@ static func interpretation(n: Dictionary, question: String) -> String:
 	return "ngang"
 
 static func topic_for(question: String) -> String:
-	return {"q1":"nguyen_lieu","q3":"lai_suat","q4":"suc_mua","q5":"suc_mua","q6":"tin_dung","q8":"noi_bo","q9":"tin_dung"}.get(question, "")
+	# T-038: the new questions read the topic named by their public variable.
+	return {"q1":"nguyen_lieu","q3":"lai_suat","q4":"suc_mua","q5":"suc_mua","q6":"tin_dung","q8":"noi_bo","q9":"tin_dung","q10":"ty_gia","q11":"ty_gia","q12":"ty_gia","q13":"chung_khoan","q14":"chung_khoan","q15":"chung_khoan","q16":"nguyen_lieu","q17":"nguyen_lieu","q18":"lai_suat","q19":"lai_suat","q20":"suc_mua","q21":"suc_mua","q22":"tin_dung"}.get(question, "")
 
 static func propose(game: RefCounted, bot: String, rng: RandomNumberGenerator, stats: Dictionary = {}) -> Dictionary:
 	var question: Dictionary = game.question_today()

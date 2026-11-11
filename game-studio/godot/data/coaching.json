@@ -1,1406 +1,1406 @@
 {
- "version": 1,
- "note": "All data, names and figures are FICTIONAL. Not real market data, not investment advice.",
- "voices": {
-  "hanh": "Ms. Hanh, the boss: direct, brisk, fair.",
-  "khoi": "Khoi, the colleague: jokey, a little dramatic, always on your side.",
-  "linh": "Dr. Linh, the mentor: calm, patient, explains the why."
- },
- "traps": {
-  "duplicates": {
-   "name": "double export",
-   "praise": [
-    {
-     "voice": "hanh",
-     "text": "Good. You removed the copied rows before adding anything up. That is exactly what the board pays for."
-    },
-    {
-     "voice": "khoi",
-     "text": "Okay, I am impressed: you removed the copied rows before adding anything up. Do not tell the others I said that."
-    },
-    {
-     "voice": "linh",
-     "text": "Well done. You removed the copied rows before adding anything up. Notice how that protects every number that comes after it."
-    }
-   ],
-   "miss": [
-    {
-     "voice": "hanh",
-     "text": "There was a double export in this case and the report counted the copied rows twice. Check for it before you send next time."
-    },
-    {
-     "voice": "khoi",
-     "text": "Ah, the double export got you. The report counted the copied rows twice. It got me last year too, and I still bring it up at parties."
-    },
-    {
-     "voice": "linh",
-     "text": "Let us look together. The case had a double export, and the report counted the copied rows twice. What check would have caught it?"
-    }
-   ],
-   "wrong_fix": [
-    {
-     "voice": "hanh",
-     "text": "You noticed the double export, which is good, but your fix deleted real repeat orders along with the copies. Right instinct, wrong repair."
-    },
-    {
-     "voice": "khoi",
-     "text": "Points for trying! Your fix deleted real repeat orders along with the copies. The double export laughs, but only a little."
-    },
-    {
-     "voice": "linh",
-     "text": "You were right that something was wrong with the double export. Your fix deleted real repeat orders along with the copies. Let us find a gentler repair."
-    }
-   ]
+  "version": 1,
+  "note": "All data, names and figures are FICTIONAL. Not real market data, not investment advice.",
+  "voices": {
+    "hanh": "Ms. Hanh, the boss: direct, brisk, fair.",
+    "khoi": "Khoi, the colleague: jokey, a little dramatic, always on your side.",
+    "linh": "Dr. Linh, the mentor: calm, patient, explains the why."
   },
-  "missing_as_zero": {
-   "name": "fake zeros",
-   "praise": [
-    {
-     "voice": "hanh",
-     "text": "Nice catch on the fake zeros. You spotted that the zeros were outages and not sales. Keep that habit."
-    },
-    {
-     "voice": "khoi",
-     "text": "You spotted that the zeros were outages and not sales! The fake zeros never stood a chance. Coffee is on me."
-    },
-    {
-     "voice": "linh",
-     "text": "That was careful work on the fake zeros. You spotted that the zeros were outages and not sales, and the result is stronger for it."
-    }
-   ],
-   "miss": [
-    {
-     "voice": "hanh",
-     "text": "The report treated outage zeros as real sales of nothing. The fake zeros was there to be found. Look again."
-    },
-    {
-     "voice": "khoi",
-     "text": "Plot twist: the case had a hidden fake zeros, and the report treated outage zeros as real sales of nothing. Plot twists are hard to spot, but not impossible."
-    },
-    {
-     "voice": "linh",
-     "text": "This one is easy to miss. The report treated outage zeros as real sales of nothing. Next time, start with an audit and look for the fake zeros."
-    }
-   ],
-   "wrong_fix": [
-    {
-     "voice": "hanh",
-     "text": "Your fix filled the gaps with an invented average. Fixing the fake zeros means changing as little as possible."
-    },
-    {
-     "voice": "khoi",
-     "text": "I love the energy, but your fix filled the gaps with an invented average. The fake zeros is still winning."
-    },
-    {
-     "voice": "linh",
-     "text": "Good instinct on the fake zeros. The fix filled the gaps with an invented average, so check the preview after each step."
-    }
-   ]
-  },
-  "mixed_units_currency": {
-   "name": "mixed units",
-   "praise": [
-    {
-     "voice": "hanh",
-     "text": "Good. You put every price into one unit and currency first. That is exactly what the board pays for."
-    },
-    {
-     "voice": "khoi",
-     "text": "Okay, I am impressed: you put every price into one unit and currency first. Do not tell the others I said that."
-    },
-    {
-     "voice": "linh",
-     "text": "Well done. You put every price into one unit and currency first. Notice how that protects every number that comes after it."
-    }
-   ],
-   "miss": [
-    {
-     "voice": "hanh",
-     "text": "There was a mixed units in this case and the report added numbers that were in different units. Check for it before you send next time."
-    },
-    {
-     "voice": "khoi",
-     "text": "Ah, the mixed units got you. The report added numbers that were in different units. It got me last year too, and I still bring it up at parties."
-    },
-    {
-     "voice": "linh",
-     "text": "Let us look together. The case had a mixed units, and the report added numbers that were in different units. What check would have caught it?"
-    }
-   ],
-   "wrong_fix": [
-    {
-     "voice": "hanh",
-     "text": "You noticed the mixed units, which is good, but your fix converted some rows and left others alone. Right instinct, wrong repair."
-    },
-    {
-     "voice": "khoi",
-     "text": "Points for trying! Your fix converted some rows and left others alone. The mixed units laughs, but only a little."
-    },
-    {
-     "voice": "linh",
-     "text": "You were right that something was wrong with the mixed units. Your fix converted some rows and left others alone. Let us find a gentler repair."
-    }
-   ]
-  },
-  "date_timezone": {
-   "name": "date and time zone",
-   "praise": [
-    {
-     "voice": "hanh",
-     "text": "Nice catch on the date and time zone. You parsed the dates and lined up the time zones. Keep that habit."
-    },
-    {
-     "voice": "khoi",
-     "text": "You parsed the dates and lined up the time zones! The date and time zone never stood a chance. Coffee is on me."
-    },
-    {
-     "voice": "linh",
-     "text": "That was careful work on the date and time zone. You parsed the dates and lined up the time zones, and the result is stronger for it."
-    }
-   ],
-   "miss": [
-    {
-     "voice": "hanh",
-     "text": "The report built days out of mismatched dates. The date and time zone was there to be found. Look again."
-    },
-    {
-     "voice": "khoi",
-     "text": "Plot twist: the case had a hidden date and time zone, and the report built days out of mismatched dates. Plot twists are hard to spot, but not impossible."
-    },
-    {
-     "voice": "linh",
-     "text": "This one is easy to miss. The report built days out of mismatched dates. Next time, start with an audit and look for the date and time zone."
-    }
-   ],
-   "wrong_fix": [
-    {
-     "voice": "hanh",
-     "text": "Your fix assumed every source used the same clock. Fixing the date and time zone means changing as little as possible."
-    },
-    {
-     "voice": "khoi",
-     "text": "I love the energy, but your fix assumed every source used the same clock. The date and time zone is still winning."
-    },
-    {
-     "voice": "linh",
-     "text": "Good instinct on the date and time zone. The fix assumed every source used the same clock, so check the preview after each step."
-    }
-   ]
-  },
-  "category_typos": {
-   "name": "spelling variants",
-   "praise": [
-    {
-     "voice": "hanh",
-     "text": "Good. You merged the spelling variants before grouping. That is exactly what the board pays for."
-    },
-    {
-     "voice": "khoi",
-     "text": "Okay, I am impressed: you merged the spelling variants before grouping. Do not tell the others I said that."
-    },
-    {
-     "voice": "linh",
-     "text": "Well done. You merged the spelling variants before grouping. Notice how that protects every number that comes after it."
-    }
-   ],
-   "miss": [
-    {
-     "voice": "hanh",
-     "text": "There was a spelling variants in this case and the report ranked regions that were split by typos. Check for it before you send next time."
-    },
-    {
-     "voice": "khoi",
-     "text": "Ah, the spelling variants got you. The report ranked regions that were split by typos. It got me last year too, and I still bring it up at parties."
-    },
-    {
-     "voice": "linh",
-     "text": "Let us look together. The case had a spelling variants, and the report ranked regions that were split by typos. What check would have caught it?"
-    }
-   ],
-   "wrong_fix": [
-    {
-     "voice": "hanh",
-     "text": "You noticed the spelling variants, which is good, but your fix merged names that were really different places. Right instinct, wrong repair."
-    },
-    {
-     "voice": "khoi",
-     "text": "Points for trying! Your fix merged names that were really different places. The spelling variants laughs, but only a little."
-    },
-    {
-     "voice": "linh",
-     "text": "You were right that something was wrong with the spelling variants. Your fix merged names that were really different places. Let us find a gentler repair."
-    }
-   ]
-  },
-  "outlier_entry_error": {
-   "name": "extra-zero value",
-   "praise": [
-    {
-     "voice": "hanh",
-     "text": "Nice catch on the extra-zero value. You fixed the typo and kept the real move. Keep that habit."
-    },
-    {
-     "voice": "khoi",
-     "text": "You fixed the typo and kept the real move! The extra-zero value never stood a chance. Coffee is on me."
-    },
-    {
-     "voice": "linh",
-     "text": "That was careful work on the extra-zero value. You fixed the typo and kept the real move, and the result is stronger for it."
-    }
-   ],
-   "miss": [
-    {
-     "voice": "hanh",
-     "text": "The report let one typo wreck the picture. The extra-zero value was there to be found. Look again."
-    },
-    {
-     "voice": "khoi",
-     "text": "Plot twist: the case had a hidden extra-zero value, and the report let one typo wreck the picture. Plot twists are hard to spot, but not impossible."
-    },
-    {
-     "voice": "linh",
-     "text": "This one is easy to miss. The report let one typo wreck the picture. Next time, start with an audit and look for the extra-zero value."
-    }
-   ],
-   "wrong_fix": [
-    {
-     "voice": "hanh",
-     "text": "Your fix threw out the real price move with the typo. Fixing the extra-zero value means changing as little as possible."
-    },
-    {
-     "voice": "khoi",
-     "text": "I love the energy, but your fix threw out the real price move with the typo. The extra-zero value is still winning."
-    },
-    {
-     "voice": "linh",
-     "text": "Good instinct on the extra-zero value. The fix threw out the real price move with the typo, so check the preview after each step."
-    }
-   ]
-  },
-  "seasonality_vs_trend": {
-   "name": "seasonal pattern",
-   "praise": [
-    {
-     "voice": "hanh",
-     "text": "Good. You compared with the same period last year. That is exactly what the board pays for."
-    },
-    {
-     "voice": "khoi",
-     "text": "Okay, I am impressed: you compared with the same period last year. Do not tell the others I said that."
-    },
-    {
-     "voice": "linh",
-     "text": "Well done. You compared with the same period last year. Notice how that protects every number that comes after it."
-    }
-   ],
-   "miss": [
-    {
-     "voice": "hanh",
-     "text": "There was a seasonal pattern in this case and the report read the calendar as growth. Check for it before you send next time."
-    },
-    {
-     "voice": "khoi",
-     "text": "Ah, the seasonal pattern got you. The report read the calendar as growth. It got me last year too, and I still bring it up at parties."
-    },
-    {
-     "voice": "linh",
-     "text": "Let us look together. The case had a seasonal pattern, and the report read the calendar as growth. What check would have caught it?"
-    }
-   ],
-   "wrong_fix": [
-    {
-     "voice": "hanh",
-     "text": "You noticed the seasonal pattern, which is good, but your fix drew a straight line through a repeating wave. Right instinct, wrong repair."
-    },
-    {
-     "voice": "khoi",
-     "text": "Points for trying! Your fix drew a straight line through a repeating wave. The seasonal pattern laughs, but only a little."
-    },
-    {
-     "voice": "linh",
-     "text": "You were right that something was wrong with the seasonal pattern. Your fix drew a straight line through a repeating wave. Let us find a gentler repair."
-    }
-   ]
-  },
-  "simpsons_paradox": {
-   "name": "mixed groups",
-   "praise": [
-    {
-     "voice": "hanh",
-     "text": "Nice catch on the mixed groups. You split by group before declaring a winner. Keep that habit."
-    },
-    {
-     "voice": "khoi",
-     "text": "You split by group before declaring a winner! The mixed groups never stood a chance. Coffee is on me."
-    },
-    {
-     "voice": "linh",
-     "text": "That was careful work on the mixed groups. You split by group before declaring a winner, and the result is stronger for it."
-    }
-   ],
-   "miss": [
-    {
-     "voice": "hanh",
-     "text": "The report trusted the overall total over the group results. The mixed groups was there to be found. Look again."
-    },
-    {
-     "voice": "khoi",
-     "text": "Plot twist: the case had a hidden mixed groups, and the report trusted the overall total over the group results. Plot twists are hard to spot, but not impossible."
-    },
-    {
-     "voice": "linh",
-     "text": "This one is easy to miss. The report trusted the overall total over the group results. Next time, start with an audit and look for the mixed groups."
-    }
-   ],
-   "wrong_fix": [
-    {
-     "voice": "hanh",
-     "text": "Your fix split the data but ignored how the groups were weighted. Fixing the mixed groups means changing as little as possible."
-    },
-    {
-     "voice": "khoi",
-     "text": "I love the energy, but your fix split the data but ignored how the groups were weighted. The mixed groups is still winning."
-    },
-    {
-     "voice": "linh",
-     "text": "Good instinct on the mixed groups. The fix split the data but ignored how the groups were weighted, so check the preview after each step."
-    }
-   ]
-  },
-  "small_sample_noise": {
-   "name": "tiny sample",
-   "praise": [
-    {
-     "voice": "hanh",
-     "text": "Good. You noticed how few cases sat behind that number. That is exactly what the board pays for."
-    },
-    {
-     "voice": "khoi",
-     "text": "Okay, I am impressed: you noticed how few cases sat behind that number. Do not tell the others I said that."
-    },
-    {
-     "voice": "linh",
-     "text": "Well done. You noticed how few cases sat behind that number. Notice how that protects every number that comes after it."
-    }
-   ],
-   "miss": [
-    {
-     "voice": "hanh",
-     "text": "There was a tiny sample in this case and the report made a big story out of a handful of cases. Check for it before you send next time."
-    },
-    {
-     "voice": "khoi",
-     "text": "Ah, the tiny sample got you. The report made a big story out of a handful of cases. It got me last year too, and I still bring it up at parties."
-    },
-    {
-     "voice": "linh",
-     "text": "Let us look together. The case had a tiny sample, and the report made a big story out of a handful of cases. What check would have caught it?"
-    }
-   ],
-   "wrong_fix": [
-    {
-     "voice": "hanh",
-     "text": "You noticed the tiny sample, which is good, but your fix hid the small group instead of flagging it. Right instinct, wrong repair."
-    },
-    {
-     "voice": "khoi",
-     "text": "Points for trying! Your fix hid the small group instead of flagging it. The tiny sample laughs, but only a little."
-    },
-    {
-     "voice": "linh",
-     "text": "You were right that something was wrong with the tiny sample. Your fix hid the small group instead of flagging it. Let us find a gentler repair."
-    }
-   ]
-  },
-  "correlation_vs_causation": {
-   "name": "hidden cause",
-   "praise": [
-    {
-     "voice": "hanh",
-     "text": "Nice catch on the hidden cause. You said associated instead of caused. Keep that habit."
-    },
-    {
-     "voice": "khoi",
-     "text": "You said associated instead of caused! The hidden cause never stood a chance. Coffee is on me."
-    },
-    {
-     "voice": "linh",
-     "text": "That was careful work on the hidden cause. You said associated instead of caused, and the result is stronger for it."
-    }
-   ],
-   "miss": [
-    {
-     "voice": "hanh",
-     "text": "The report announced a cause that the data could not support. The hidden cause was there to be found. Look again."
-    },
-    {
-     "voice": "khoi",
-     "text": "Plot twist: the case had a hidden hidden cause, and the report announced a cause that the data could not support. Plot twists are hard to spot, but not impossible."
-    },
-    {
-     "voice": "linh",
-     "text": "This one is easy to miss. The report announced a cause that the data could not support. Next time, start with an audit and look for the hidden cause."
-    }
-   ],
-   "wrong_fix": [
-    {
-     "voice": "hanh",
-     "text": "Your fix denied there was any link at all. Fixing the hidden cause means changing as little as possible."
-    },
-    {
-     "voice": "khoi",
-     "text": "I love the energy, but your fix denied there was any link at all. The hidden cause is still winning."
-    },
-    {
-     "voice": "linh",
-     "text": "Good instinct on the hidden cause. The fix denied there was any link at all, so check the preview after each step."
-    }
-   ]
-  },
-  "base_rate": {
-   "name": "rare event",
-   "praise": [
-    {
-     "voice": "hanh",
-     "text": "Good. You counted the false alarms, not just the hits. That is exactly what the board pays for."
-    },
-    {
-     "voice": "khoi",
-     "text": "Okay, I am impressed: you counted the false alarms, not just the hits. Do not tell the others I said that."
-    },
-    {
-     "voice": "linh",
-     "text": "Well done. You counted the false alarms, not just the hits. Notice how that protects every number that comes after it."
-    }
-   ],
-   "miss": [
-    {
-     "voice": "hanh",
-     "text": "There was a rare event in this case and the report treated a flag as a near-certain hit. Check for it before you send next time."
-    },
-    {
-     "voice": "khoi",
-     "text": "Ah, the rare event got you. The report treated a flag as a near-certain hit. It got me last year too, and I still bring it up at parties."
-    },
-    {
-     "voice": "linh",
-     "text": "Let us look together. The case had a rare event, and the report treated a flag as a near-certain hit. What check would have caught it?"
-    }
-   ],
-   "wrong_fix": [
-    {
-     "voice": "hanh",
-     "text": "You noticed the rare event, which is good, but your fix threw the whole alarm away. Right instinct, wrong repair."
-    },
-    {
-     "voice": "khoi",
-     "text": "Points for trying! Your fix threw the whole alarm away. The rare event laughs, but only a little."
-    },
-    {
-     "voice": "linh",
-     "text": "You were right that something was wrong with the rare event. Your fix threw the whole alarm away. Let us find a gentler repair."
-    }
-   ]
-  },
-  "survivorship_bias": {
-   "name": "missing failures",
-   "praise": [
-    {
-     "voice": "hanh",
-     "text": "Nice catch on the missing failures. You asked what had been removed from the file. Keep that habit."
-    },
-    {
-     "voice": "khoi",
-     "text": "You asked what had been removed from the file! The missing failures never stood a chance. Coffee is on me."
-    },
-    {
-     "voice": "linh",
-     "text": "That was careful work on the missing failures. You asked what had been removed from the file, and the result is stronger for it."
-    }
-   ],
-   "miss": [
-    {
-     "voice": "hanh",
-     "text": "The report judged risk from the survivors only. The missing failures was there to be found. Look again."
-    },
-    {
-     "voice": "khoi",
-     "text": "Plot twist: the case had a hidden missing failures, and the report judged risk from the survivors only. Plot twists are hard to spot, but not impossible."
-    },
-    {
-     "voice": "linh",
-     "text": "This one is easy to miss. The report judged risk from the survivors only. Next time, start with an audit and look for the missing failures."
-    }
-   ],
-   "wrong_fix": [
-    {
-     "voice": "hanh",
-     "text": "Your fix assumed every missing account had failed. Fixing the missing failures means changing as little as possible."
-    },
-    {
-     "voice": "khoi",
-     "text": "I love the energy, but your fix assumed every missing account had failed. The missing failures is still winning."
-    },
-    {
-     "voice": "linh",
-     "text": "Good instinct on the missing failures. The fix assumed every missing account had failed, so check the preview after each step."
-    }
-   ]
-  },
-  "cherry_picking": {
-   "name": "chosen window",
-   "praise": [
-    {
-     "voice": "hanh",
-     "text": "Good. You checked the full period, not just the flattering window. That is exactly what the board pays for."
-    },
-    {
-     "voice": "khoi",
-     "text": "Okay, I am impressed: you checked the full period, not just the flattering window. Do not tell the others I said that."
-    },
-    {
-     "voice": "linh",
-     "text": "Well done. You checked the full period, not just the flattering window. Notice how that protects every number that comes after it."
-    }
-   ],
-   "miss": [
-    {
-     "voice": "hanh",
-     "text": "There was a chosen window in this case and the report repeated a flattering window as if it were the whole story. Check for it before you send next time."
-    },
-    {
-     "voice": "khoi",
-     "text": "Ah, the chosen window got you. The report repeated a flattering window as if it were the whole story. It got me last year too, and I still bring it up at parties."
-    },
-    {
-     "voice": "linh",
-     "text": "Let us look together. The case had a chosen window, and the report repeated a flattering window as if it were the whole story. What check would have caught it?"
-    }
-   ],
-   "wrong_fix": [
-    {
-     "voice": "hanh",
-     "text": "You noticed the chosen window, which is good, but your fix accused someone instead of showing the full chart. Right instinct, wrong repair."
-    },
-    {
-     "voice": "khoi",
-     "text": "Points for trying! Your fix accused someone instead of showing the full chart. The chosen window laughs, but only a little."
-    },
-    {
-     "voice": "linh",
-     "text": "You were right that something was wrong with the chosen window. Your fix accused someone instead of showing the full chart. Let us find a gentler repair."
-    }
-   ]
-  },
-  "misleading_axis": {
-   "name": "axis trick",
-   "praise": [
-    {
-     "voice": "hanh",
-     "text": "Nice catch on the axis trick. You started the bars at zero and labelled the units. Keep that habit."
-    },
-    {
-     "voice": "khoi",
-     "text": "You started the bars at zero and labelled the units! The axis trick never stood a chance. Coffee is on me."
-    },
-    {
-     "voice": "linh",
-     "text": "That was careful work on the axis trick. You started the bars at zero and labelled the units, and the result is stronger for it."
-    }
-   ],
-   "miss": [
-    {
-     "voice": "hanh",
-     "text": "The report let a cut-off axis exaggerate a small gap. The axis trick was there to be found. Look again."
-    },
-    {
-     "voice": "khoi",
-     "text": "Plot twist: the case had a hidden axis trick, and the report let a cut-off axis exaggerate a small gap. Plot twists are hard to spot, but not impossible."
-    },
-    {
-     "voice": "linh",
-     "text": "This one is easy to miss. The report let a cut-off axis exaggerate a small gap. Next time, start with an audit and look for the axis trick."
-    }
-   ],
-   "wrong_fix": [
-    {
-     "voice": "hanh",
-     "text": "Your fix swapped chart types without fixing the axis. Fixing the axis trick means changing as little as possible."
-    },
-    {
-     "voice": "khoi",
-     "text": "I love the energy, but your fix swapped chart types without fixing the axis. The axis trick is still winning."
-    },
-    {
-     "voice": "linh",
-     "text": "Good instinct on the axis trick. The fix swapped chart types without fixing the axis, so check the preview after each step."
-    }
-   ]
-  },
-  "double_counting": {
-   "name": "overlapping lists",
-   "praise": [
-    {
-     "voice": "hanh",
-     "text": "Good. You counted unique customers instead of adding lists. That is exactly what the board pays for."
-    },
-    {
-     "voice": "khoi",
-     "text": "Okay, I am impressed: you counted unique customers instead of adding lists. Do not tell the others I said that."
-    },
-    {
-     "voice": "linh",
-     "text": "Well done. You counted unique customers instead of adding lists. Notice how that protects every number that comes after it."
-    }
-   ],
-   "miss": [
-    {
-     "voice": "hanh",
-     "text": "There was a overlapping lists in this case and the report added overlapping lists together. Check for it before you send next time."
-    },
-    {
-     "voice": "khoi",
-     "text": "Ah, the overlapping lists got you. The report added overlapping lists together. It got me last year too, and I still bring it up at parties."
-    },
-    {
-     "voice": "linh",
-     "text": "Let us look together. The case had a overlapping lists, and the report added overlapping lists together. What check would have caught it?"
-    }
-   ],
-   "wrong_fix": [
-    {
-     "voice": "hanh",
-     "text": "You noticed the overlapping lists, which is good, but your fix dropped one list and lost real customers. Right instinct, wrong repair."
-    },
-    {
-     "voice": "khoi",
-     "text": "Points for trying! Your fix dropped one list and lost real customers. The overlapping lists laughs, but only a little."
-    },
-    {
-     "voice": "linh",
-     "text": "You were right that something was wrong with the overlapping lists. Your fix dropped one list and lost real customers. Let us find a gentler repair."
-    }
-   ]
-  },
-  "late_arriving_data": {
-   "name": "partial last day",
-   "praise": [
-    {
-     "voice": "hanh",
-     "text": "Nice catch on the partial last day. You left out the half-finished last day. Keep that habit."
-    },
-    {
-     "voice": "khoi",
-     "text": "You left out the half-finished last day! The partial last day never stood a chance. Coffee is on me."
-    },
-    {
-     "voice": "linh",
-     "text": "That was careful work on the partial last day. You left out the half-finished last day, and the result is stronger for it."
-    }
-   ],
-   "miss": [
-    {
-     "voice": "hanh",
-     "text": "The report reported a crash that was just late data. The partial last day was there to be found. Look again."
-    },
-    {
-     "voice": "khoi",
-     "text": "Plot twist: the case had a hidden partial last day, and the report reported a crash that was just late data. Plot twists are hard to spot, but not impossible."
-    },
-    {
-     "voice": "linh",
-     "text": "This one is easy to miss. The report reported a crash that was just late data. Next time, start with an audit and look for the partial last day."
-    }
-   ],
-   "wrong_fix": [
-    {
-     "voice": "hanh",
-     "text": "Your fix removed the day without saying so. Fixing the partial last day means changing as little as possible."
-    },
-    {
-     "voice": "khoi",
-     "text": "I love the energy, but your fix removed the day without saying so. The partial last day is still winning."
-    },
-    {
-     "voice": "linh",
-     "text": "Good instinct on the partial last day. The fix removed the day without saying so, so check the preview after each step."
-    }
-   ]
-  },
-  "ab_significance": {
-   "name": "luck check",
-   "praise": [
-    {
-     "voice": "hanh",
-     "text": "Good. You looked at the p-value and the size of the effect. That is exactly what the board pays for."
-    },
-    {
-     "voice": "khoi",
-     "text": "Okay, I am impressed: you looked at the p-value and the size of the effect. Do not tell the others I said that."
-    },
-    {
-     "voice": "linh",
-     "text": "Well done. You looked at the p-value and the size of the effect. Notice how that protects every number that comes after it."
-    }
-   ],
-   "miss": [
-    {
-     "voice": "hanh",
-     "text": "There was a luck check in this case and the report picked a winner without a significance check. Check for it before you send next time."
-    },
-    {
-     "voice": "khoi",
-     "text": "Ah, the luck check got you. The report picked a winner without a significance check. It got me last year too, and I still bring it up at parties."
-    },
-    {
-     "voice": "linh",
-     "text": "Let us look together. The case had a luck check, and the report picked a winner without a significance check. What check would have caught it?"
-    }
-   ],
-   "wrong_fix": [
-    {
-     "voice": "hanh",
-     "text": "You noticed the luck check, which is good, but your fix read the p-value as the chance the change works. Right instinct, wrong repair."
-    },
-    {
-     "voice": "khoi",
-     "text": "Points for trying! Your fix read the p-value as the chance the change works. The luck check laughs, but only a little."
-    },
-    {
-     "voice": "linh",
-     "text": "You were right that something was wrong with the luck check. Your fix read the p-value as the chance the change works. Let us find a gentler repair."
-    }
-   ]
-  },
-  "ab_peeking": {
-   "name": "early peek",
-   "praise": [
-    {
-     "voice": "hanh",
-     "text": "Nice catch on the early peek. You waited for the planned sample before deciding. Keep that habit."
-    },
-    {
-     "voice": "khoi",
-     "text": "You waited for the planned sample before deciding! The early peek never stood a chance. Coffee is on me."
-    },
-    {
-     "voice": "linh",
-     "text": "That was careful work on the early peek. You waited for the planned sample before deciding, and the result is stronger for it."
-    }
-   ],
-   "miss": [
-    {
-     "voice": "hanh",
-     "text": "The report stopped the test the moment it looked good. The early peek was there to be found. Look again."
-    },
-    {
-     "voice": "khoi",
-     "text": "Plot twist: the case had a hidden early peek, and the report stopped the test the moment it looked good. Plot twists are hard to spot, but not impossible."
-    },
-    {
-     "voice": "linh",
-     "text": "This one is easy to miss. The report stopped the test the moment it looked good. Next time, start with an audit and look for the early peek."
-    }
-   ],
-   "wrong_fix": [
-    {
-     "voice": "hanh",
-     "text": "Your fix threw the whole test away. Fixing the early peek means changing as little as possible."
-    },
-    {
-     "voice": "khoi",
-     "text": "I love the energy, but your fix threw the whole test away. The early peek is still winning."
-    },
-    {
-     "voice": "linh",
-     "text": "Good instinct on the early peek. The fix threw the whole test away, so check the preview after each step."
-    }
-   ]
-  },
-  "ab_sample_size": {
-   "name": "underpowered test",
-   "praise": [
-    {
-     "voice": "hanh",
-     "text": "Good. You called an inconclusive test inconclusive. That is exactly what the board pays for."
-    },
-    {
-     "voice": "khoi",
-     "text": "Okay, I am impressed: you called an inconclusive test inconclusive. Do not tell the others I said that."
-    },
-    {
-     "voice": "linh",
-     "text": "Well done. You called an inconclusive test inconclusive. Notice how that protects every number that comes after it."
-    }
-   ],
-   "miss": [
-    {
-     "voice": "hanh",
-     "text": "There was a underpowered test in this case and the report read no significant difference as no difference. Check for it before you send next time."
-    },
-    {
-     "voice": "khoi",
-     "text": "Ah, the underpowered test got you. The report read no significant difference as no difference. It got me last year too, and I still bring it up at parties."
-    },
-    {
-     "voice": "linh",
-     "text": "Let us look together. The case had a underpowered test, and the report read no significant difference as no difference. What check would have caught it?"
-    }
-   ],
-   "wrong_fix": [
-    {
-     "voice": "hanh",
-     "text": "You noticed the underpowered test, which is good, but your fix declared a winner from a few hundred users. Right instinct, wrong repair."
-    },
-    {
-     "voice": "khoi",
-     "text": "Points for trying! Your fix declared a winner from a few hundred users. The underpowered test laughs, but only a little."
-    },
-    {
-     "voice": "linh",
-     "text": "You were right that something was wrong with the underpowered test. Your fix declared a winner from a few hundred users. Let us find a gentler repair."
-    }
-   ]
-  },
-  "funnel_dropoff": {
-   "name": "leaky step",
-   "praise": [
-    {
-     "voice": "hanh",
-     "text": "Nice catch on the leaky step. You compared step to step and found the weakest one. Keep that habit."
-    },
-    {
-     "voice": "khoi",
-     "text": "You compared step to step and found the weakest one! The leaky step never stood a chance. Coffee is on me."
-    },
-    {
-     "voice": "linh",
-     "text": "That was careful work on the leaky step. You compared step to step and found the weakest one, and the result is stronger for it."
-    }
-   ],
-   "miss": [
-    {
-     "voice": "hanh",
-     "text": "The report chased the biggest raw drop, which is always the first step. The leaky step was there to be found. Look again."
-    },
-    {
-     "voice": "khoi",
-     "text": "Plot twist: the case had a hidden leaky step, and the report chased the biggest raw drop, which is always the first step. Plot twists are hard to spot, but not impossible."
-    },
-    {
-     "voice": "linh",
-     "text": "This one is easy to miss. The report chased the biggest raw drop, which is always the first step. Next time, start with an audit and look for the leaky step."
-    }
-   ],
-   "wrong_fix": [
-    {
-     "voice": "hanh",
-     "text": "Your fix included the partial last day and distorted the late steps. Fixing the leaky step means changing as little as possible."
-    },
-    {
-     "voice": "khoi",
-     "text": "I love the energy, but your fix included the partial last day and distorted the late steps. The leaky step is still winning."
-    },
-    {
-     "voice": "linh",
-     "text": "Good instinct on the leaky step. The fix included the partial last day and distorted the late steps, so check the preview after each step."
-    }
-   ]
-  },
-  "cohort_retention": {
-   "name": "cohort effect",
-   "praise": [
-    {
-     "voice": "hanh",
-     "text": "Good. You compared cohorts at the same age. That is exactly what the board pays for."
-    },
-    {
-     "voice": "khoi",
-     "text": "Okay, I am impressed: you compared cohorts at the same age. Do not tell the others I said that."
-    },
-    {
-     "voice": "linh",
-     "text": "Well done. You compared cohorts at the same age. Notice how that protects every number that comes after it."
-    }
-   ],
-   "miss": [
-    {
-     "voice": "hanh",
-     "text": "There was a cohort effect in this case and the report let new sign-ups hide the churn. Check for it before you send next time."
-    },
-    {
-     "voice": "khoi",
-     "text": "Ah, the cohort effect got you. The report let new sign-ups hide the churn. It got me last year too, and I still bring it up at parties."
-    },
-    {
-     "voice": "linh",
-     "text": "Let us look together. The case had a cohort effect, and the report let new sign-ups hide the churn. What check would have caught it?"
-    }
-   ],
-   "wrong_fix": [
-    {
-     "voice": "hanh",
-     "text": "You noticed the cohort effect, which is good, but your fix compared old and young cohorts side by side. Right instinct, wrong repair."
-    },
-    {
-     "voice": "khoi",
-     "text": "Points for trying! Your fix compared old and young cohorts side by side. The cohort effect laughs, but only a little."
-    },
-    {
-     "voice": "linh",
-     "text": "You were right that something was wrong with the cohort effect. Your fix compared old and young cohorts side by side. Let us find a gentler repair."
-    }
-   ]
-  },
-  "segmentation": {
-   "name": "hidden segments",
-   "praise": [
-    {
-     "voice": "hanh",
-     "text": "Nice catch on the hidden segments. You split the average into segments. Keep that habit."
-    },
-    {
-     "voice": "khoi",
-     "text": "You split the average into segments! The hidden segments never stood a chance. Coffee is on me."
-    },
-    {
-     "voice": "linh",
-     "text": "That was careful work on the hidden segments. You split the average into segments, and the result is stronger for it."
-    }
-   ],
-   "miss": [
-    {
-     "voice": "hanh",
-     "text": "The report reported a flat average and missed two opposite moves. The hidden segments was there to be found. Look again."
-    },
-    {
-     "voice": "khoi",
-     "text": "Plot twist: the case had a hidden hidden segments, and the report reported a flat average and missed two opposite moves. Plot twists are hard to spot, but not impossible."
-    },
-    {
-     "voice": "linh",
-     "text": "This one is easy to miss. The report reported a flat average and missed two opposite moves. Next time, start with an audit and look for the hidden segments."
-    }
-   ],
-   "wrong_fix": [
-    {
-     "voice": "hanh",
-     "text": "Your fix sliced into so many tiny segments that it was noise. Fixing the hidden segments means changing as little as possible."
-    },
-    {
-     "voice": "khoi",
-     "text": "I love the energy, but your fix sliced into so many tiny segments that it was noise. The hidden segments is still winning."
-    },
-    {
-     "voice": "linh",
-     "text": "Good instinct on the hidden segments. The fix sliced into so many tiny segments that it was noise, so check the preview after each step."
-    }
-   ]
-  },
-  "root_cause_drilldown": {
-   "name": "real source",
-   "praise": [
-    {
-     "voice": "hanh",
-     "text": "Good. You kept drilling until the split explained the whole drop. That is exactly what the board pays for."
-    },
-    {
-     "voice": "khoi",
-     "text": "Okay, I am impressed: you kept drilling until the split explained the whole drop. Do not tell the others I said that."
-    },
-    {
-     "voice": "linh",
-     "text": "Well done. You kept drilling until the split explained the whole drop. Notice how that protects every number that comes after it."
-    }
-   ],
-   "miss": [
-    {
-     "voice": "hanh",
-     "text": "There was a real source in this case and the report stopped at the first plausible story. Check for it before you send next time."
-    },
-    {
-     "voice": "khoi",
-     "text": "Ah, the real source got you. The report stopped at the first plausible story. It got me last year too, and I still bring it up at parties."
-    },
-    {
-     "voice": "linh",
-     "text": "Let us look together. The case had a real source, and the report stopped at the first plausible story. What check would have caught it?"
-    }
-   ],
-   "wrong_fix": [
-    {
-     "voice": "hanh",
-     "text": "You noticed the real source, which is good, but your fix blamed the economy without a single split. Right instinct, wrong repair."
-    },
-    {
-     "voice": "khoi",
-     "text": "Points for trying! Your fix blamed the economy without a single split. The real source laughs, but only a little."
-    },
-    {
-     "voice": "linh",
-     "text": "You were right that something was wrong with the real source. Your fix blamed the economy without a single split. Let us find a gentler repair."
-    }
-   ]
-  },
-  "regression_to_mean": {
-   "name": "natural bounce",
-   "praise": [
-    {
-     "voice": "hanh",
-     "text": "Nice catch on the natural bounce. You compared with similar untreated shops. Keep that habit."
-    },
-    {
-     "voice": "khoi",
-     "text": "You compared with similar untreated shops! The natural bounce never stood a chance. Coffee is on me."
-    },
-    {
-     "voice": "linh",
-     "text": "That was careful work on the natural bounce. You compared with similar untreated shops, and the result is stronger for it."
-    }
-   ],
-   "miss": [
-    {
-     "voice": "hanh",
-     "text": "The report credited a fix for a natural rebound. The natural bounce was there to be found. Look again."
-    },
-    {
-     "voice": "khoi",
-     "text": "Plot twist: the case had a hidden natural bounce, and the report credited a fix for a natural rebound. Plot twists are hard to spot, but not impossible."
-    },
-    {
-     "voice": "linh",
-     "text": "This one is easy to miss. The report credited a fix for a natural rebound. Next time, start with an audit and look for the natural bounce."
-    }
-   ],
-   "wrong_fix": [
-    {
-     "voice": "hanh",
-     "text": "Your fix decided the fix backfired from the same noise. Fixing the natural bounce means changing as little as possible."
-    },
-    {
-     "voice": "khoi",
-     "text": "I love the energy, but your fix decided the fix backfired from the same noise. The natural bounce is still winning."
-    },
-    {
-     "voice": "linh",
-     "text": "Good instinct on the natural bounce. The fix decided the fix backfired from the same noise, so check the preview after each step."
-    }
-   ]
-  },
-  "join_mismatch": {
-   "name": "lost keys",
-   "praise": [
-    {
-     "voice": "hanh",
-     "text": "Good. You checked how many rows matched after the join. That is exactly what the board pays for."
-    },
-    {
-     "voice": "khoi",
-     "text": "Okay, I am impressed: you checked how many rows matched after the join. Do not tell the others I said that."
-    },
-    {
-     "voice": "linh",
-     "text": "Well done. You checked how many rows matched after the join. Notice how that protects every number that comes after it."
-    }
-   ],
-   "miss": [
-    {
-     "voice": "hanh",
-     "text": "There was a lost keys in this case and the report trusted a join that quietly dropped customers. Check for it before you send next time."
-    },
-    {
-     "voice": "khoi",
-     "text": "Ah, the lost keys got you. The report trusted a join that quietly dropped customers. It got me last year too, and I still bring it up at parties."
-    },
-    {
-     "voice": "linh",
-     "text": "Let us look together. The case had a lost keys, and the report trusted a join that quietly dropped customers. What check would have caught it?"
-    }
-   ],
-   "wrong_fix": [
-    {
-     "voice": "hanh",
-     "text": "You noticed the lost keys, which is good, but your fix joined on names, which are not unique. Right instinct, wrong repair."
-    },
-    {
-     "voice": "khoi",
-     "text": "Points for trying! Your fix joined on names, which are not unique. The lost keys laughs, but only a little."
-    },
-    {
-     "voice": "linh",
-     "text": "You were right that something was wrong with the lost keys. Your fix joined on names, which are not unique. Let us find a gentler repair."
-    }
-   ]
-  },
-  "test_accounts": {
-   "name": "staff accounts",
-   "praise": [
-    {
-     "voice": "hanh",
-     "text": "Nice catch on the staff accounts. You filtered out the test accounts and noted the rule. Keep that habit."
-    },
-    {
-     "voice": "khoi",
-     "text": "You filtered out the test accounts and noted the rule! The staff accounts never stood a chance. Coffee is on me."
-    },
-    {
-     "voice": "linh",
-     "text": "That was careful work on the staff accounts. You filtered out the test accounts and noted the rule, and the result is stronger for it."
-    }
-   ],
-   "miss": [
-    {
-     "voice": "hanh",
-     "text": "The report counted staff clicks as customers. The staff accounts was there to be found. Look again."
-    },
-    {
-     "voice": "khoi",
-     "text": "Plot twist: the case had a hidden staff accounts, and the report counted staff clicks as customers. Plot twists are hard to spot, but not impossible."
-    },
-    {
-     "voice": "linh",
-     "text": "This one is easy to miss. The report counted staff clicks as customers. Next time, start with an audit and look for the staff accounts."
-    }
-   ],
-   "wrong_fix": [
-    {
-     "voice": "hanh",
-     "text": "Your fix removed real power users because they looked unusual. Fixing the staff accounts means changing as little as possible."
-    },
-    {
-     "voice": "khoi",
-     "text": "I love the energy, but your fix removed real power users because they looked unusual. The staff accounts is still winning."
-    },
-    {
-     "voice": "linh",
-     "text": "Good instinct on the staff accounts. The fix removed real power users because they looked unusual, so check the preview after each step."
-    }
-   ]
-  },
-  "double_counting_subtotals": {
-   "name": "total rows",
-   "praise": [
-    {
-     "voice": "hanh",
-     "text": "Good. You removed the subtotal and repeated header rows. That is exactly what the board pays for."
-    },
-    {
-     "voice": "khoi",
-     "text": "Okay, I am impressed: you removed the subtotal and repeated header rows. Do not tell the others I said that."
-    },
-    {
-     "voice": "linh",
-     "text": "Well done. You removed the subtotal and repeated header rows. Notice how that protects every number that comes after it."
-    }
-   ],
-   "miss": [
-    {
-     "voice": "hanh",
-     "text": "There was a total rows in this case and the report summed a column that contained its own totals. Check for it before you send next time."
-    },
-    {
-     "voice": "khoi",
-     "text": "Ah, the total rows got you. The report summed a column that contained its own totals. It got me last year too, and I still bring it up at parties."
-    },
-    {
-     "voice": "linh",
-     "text": "Let us look together. The case had a total rows, and the report summed a column that contained its own totals. What check would have caught it?"
-    }
-   ],
-   "wrong_fix": [
-    {
-     "voice": "hanh",
-     "text": "You noticed the total rows, which is good, but your fix removed rows with a blank region that were real. Right instinct, wrong repair."
-    },
-    {
-     "voice": "khoi",
-     "text": "Points for trying! Your fix removed rows with a blank region that were real. The total rows laughs, but only a little."
-    },
-    {
-     "voice": "linh",
-     "text": "You were right that something was wrong with the total rows. Your fix removed rows with a blank region that were real. Let us find a gentler repair."
-    }
-   ]
-  },
-  "refunds_vs_cancellations": {
-   "name": "refunds",
-   "praise": [
-    {
-     "voice": "hanh",
-     "text": "Nice catch on the refunds. You kept refunds and set cancellations aside. Keep that habit."
-    },
-    {
-     "voice": "khoi",
-     "text": "You kept refunds and set cancellations aside! The refunds never stood a chance. Coffee is on me."
-    },
-    {
-     "voice": "linh",
-     "text": "That was careful work on the refunds. You kept refunds and set cancellations aside, and the result is stronger for it."
-    }
-   ],
-   "miss": [
-    {
-     "voice": "hanh",
-     "text": "The report counted cancelled orders as sales. The refunds was there to be found. Look again."
-    },
-    {
-     "voice": "khoi",
-     "text": "Plot twist: the case had a hidden refunds, and the report counted cancelled orders as sales. Plot twists are hard to spot, but not impossible."
-    },
-    {
-     "voice": "linh",
-     "text": "This one is easy to miss. The report counted cancelled orders as sales. Next time, start with an audit and look for the refunds."
-    }
-   ],
-   "wrong_fix": [
-    {
-     "voice": "hanh",
-     "text": "Your fix dropped refunds as errors and overstated revenue. Fixing the refunds means changing as little as possible."
-    },
-    {
-     "voice": "khoi",
-     "text": "I love the energy, but your fix dropped refunds as errors and overstated revenue. The refunds is still winning."
-    },
-    {
-     "voice": "linh",
-     "text": "Good instinct on the refunds. The fix dropped refunds as errors and overstated revenue, so check the preview after each step."
-    }
-   ]
-  },
-  "truncated_export": {
-   "name": "cut-off file",
-   "praise": [
-    {
-     "voice": "hanh",
-     "text": "Good. You noticed the file stopped early. That is exactly what the board pays for."
-    },
-    {
-     "voice": "khoi",
-     "text": "Okay, I am impressed: you noticed the file stopped early. Do not tell the others I said that."
-    },
-    {
-     "voice": "linh",
-     "text": "Well done. You noticed the file stopped early. Notice how that protects every number that comes after it."
-    }
-   ],
-   "miss": [
-    {
-     "voice": "hanh",
-     "text": "There was a cut-off file in this case and the report compared a partial year with a full year. Check for it before you send next time."
-    },
-    {
-     "voice": "khoi",
-     "text": "Ah, the cut-off file got you. The report compared a partial year with a full year. It got me last year too, and I still bring it up at parties."
-    },
-    {
-     "voice": "linh",
-     "text": "Let us look together. The case had a cut-off file, and the report compared a partial year with a full year. What check would have caught it?"
-    }
-   ],
-   "wrong_fix": [
-    {
-     "voice": "hanh",
-     "text": "You noticed the cut-off file, which is good, but your fix stretched the missing months with a guess nobody saw. Right instinct, wrong repair."
-    },
-    {
-     "voice": "khoi",
-     "text": "Points for trying! Your fix stretched the missing months with a guess nobody saw. The cut-off file laughs, but only a little."
-    },
-    {
-     "voice": "linh",
-     "text": "You were right that something was wrong with the cut-off file. Your fix stretched the missing months with a guess nobody saw. Let us find a gentler repair."
-    }
-   ]
-  },
-  "multiple_defects": {
-   "name": "pile of defects",
-   "praise": [
-    {
-     "voice": "hanh",
-     "text": "Nice catch on the pile of defects. You worked through every defect in the file. Keep that habit."
-    },
-    {
-     "voice": "khoi",
-     "text": "You worked through every defect in the file! The pile of defects never stood a chance. Coffee is on me."
-    },
-    {
-     "voice": "linh",
-     "text": "That was careful work on the pile of defects. You worked through every defect in the file, and the result is stronger for it."
-    }
-   ],
-   "miss": [
-    {
-     "voice": "hanh",
-     "text": "The report fixed one defect and trusted the rest. The pile of defects was there to be found. Look again."
-    },
-    {
-     "voice": "khoi",
-     "text": "Plot twist: the case had a hidden pile of defects, and the report fixed one defect and trusted the rest. Plot twists are hard to spot, but not impossible."
-    },
-    {
-     "voice": "linh",
-     "text": "This one is easy to miss. The report fixed one defect and trusted the rest. Next time, start with an audit and look for the pile of defects."
-    }
-   ],
-   "wrong_fix": [
-    {
-     "voice": "hanh",
-     "text": "Your fix cleaned so hard that real variation disappeared. Fixing the pile of defects means changing as little as possible."
-    },
-    {
-     "voice": "khoi",
-     "text": "I love the energy, but your fix cleaned so hard that real variation disappeared. The pile of defects is still winning."
-    },
-    {
-     "voice": "linh",
-     "text": "Good instinct on the pile of defects. The fix cleaned so hard that real variation disappeared, so check the preview after each step."
-    }
-   ]
-  },
-  "mean_vs_median": {
-   "name": "skewed average",
-   "praise": [
-    {
-     "voice": "hanh",
-     "text": "Good. You reported the median beside the mean. That is exactly what the board pays for."
-    },
-    {
-     "voice": "khoi",
-     "text": "Okay, I am impressed: you reported the median beside the mean. Do not tell the others I said that."
-    },
-    {
-     "voice": "linh",
-     "text": "Well done. You reported the median beside the mean. Notice how that protects every number that comes after it."
-    }
-   ],
-   "miss": [
-    {
-     "voice": "hanh",
-     "text": "There was a skewed average in this case and the report reported an average that fits no real ticket. Check for it before you send next time."
-    },
-    {
-     "voice": "khoi",
-     "text": "Ah, the skewed average got you. The report reported an average that fits no real ticket. It got me last year too, and I still bring it up at parties."
-    },
-    {
-     "voice": "linh",
-     "text": "Let us look together. The case had a skewed average, and the report reported an average that fits no real ticket. What check would have caught it?"
-    }
-   ],
-   "wrong_fix": [
-    {
-     "voice": "hanh",
-     "text": "You noticed the skewed average, which is good, but your fix deleted the long tickets. Right instinct, wrong repair."
-    },
-    {
-     "voice": "khoi",
-     "text": "Points for trying! Your fix deleted the long tickets. The skewed average laughs, but only a little."
-    },
-    {
-     "voice": "linh",
-     "text": "You were right that something was wrong with the skewed average. Your fix deleted the long tickets. Let us find a gentler repair."
+  "traps": {
+    "duplicates": {
+      "name": "double export",
+      "praise": [
+        {
+          "voice": "hanh",
+          "text": "Copies removed, real orders retained. These totals can go to the board."
+        },
+        {
+          "voice": "khoi",
+          "text": "The export brought twins; you checked their IDs before counting them."
+        },
+        {
+          "voice": "linh",
+          "text": "Checking record keys kept duplicate exports from inflating the totals."
+        }
+      ],
+      "miss": [
+        {
+          "voice": "hanh",
+          "text": "Copied rows inflated the order total. Reconcile the keys before sending it."
+        },
+        {
+          "voice": "khoi",
+          "text": "The export got a second helping of the same orders. Let's count each once."
+        },
+        {
+          "voice": "linh",
+          "text": "Compare record keys before aggregation to distinguish copies from real repeats."
+        }
+      ],
+      "wrong_fix": [
+        {
+          "voice": "hanh",
+          "text": "The fix also removed genuine repeat orders. Restore them and deduplicate by key."
+        },
+        {
+          "voice": "khoi",
+          "text": "Some regular customers vanished with the copies. Their second orders still count."
+        },
+        {
+          "voice": "linh",
+          "text": "A repeated customer is not necessarily a duplicate transaction; check the order key."
+        }
+      ]
+    },
+    "missing_as_zero": {
+      "name": "fake zeros",
+      "praise": [
+        {
+          "voice": "hanh",
+          "text": "You separated outage zeros from sales. The demand estimate is better supported."
+        },
+        {
+          "voice": "khoi",
+          "text": "The shop did not sell zero just because the recorder took a nap. Good catch."
+        },
+        {
+          "voice": "linh",
+          "text": "Treating outage zeros as missing preserves the distinction between no sales and no observation."
+        }
+      ],
+      "miss": [
+        {
+          "voice": "hanh",
+          "text": "Outage zeros pulled the sales estimate down. Check the recording status."
+        },
+        {
+          "voice": "khoi",
+          "text": "Our recorder went quiet, and the chart called it a sales drought. Check the outage log."
+        },
+        {
+          "voice": "linh",
+          "text": "An outage tells us the value is unknown, not that sales were zero."
+        }
+      ],
+      "wrong_fix": [
+        {
+          "voice": "hanh",
+          "text": "The replacement average is unsupported. Mark the gaps and disclose them."
+        },
+        {
+          "voice": "khoi",
+          "text": "We gave the missing sales imaginary friends. Let's keep the gaps visible instead."
+        },
+        {
+          "voice": "linh",
+          "text": "An invented average adds assumptions; retain missing values unless a justified method is stated."
+        }
+      ]
+    },
+    "mixed_units_currency": {
+      "name": "mixed units",
+      "praise": [
+        {
+          "voice": "hanh",
+          "text": "Prices now share a unit and currency. We can compare supplier costs."
+        },
+        {
+          "voice": "khoi",
+          "text": "The prices finally speak the same currency. My calculator can stop translating."
+        },
+        {
+          "voice": "linh",
+          "text": "Convert units and currencies consistently before comparing or summing values."
+        }
+      ],
+      "miss": [
+        {
+          "voice": "hanh",
+          "text": "The total combines incompatible units. Standardize them before using it."
+        },
+        {
+          "voice": "khoi",
+          "text": "We added crates to coins and got a very confident mystery number."
+        },
+        {
+          "voice": "linh",
+          "text": "Numbers in different units cannot be added meaningfully without conversion."
+        }
+      ],
+      "wrong_fix": [
+        {
+          "voice": "hanh",
+          "text": "Some rows still use the old unit. Complete the conversion before reporting."
+        },
+        {
+          "voice": "khoi",
+          "text": "Half the prices crossed the currency bridge; the others are still waiting."
+        },
+        {
+          "voice": "linh",
+          "text": "Apply the conversion rule to every affected row and verify the resulting units."
+        }
+      ]
+    },
+    "date_timezone": {
+      "name": "date and time zone",
+      "praise": [
+        {
+          "voice": "hanh",
+          "text": "Dates and time zones now align. The daily comparison is usable."
+        },
+        {
+          "voice": "khoi",
+          "text": "Everyone's clock has joined the same meeting. The daily totals make sense now."
+        },
+        {
+          "voice": "linh",
+          "text": "Parsing dates and aligning time zones places observations in comparable daily windows."
+        }
+      ],
+      "miss": [
+        {
+          "voice": "hanh",
+          "text": "The daily totals mix date formats and clocks. Normalize both first."
+        },
+        {
+          "voice": "khoi",
+          "text": "Our Tuesday borrowed a few hours from Wednesday. Let's put them back."
+        },
+        {
+          "voice": "linh",
+          "text": "Different date formats or time zones can assign the same event to different days."
+        }
+      ],
+      "wrong_fix": [
+        {
+          "voice": "hanh",
+          "text": "The fix assumes identical clocks. Check each source's time zone."
+        },
+        {
+          "voice": "khoi",
+          "text": "We set every clock by the office kettle. The export needs its own time-zone rules."
+        },
+        {
+          "voice": "linh",
+          "text": "Parse each source's date convention and time zone before assigning calendar days."
+        }
+      ]
+    },
+    "category_typos": {
+      "name": "spelling variants",
+      "praise": [
+        {
+          "voice": "hanh",
+          "text": "Spelling variants are merged without losing real regions. Use this grouping."
+        },
+        {
+          "voice": "khoi",
+          "text": "The same region stopped wearing five name badges. Nicely sorted."
+        },
+        {
+          "voice": "linh",
+          "text": "Standardizing equivalent labels prevents one category from being split across groups."
+        }
+      ],
+      "miss": [
+        {
+          "voice": "hanh",
+          "text": "Typos split the regions and distorted their ranking. Normalize the labels."
+        },
+        {
+          "voice": "khoi",
+          "text": "One region entered the league three times under different spellings."
+        },
+        {
+          "voice": "linh",
+          "text": "Group equivalent spellings together before comparing category totals."
+        }
+      ],
+      "wrong_fix": [
+        {
+          "voice": "hanh",
+          "text": "Distinct places were merged. Restore them and use a verified label map."
+        },
+        {
+          "voice": "khoi",
+          "text": "Two different towns now share a name badge. Let's untangle the guest list."
+        },
+        {
+          "voice": "linh",
+          "text": "A spelling resemblance is insufficient; confirm that labels refer to the same category."
+        }
+      ]
+    },
+    "outlier_entry_error": {
+      "name": "extra-zero value",
+      "praise": [
+        {
+          "voice": "hanh",
+          "text": "The entry typo is corrected and the real price move remains. Good judgment."
+        },
+        {
+          "voice": "khoi",
+          "text": "You removed the extra zero without evicting the actual price jump."
+        },
+        {
+          "voice": "linh",
+          "text": "Checking the source lets us correct entry errors while retaining genuine extremes."
+        }
+      ],
+      "miss": [
+        {
+          "voice": "hanh",
+          "text": "One entry error dominates the chart. Check it against the source."
+        },
+        {
+          "voice": "khoi",
+          "text": "That extra zero has taken over the whole meeting. Can we check its paperwork?"
+        },
+        {
+          "voice": "linh",
+          "text": "Investigate an extreme value before deciding whether it is an error or a real observation."
+        }
+      ],
+      "wrong_fix": [
+        {
+          "voice": "hanh",
+          "text": "The fix removed a genuine price move too. Restore it and correct only the typo."
+        },
+        {
+          "voice": "khoi",
+          "text": "The typo left, but it took a real price jump along for the ride."
+        },
+        {
+          "voice": "linh",
+          "text": "An unusual value may be valid; remove or correct it only with supporting evidence."
+        }
+      ]
+    },
+    "seasonality_vs_trend": {
+      "name": "seasonal pattern",
+      "praise": [
+        {
+          "voice": "hanh",
+          "text": "The year-on-year comparison controls for the season. Use that in the forecast."
+        },
+        {
+          "voice": "khoi",
+          "text": "You checked last year's holiday rush before ordering more shelves. Sensible."
+        },
+        {
+          "voice": "linh",
+          "text": "Comparing equivalent seasonal periods helps separate recurring patterns from trend."
+        }
+      ],
+      "miss": [
+        {
+          "voice": "hanh",
+          "text": "The forecast treats a seasonal peak as lasting growth. Compare like periods."
+        },
+        {
+          "voice": "khoi",
+          "text": "The calendar did its usual dance, and we called it a growth strategy."
+        },
+        {
+          "voice": "linh",
+          "text": "A recurring seasonal rise is not evidence of a sustained trend on its own."
+        }
+      ],
+      "wrong_fix": [
+        {
+          "voice": "hanh",
+          "text": "A straight line misses the seasonal cycle. Use comparable periods."
+        },
+        {
+          "voice": "khoi",
+          "text": "We put a ruler on a wave. It still comes back next season."
+        },
+        {
+          "voice": "linh",
+          "text": "A linear fit alone does not account for a repeating seasonal pattern."
+        }
+      ]
+    },
+    "simpsons_paradox": {
+      "name": "mixed groups",
+      "praise": [
+        {
+          "voice": "hanh",
+          "text": "Group results and their weights are clear. The overall winner needs that context."
+        },
+        {
+          "voice": "khoi",
+          "text": "The grand total tried to steal the show; you gave the groups their lines back."
+        },
+        {
+          "voice": "linh",
+          "text": "Examining group rates and group sizes can explain why an aggregate comparison reverses."
+        }
+      ],
+      "miss": [
+        {
+          "voice": "hanh",
+          "text": "The aggregate hides the group results. Show both before choosing a winner."
+        },
+        {
+          "voice": "khoi",
+          "text": "The headline total won the debate before the groups even got a chair."
+        },
+        {
+          "voice": "linh",
+          "text": "A change in group composition can reverse the pattern seen within each group."
+        }
+      ],
+      "wrong_fix": [
+        {
+          "voice": "hanh",
+          "text": "The split is useful, but the weights are missing. Include group sizes."
+        },
+        {
+          "voice": "khoi",
+          "text": "We invited the groups but forgot to count how many people each brought."
+        },
+        {
+          "voice": "linh",
+          "text": "Within-group rates need their denominators to explain the aggregate result."
+        }
+      ]
+    },
+    "small_sample_noise": {
+      "name": "tiny sample",
+      "praise": [
+        {
+          "voice": "hanh",
+          "text": "You flagged the small sample. Keep the forecast cautious."
+        },
+        {
+          "voice": "khoi",
+          "text": "Five observations did not get promoted to universal law today. Good call."
+        },
+        {
+          "voice": "linh",
+          "text": "A small sample carries substantial uncertainty, so its conclusion needs qualification."
+        }
+      ],
+      "miss": [
+        {
+          "voice": "hanh",
+          "text": "The claim is too strong for this sample. State the count and uncertainty."
+        },
+        {
+          "voice": "khoi",
+          "text": "A handful of cases is doing a stadium-sized impression. Let's turn down the volume."
+        },
+        {
+          "voice": "linh",
+          "text": "With few observations, random variation can look like a strong pattern."
+        }
+      ],
+      "wrong_fix": [
+        {
+          "voice": "hanh",
+          "text": "The small group disappeared from the report. Restore it with a caveat."
+        },
+        {
+          "voice": "khoi",
+          "text": "The tiny group needs a warning label, not a trapdoor."
+        },
+        {
+          "voice": "linh",
+          "text": "Report the small group's result and sample size rather than hiding it."
+        }
+      ]
+    },
+    "correlation_vs_causation": {
+      "name": "hidden cause",
+      "praise": [
+        {
+          "voice": "hanh",
+          "text": "The report says associated, with no unsupported causal claim. Approved."
+        },
+        {
+          "voice": "khoi",
+          "text": "The two lines moved together; you resisted giving one the steering wheel."
+        },
+        {
+          "voice": "linh",
+          "text": "Association alone cannot establish causation; other factors may influence both variables."
+        }
+      ],
+      "miss": [
+        {
+          "voice": "hanh",
+          "text": "The causal claim exceeds the evidence. Check alternative explanations."
+        },
+        {
+          "voice": "khoi",
+          "text": "Those lines are travel companions; we have not proved which one drives."
+        },
+        {
+          "voice": "linh",
+          "text": "Observational association can reflect confounding, reverse causation, or chance."
+        }
+      ],
+      "wrong_fix": [
+        {
+          "voice": "hanh",
+          "text": "The revision denies the association too. Keep the observed link, qualify the cause."
+        },
+        {
+          "voice": "khoi",
+          "text": "We took away the steering wheel and accidentally erased the road."
+        },
+        {
+          "voice": "linh",
+          "text": "Rejecting a causal interpretation does not erase an observed association."
+        }
+      ]
+    },
+    "base_rate": {
+      "name": "rare event",
+      "praise": [
+        {
+          "voice": "hanh",
+          "text": "The report includes false alarms and prevalence. That supports the risk estimate."
+        },
+        {
+          "voice": "khoi",
+          "text": "You counted the false alarms as well as the sirens. My ears thank you."
+        },
+        {
+          "voice": "linh",
+          "text": "The chance a flag is correct depends on prevalence as well as the test's error rates."
+        }
+      ],
+      "miss": [
+        {
+          "voice": "hanh",
+          "text": "A flag is presented as near certainty. Include the underlying event rate."
+        },
+        {
+          "voice": "khoi",
+          "text": "Our alarm shouts loudly, but rare events still need a head count."
+        },
+        {
+          "voice": "linh",
+          "text": "When an event is rare, false positives may outnumber true positives even with a useful test."
+        }
+      ],
+      "wrong_fix": [
+        {
+          "voice": "hanh",
+          "text": "Discarding the alarm loses useful information. Recalculate using the base rate."
+        },
+        {
+          "voice": "khoi",
+          "text": "The alarm needs context, not early retirement."
+        },
+        {
+          "voice": "linh",
+          "text": "Combine prevalence and error rates to interpret the signal rather than rejecting it entirely."
+        }
+      ]
+    },
+    "survivorship_bias": {
+      "name": "missing failures",
+      "praise": [
+        {
+          "voice": "hanh",
+          "text": "You checked which accounts were excluded. The risk claim now has context."
+        },
+        {
+          "voice": "khoi",
+          "text": "You asked about the shops missing from the reunion photo. That matters."
+        },
+        {
+          "voice": "linh",
+          "text": "An analysis of survivors alone may omit failures and misrepresent the original population."
+        }
+      ],
+      "miss": [
+        {
+          "voice": "hanh",
+          "text": "The estimate only includes surviving accounts. Identify the missing group."
+        },
+        {
+          "voice": "khoi",
+          "text": "Our reunion photo makes everyone look successful; the absent shops need a mention."
+        },
+        {
+          "voice": "linh",
+          "text": "Selection into the observed sample can bias conclusions about the full population."
+        }
+      ],
+      "wrong_fix": [
+        {
+          "voice": "hanh",
+          "text": "Missing does not mean failed. Verify those accounts before classifying them."
+        },
+        {
+          "voice": "khoi",
+          "text": "An empty chair is not a bankruptcy certificate. Let's check who is missing."
+        },
+        {
+          "voice": "linh",
+          "text": "Determine why observations are absent rather than assuming a single outcome for them."
+        }
+      ]
+    },
+    "cherry_picking": {
+      "name": "chosen window",
+      "praise": [
+        {
+          "voice": "hanh",
+          "text": "The full period is shown. We can judge the campaign in context."
+        },
+        {
+          "voice": "khoi",
+          "text": "You opened the whole album instead of just the flattering photo."
+        },
+        {
+          "voice": "linh",
+          "text": "A consistent, justified time window reduces the risk of selecting only favorable results."
+        }
+      ],
+      "miss": [
+        {
+          "voice": "hanh",
+          "text": "The selected window overstates performance. Show the full relevant period."
+        },
+        {
+          "voice": "khoi",
+          "text": "That chart picked its best week for the office portrait. Let's see the rest."
+        },
+        {
+          "voice": "linh",
+          "text": "Changing the time window can change the story; inspect the broader period before concluding."
+        }
+      ],
+      "wrong_fix": [
+        {
+          "voice": "hanh",
+          "text": "Show the broader evidence rather than assigning motives."
+        },
+        {
+          "voice": "khoi",
+          "text": "The chart needs more dates, not a courtroom scene."
+        },
+        {
+          "voice": "linh",
+          "text": "Explain how the full period changes the result without inferring someone's intent."
+        }
+      ]
+    },
+    "misleading_axis": {
+      "name": "axis trick",
+      "praise": [
+        {
+          "voice": "hanh",
+          "text": "The bars start at zero and show units. The size difference is clear."
+        },
+        {
+          "voice": "khoi",
+          "text": "The bars have their feet on the same floor again. Much less dramatic."
+        },
+        {
+          "voice": "linh",
+          "text": "A zero baseline lets bar lengths represent quantities proportionally."
+        }
+      ],
+      "miss": [
+        {
+          "voice": "hanh",
+          "text": "The cut-off axis magnifies the gap. Reset the baseline and label units."
+        },
+        {
+          "voice": "khoi",
+          "text": "Those bars are standing on a hidden box. Let's put them back on the floor."
+        },
+        {
+          "voice": "linh",
+          "text": "Truncating a bar chart's baseline can exaggerate a small difference."
+        }
+      ],
+      "wrong_fix": [
+        {
+          "voice": "hanh",
+          "text": "Changing chart type left the axis issue unresolved. Fix the scale."
+        },
+        {
+          "voice": "khoi",
+          "text": "The chart changed clothes but kept the same platform shoes."
+        },
+        {
+          "voice": "linh",
+          "text": "Check the baseline and units directly; a different chart type alone does not fix them."
+        }
+      ]
+    },
+    "double_counting": {
+      "name": "overlapping lists",
+      "praise": [
+        {
+          "voice": "hanh",
+          "text": "Unique customers are counted across both lists. Use that total."
+        },
+        {
+          "voice": "khoi",
+          "text": "Customers can visit twice without becoming two people. You kept the head count honest."
+        },
+        {
+          "voice": "linh",
+          "text": "Deduplicating overlapping customer sets gives the size of their union."
+        }
+      ],
+      "miss": [
+        {
+          "voice": "hanh",
+          "text": "The lists overlap, so their sum overstates customers. Match the identifiers."
+        },
+        {
+          "voice": "khoi",
+          "text": "Some customers got two seats in our head count. Let's check the overlap."
+        },
+        {
+          "voice": "linh",
+          "text": "Adding list sizes double-counts customers present in more than one list."
+        }
+      ],
+      "wrong_fix": [
+        {
+          "voice": "hanh",
+          "text": "Dropping a whole list loses valid customers. Reconcile the overlap instead."
+        },
+        {
+          "voice": "khoi",
+          "text": "We solved the seating problem by closing half the room. Let's reopen it."
+        },
+        {
+          "voice": "linh",
+          "text": "Retain customers unique to either list while counting shared identifiers once."
+        }
+      ]
+    },
+    "late_arriving_data": {
+      "name": "partial last day",
+      "praise": [
+        {
+          "voice": "hanh",
+          "text": "The unfinished day is excluded and disclosed. The comparison is fair."
+        },
+        {
+          "voice": "khoi",
+          "text": "Today's export had not finished breakfast. You gave it time before judging sales."
+        },
+        {
+          "voice": "linh",
+          "text": "Compare complete periods and state when incomplete observations are excluded."
+        }
+      ],
+      "miss": [
+        {
+          "voice": "hanh",
+          "text": "The apparent crash comes from incomplete data. Check arrival status."
+        },
+        {
+          "voice": "khoi",
+          "text": "The numbers are still on the delivery truck, but the chart has declared a crisis."
+        },
+        {
+          "voice": "linh",
+          "text": "A partial final day can resemble a decline even when the underlying activity is stable."
+        }
+      ],
+      "wrong_fix": [
+        {
+          "voice": "hanh",
+          "text": "The exclusion needs a note. Tell readers why the last day is absent."
+        },
+        {
+          "voice": "khoi",
+          "text": "The last day slipped out the back door; leave readers a note."
+        },
+        {
+          "voice": "linh",
+          "text": "Disclose the cutoff so readers understand which complete periods were compared."
+        }
+      ]
+    },
+    "ab_significance": {
+      "name": "luck check",
+      "praise": [
+        {
+          "voice": "hanh",
+          "text": "Effect size and significance are both reported. We can assess the test."
+        },
+        {
+          "voice": "khoi",
+          "text": "You asked how big the lift was and whether luck could explain it. Two useful questions."
+        },
+        {
+          "voice": "linh",
+          "text": "Effect size describes the estimated change; a significance test assesses compatibility with the null."
+        }
+      ],
+      "miss": [
+        {
+          "voice": "hanh",
+          "text": "There is no significance check behind this winner. Assess the uncertainty."
+        },
+        {
+          "voice": "khoi",
+          "text": "The winning variant has a trophy but no uncertainty check. Let's do the paperwork."
+        },
+        {
+          "voice": "linh",
+          "text": "A measured difference alone does not establish that the evidence is strong enough to select a winner."
+        }
+      ],
+      "wrong_fix": [
+        {
+          "voice": "hanh",
+          "text": "The p-value is not the chance the change works. Correct that explanation."
+        },
+        {
+          "voice": "khoi",
+          "text": "That p-value is answering a different question from the one on its name badge."
+        },
+        {
+          "voice": "linh",
+          "text": "A p-value concerns data under the null model, not the probability that a change succeeds."
+        }
+      ]
+    },
+    "ab_peeking": {
+      "name": "early peek",
+      "praise": [
+        {
+          "voice": "hanh",
+          "text": "You waited for the planned sample. The decision follows the test design."
+        },
+        {
+          "voice": "khoi",
+          "text": "The test got to finish its shift before we crowned a winner."
+        },
+        {
+          "voice": "linh",
+          "text": "Following the planned stopping rule avoids the false-positive risk of repeated early checks."
+        }
+      ],
+      "miss": [
+        {
+          "voice": "hanh",
+          "text": "The test stopped at a favorable peek. Use the planned stopping rule."
+        },
+        {
+          "voice": "khoi",
+          "text": "We called the match at the first good score. The test still had time on the clock."
+        },
+        {
+          "voice": "linh",
+          "text": "Repeatedly checking and stopping when significance appears can inflate false positives."
+        }
+      ],
+      "wrong_fix": [
+        {
+          "voice": "hanh",
+          "text": "Keep the evidence, but explain the early stopping and its limits."
+        },
+        {
+          "voice": "khoi",
+          "text": "No need to throw the whole test into the shredder; its stopping rule needs a footnote."
+        },
+        {
+          "voice": "linh",
+          "text": "An early peek calls for qualified interpretation or a valid sequential method, not automatic deletion."
+        }
+      ]
+    },
+    "ab_sample_size": {
+      "name": "underpowered test",
+      "praise": [
+        {
+          "voice": "hanh",
+          "text": "The result is marked inconclusive. That is the right decision for this sample."
+        },
+        {
+          "voice": "khoi",
+          "text": "No winner today, and the report says so. The trophy can stay in the cupboard."
+        },
+        {
+          "voice": "linh",
+          "text": "An underpowered test may miss a meaningful effect, so non-significance is not proof of equality."
+        }
+      ],
+      "miss": [
+        {
+          "voice": "hanh",
+          "text": "The test cannot establish no difference. Check its power and sample size."
+        },
+        {
+          "voice": "khoi",
+          "text": "The test whispered, and we translated it as a firm no. Let's check the sample."
+        },
+        {
+          "voice": "linh",
+          "text": "A non-significant result may reflect insufficient data rather than the absence of an effect."
+        }
+      ],
+      "wrong_fix": [
+        {
+          "voice": "hanh",
+          "text": "A few hundred users do not settle this test. Revisit the planned sample."
+        },
+        {
+          "voice": "khoi",
+          "text": "We found a bigger handful, but it still may not fill the sample plan."
+        },
+        {
+          "voice": "linh",
+          "text": "Choose sample size from the effect of interest and desired power before declaring a winner."
+        }
+      ]
+    },
+    "funnel_dropoff": {
+      "name": "leaky step",
+      "praise": [
+        {
+          "voice": "hanh",
+          "text": "Step conversion rates identify the weakest stage. Focus the repair there."
+        },
+        {
+          "voice": "khoi",
+          "text": "You found the leaky step instead of blaming the biggest bucket."
+        },
+        {
+          "voice": "linh",
+          "text": "Compare adjacent-step conversion rates to locate disproportionate funnel losses."
+        }
+      ],
+      "miss": [
+        {
+          "voice": "hanh",
+          "text": "Raw losses alone do not locate the problem. Compare step rates."
+        },
+        {
+          "voice": "khoi",
+          "text": "The first bucket is biggest, so its spill looks loudest. Check the rates too."
+        },
+        {
+          "voice": "linh",
+          "text": "A large raw drop can simply reflect a large starting population; use step denominators."
+        }
+      ],
+      "wrong_fix": [
+        {
+          "voice": "hanh",
+          "text": "The partial last day distorts later steps. Compare complete periods."
+        },
+        {
+          "voice": "khoi",
+          "text": "Some customers are still walking down the funnel. Let's not mark them missing yet."
+        },
+        {
+          "voice": "linh",
+          "text": "Incomplete recent periods can bias downstream conversion when events arrive with a delay."
+        }
+      ]
+    },
+    "cohort_retention": {
+      "name": "cohort effect",
+      "praise": [
+        {
+          "voice": "hanh",
+          "text": "Cohorts are compared at the same age. The retention claim is supported."
+        },
+        {
+          "voice": "khoi",
+          "text": "The new sign-ups cannot hide the leavers in this chart. Nice detective work."
+        },
+        {
+          "voice": "linh",
+          "text": "Comparing cohorts at equal ages separates retention from changes in acquisition volume."
+        }
+      ],
+      "miss": [
+        {
+          "voice": "hanh",
+          "text": "New arrivals hide existing-customer churn. Show cohort retention."
+        },
+        {
+          "voice": "khoi",
+          "text": "The welcome party is busy enough to hide the exit queue. Let's check cohorts."
+        },
+        {
+          "voice": "linh",
+          "text": "A growing customer total can coexist with poor retention when acquisition offsets churn."
+        }
+      ],
+      "wrong_fix": [
+        {
+          "voice": "hanh",
+          "text": "Old and young cohorts need matching ages. Align their observation windows."
+        },
+        {
+          "voice": "khoi",
+          "text": "We compared a first day with a tenth birthday. Let's line up the calendars."
+        },
+        {
+          "voice": "linh",
+          "text": "Compare the same time since joining so each cohort has an equivalent opportunity to return."
+        }
+      ]
+    },
+    "segmentation": {
+      "name": "hidden segments",
+      "praise": [
+        {
+          "voice": "hanh",
+          "text": "The report shows both opposing segment moves. That explains the flat total."
+        },
+        {
+          "voice": "khoi",
+          "text": "The average said nothing happened; the segments brought two different stories."
+        },
+        {
+          "voice": "linh",
+          "text": "An aggregate can mask offsetting changes, so inspect relevant segments."
+        }
+      ],
+      "miss": [
+        {
+          "voice": "hanh",
+          "text": "The flat average hides opposite movements. Break it down."
+        },
+        {
+          "voice": "khoi",
+          "text": "Two teams pulled in opposite directions, and the average took a nap."
+        },
+        {
+          "voice": "linh",
+          "text": "Examine meaningful subgroups when a stable overall measure may conceal changing composition."
+        }
+      ],
+      "wrong_fix": [
+        {
+          "voice": "hanh",
+          "text": "The segments are now too small to interpret. Use fewer, meaningful groups."
+        },
+        {
+          "voice": "khoi",
+          "text": "We sliced the cake so thin nobody can taste it. Broader groups may help."
+        },
+        {
+          "voice": "linh",
+          "text": "Too many small slices increase noise; balance business relevance with adequate sample sizes."
+        }
+      ]
+    },
+    "root_cause_drilldown": {
+      "name": "real source",
+      "praise": [
+        {
+          "voice": "hanh",
+          "text": "The drilldown accounts for the full drop. We have a focused next step."
+        },
+        {
+          "voice": "khoi",
+          "text": "You followed the crumbs past the first plausible sandwich. The drop finally adds up."
+        },
+        {
+          "voice": "linh",
+          "text": "A useful drilldown checks whether the identified segment explains the observed overall change."
+        }
+      ],
+      "miss": [
+        {
+          "voice": "hanh",
+          "text": "The first explanation is untested. Quantify which segment accounts for the drop."
+        },
+        {
+          "voice": "khoi",
+          "text": "The first suspect had a convincing hat. Let's still check the numbers."
+        },
+        {
+          "voice": "linh",
+          "text": "Test plausible explanations against segment contributions before naming the source of a decline."
+        }
+      ],
+      "wrong_fix": [
+        {
+          "voice": "hanh",
+          "text": "The economy is a hypothesis, not evidence. Show the relevant splits."
+        },
+        {
+          "voice": "khoi",
+          "text": "The economy got blamed before we opened a single drawer. Let's look inside."
+        },
+        {
+          "voice": "linh",
+          "text": "A broad explanation needs supporting comparisons and a quantified link to the observed change."
+        }
+      ]
+    },
+    "regression_to_mean": {
+      "name": "natural bounce",
+      "praise": [
+        {
+          "voice": "hanh",
+          "text": "The untreated comparison puts the rebound in context. Keep that caveat."
+        },
+        {
+          "voice": "khoi",
+          "text": "The worst week bounced back, but you checked whether everyone else bounced too."
+        },
+        {
+          "voice": "linh",
+          "text": "Comparable untreated shops help distinguish an intervention from a natural return toward typical levels."
+        }
+      ],
+      "miss": [
+        {
+          "voice": "hanh",
+          "text": "The report credits a natural rebound to the fix. Add a comparison group."
+        },
+        {
+          "voice": "khoi",
+          "text": "We gave the repair a medal for a bounce that might have happened anyway."
+        },
+        {
+          "voice": "linh",
+          "text": "Selecting extreme performers can produce a later rebound even without an effective intervention."
+        }
+      ],
+      "wrong_fix": [
+        {
+          "voice": "hanh",
+          "text": "The same noise cannot establish that the fix backfired. Check the comparison."
+        },
+        {
+          "voice": "khoi",
+          "text": "The medal became a complaint form awfully fast. We still need the comparison shops."
+        },
+        {
+          "voice": "linh",
+          "text": "A noisy reversal alone supports neither benefit nor harm; use an appropriate untreated comparison."
+        }
+      ]
+    },
+    "join_mismatch": {
+      "name": "lost keys",
+      "praise": [
+        {
+          "voice": "hanh",
+          "text": "Match rates were checked after the join. The customer totals are traceable."
+        },
+        {
+          "voice": "khoi",
+          "text": "You checked who made it through the join door. No silent disappearing act."
+        },
+        {
+          "voice": "linh",
+          "text": "Auditing matched and unmatched keys reveals records lost during a join."
+        }
+      ],
+      "miss": [
+        {
+          "voice": "hanh",
+          "text": "The join dropped customers silently. Inspect unmatched keys before reporting."
+        },
+        {
+          "voice": "khoi",
+          "text": "The join held a meeting and forgot to invite some customer IDs."
+        },
+        {
+          "voice": "linh",
+          "text": "A join can change the population; compare row counts and key coverage before and after."
+        }
+      ],
+      "wrong_fix": [
+        {
+          "voice": "hanh",
+          "text": "Names are not unique identifiers. Restore a validated key."
+        },
+        {
+          "voice": "khoi",
+          "text": "Two customers share a name, and the join thinks they share a wallet."
+        },
+        {
+          "voice": "linh",
+          "text": "Use a stable, appropriately unique key and check its cardinality before joining."
+        }
+      ]
+    },
+    "test_accounts": {
+      "name": "staff accounts",
+      "praise": [
+        {
+          "voice": "hanh",
+          "text": "Test accounts are filtered with a stated rule. These are customer metrics."
+        },
+        {
+          "voice": "khoi",
+          "text": "The staff's practice clicks no longer count as a customer stampede."
+        },
+        {
+          "voice": "linh",
+          "text": "A documented test-account filter separates internal activity from genuine customer behavior."
+        }
+      ],
+      "miss": [
+        {
+          "voice": "hanh",
+          "text": "Staff test clicks inflated the customer metric. Apply the account rule."
+        },
+        {
+          "voice": "khoi",
+          "text": "The office testing party showed up as customer growth. Let's check the guest list."
+        },
+        {
+          "voice": "linh",
+          "text": "Internal test activity can bias metrics unless identified and consistently excluded."
+        }
+      ],
+      "wrong_fix": [
+        {
+          "voice": "hanh",
+          "text": "Real power users were removed too. Filter by verified test status."
+        },
+        {
+          "voice": "khoi",
+          "text": "Our busiest customers got mistaken for staff. They deserve their seats back."
+        },
+        {
+          "voice": "linh",
+          "text": "High activity alone is not evidence of a test account; use verified identifiers or flags."
+        }
+      ]
+    },
+    "double_counting_subtotals": {
+      "name": "total rows",
+      "praise": [
+        {
+          "voice": "hanh",
+          "text": "Subtotal and header rows are excluded. The total now counts detail rows once."
+        },
+        {
+          "voice": "khoi",
+          "text": "The total stopped adding itself to itself. A small victory for arithmetic."
+        },
+        {
+          "voice": "linh",
+          "text": "Exclude summary and repeated header rows before aggregating the underlying records."
+        }
+      ],
+      "miss": [
+        {
+          "voice": "hanh",
+          "text": "The sum includes its own subtotals. Separate detail from summary rows."
+        },
+        {
+          "voice": "khoi",
+          "text": "The totals came back for seconds. Let's serve only the detail rows."
+        },
+        {
+          "voice": "linh",
+          "text": "Adding detail and subtotal rows double-counts the same underlying values."
+        }
+      ],
+      "wrong_fix": [
+        {
+          "voice": "hanh",
+          "text": "Blank regions can be valid records. Remove rows by their role, not that field alone."
+        },
+        {
+          "voice": "khoi",
+          "text": "A missing region is not a subtotal disguise. Check the row before showing it out."
+        },
+        {
+          "voice": "linh",
+          "text": "Use evidence that a row is a summary or header rather than deleting all incomplete labels."
+        }
+      ]
+    },
+    "refunds_vs_cancellations": {
+      "name": "refunds",
+      "praise": [
+        {
+          "voice": "hanh",
+          "text": "Refunds remain and cancellations are separated. Net revenue is clearer."
+        },
+        {
+          "voice": "khoi",
+          "text": "Refunds kept their minus signs; cancelled orders left the sales queue."
+        },
+        {
+          "voice": "linh",
+          "text": "Refunds reverse revenue, while cancelled orders should not be treated as completed sales."
+        }
+      ],
+      "miss": [
+        {
+          "voice": "hanh",
+          "text": "Cancelled orders are counted as revenue. Separate them from completed sales."
+        },
+        {
+          "voice": "khoi",
+          "text": "Some orders never left the starting line but still got a sales medal."
+        },
+        {
+          "voice": "linh",
+          "text": "Use order status to distinguish cancellations from sales and their later refunds."
+        }
+      ],
+      "wrong_fix": [
+        {
+          "voice": "hanh",
+          "text": "Removing refunds overstates revenue. Restore those valid negative entries."
+        },
+        {
+          "voice": "khoi",
+          "text": "The refunds were inconvenient, but the cash still went back. Keep them in the books."
+        },
+        {
+          "voice": "linh",
+          "text": "Valid refund amounts belong in net revenue; a negative sign alone does not indicate an error."
+        }
+      ]
+    },
+    "truncated_export": {
+      "name": "cut-off file",
+      "praise": [
+        {
+          "voice": "hanh",
+          "text": "The cutoff is identified. We will compare only equivalent coverage."
+        },
+        {
+          "voice": "khoi",
+          "text": "You spotted that the file left work early. No full-year verdict from half a shift."
+        },
+        {
+          "voice": "linh",
+          "text": "Check temporal coverage before comparing totals from periods of different lengths."
+        }
+      ],
+      "miss": [
+        {
+          "voice": "hanh",
+          "text": "This export ends early. A partial year cannot support the full-year comparison."
+        },
+        {
+          "voice": "khoi",
+          "text": "The file ran out of pages, and we called it a business slump."
+        },
+        {
+          "voice": "linh",
+          "text": "A truncated export can mimic a decline because later observations are absent."
+        }
+      ],
+      "wrong_fix": [
+        {
+          "voice": "hanh",
+          "text": "The extrapolation is undisclosed. Show observed coverage and any assumptions."
+        },
+        {
+          "voice": "khoi",
+          "text": "We filled missing months with invisible pencil. Readers need to see the assumptions."
+        },
+        {
+          "voice": "linh",
+          "text": "If extrapolation is justified, label it and explain its uncertainty rather than presenting it as observed data."
+        }
+      ]
+    },
+    "multiple_defects": {
+      "name": "pile of defects",
+      "praise": [
+        {
+          "voice": "hanh",
+          "text": "All identified defects were checked. The final result has an audit trail."
+        },
+        {
+          "voice": "khoi",
+          "text": "You fixed the whole queue of defects, not just the loudest one."
+        },
+        {
+          "voice": "linh",
+          "text": "An ordered audit and validation after each step help handle interacting data defects."
+        }
+      ],
+      "miss": [
+        {
+          "voice": "hanh",
+          "text": "One repair left other defects unresolved. Run the remaining checks."
+        },
+        {
+          "voice": "khoi",
+          "text": "One gremlin left, but its colleagues are still in the spreadsheet."
+        },
+        {
+          "voice": "linh",
+          "text": "Fixing a single issue does not validate the rest of a file; continue the audit."
+        }
+      ],
+      "wrong_fix": [
+        {
+          "voice": "hanh",
+          "text": "The cleaning removed real variation. Restore valid values and narrow the rules."
+        },
+        {
+          "voice": "khoi",
+          "text": "The spreadsheet is spotless because we polished away part of the business."
+        },
+        {
+          "voice": "linh",
+          "text": "Validate each transformation against source evidence so cleaning preserves genuine variation."
+        }
+      ]
+    },
+    "mean_vs_median": {
+      "name": "skewed average",
+      "praise": [
+        {
+          "voice": "hanh",
+          "text": "Mean and median are both reported. Typical ticket size is clearer."
+        },
+        {
+          "voice": "khoi",
+          "text": "The giant tickets no longer get to speak for every ticket."
+        },
+        {
+          "voice": "linh",
+          "text": "For skewed values, the median complements the mean by describing a less tail-sensitive center."
+        }
+      ],
+      "miss": [
+        {
+          "voice": "hanh",
+          "text": "The mean alone is not representative here. Include the median and spread."
+        },
+        {
+          "voice": "khoi",
+          "text": "A few marathon tickets made every job look like an all-day expedition."
+        },
+        {
+          "voice": "linh",
+          "text": "A long tail can pull the mean far from a typical observation; inspect the distribution too."
+        }
+      ],
+      "wrong_fix": [
+        {
+          "voice": "hanh",
+          "text": "Long tickets may be valid. Restore them and report the skew."
+        },
+        {
+          "voice": "khoi",
+          "text": "The marathon tickets are still real work, even if they spoil the average."
+        },
+        {
+          "voice": "linh",
+          "text": "Retain valid extremes and use suitable summaries rather than deleting the tail to make a neat average."
+        }
+      ]
     }
-   ]
   }
- }
 }

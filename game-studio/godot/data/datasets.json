@@ -100,14 +100,145 @@
  "relevance":{
   "lead_days":4,
   "map":{
-   "q1":[{"dataset":"market_prices","series":"Raw material"},{"dataset":"competitor_scrape"}],
-   "q3":[{"dataset":"market_prices","series":"Policy rate"}],
-   "q4":[{"dataset":"sales_export"},{"dataset":"web_funnel"}],
-   "q5":[{"dataset":"competitor_scrape","flat":true,"shocks":["competitor_discount"]}],
-   "q6":[{"dataset":"loan_book"}],
-   "q8":[{"dataset":"web_funnel","flat":true,"shocks":["logging_error"]}],
-   "q9":[{"dataset":"loan_book"}]
-  }
+  "q1": [
+    {
+      "dataset": "market_prices",
+      "series": "Raw material"
+    },
+    {
+      "dataset": "competitor_scrape"
+    }
+  ],
+  "q3": [
+    {
+      "dataset": "market_prices",
+      "series": "Policy rate"
+    }
+  ],
+  "q4": [
+    {
+      "dataset": "sales_export"
+    },
+    {
+      "dataset": "web_funnel"
+    }
+  ],
+  "q5": [
+    {
+      "dataset": "competitor_scrape",
+      "flat": true,
+      "shocks": [
+        "competitor_discount"
+      ]
+    }
+  ],
+  "q6": [
+    {
+      "dataset": "loan_book"
+    }
+  ],
+  "q8": [
+    {
+      "dataset": "web_funnel",
+      "flat": true,
+      "shocks": [
+        "logging_error"
+      ]
+    }
+  ],
+  "q9": [
+    {
+      "dataset": "loan_book"
+    }
+  ],
+  "q10": [
+    {
+      "dataset": "market_prices",
+      "series": "FX rate"
+    }
+  ],
+  "q11": [
+    {
+      "dataset": "market_prices",
+      "series": "FX rate"
+    }
+  ],
+  "q12": [
+    {
+      "dataset": "market_prices",
+      "series": "FX rate"
+    }
+  ],
+  "q13": [
+    {
+      "dataset": "market_prices",
+      "series": "Stock index"
+    }
+  ],
+  "q14": [
+    {
+      "dataset": "market_prices",
+      "series": "Stock index"
+    }
+  ],
+  "q15": [
+    {
+      "dataset": "market_prices",
+      "series": "Stock index"
+    }
+  ],
+  "q16": [
+    {
+      "dataset": "market_prices",
+      "series": "Raw material"
+    },
+    {
+      "dataset": "competitor_scrape"
+    }
+  ],
+  "q17": [
+    {
+      "dataset": "market_prices",
+      "series": "Raw material"
+    },
+    {
+      "dataset": "competitor_scrape"
+    }
+  ],
+  "q18": [
+    {
+      "dataset": "market_prices",
+      "series": "Policy rate"
+    }
+  ],
+  "q19": [
+    {
+      "dataset": "market_prices",
+      "series": "Policy rate"
+    }
+  ],
+  "q20": [
+    {
+      "dataset": "sales_export"
+    },
+    {
+      "dataset": "web_funnel"
+    }
+  ],
+  "q21": [
+    {
+      "dataset": "sales_export"
+    },
+    {
+      "dataset": "web_funnel"
+    }
+  ],
+  "q22": [
+    {
+      "dataset": "loan_book"
+    }
+  ]
+}
  },
  "data":{"minutes_per_file":90,"minutes_per_clean":120,"minutes_per_chart":60,"minutes_findings":75,"max_pinned":4,"max_attached":3,"analysis_bonus":1.5,"analysis_good":0.6,"analysis_wrong_penalty":3.0,"analysis_wrong_below":0.5,"flag_penalty":0.5,"flag_penalty_max":1.5},
  "charts":{"bar_max_categories":12,"pie_max_slices":5,"unsorted_min_categories":4,"smoothing_min_window":3,"spike_z":3.0,"spike_min_points":5},

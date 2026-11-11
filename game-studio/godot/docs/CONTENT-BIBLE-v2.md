@@ -1,6 +1,6 @@
 # Content bible: Data Corp v2
 
-Version 0.1, 2026-11-10. Owner: Claude. Design source: `docs/GDD-v2-concept.md`. Machine-readable data: `data/news.json` (41 news templates, 10 sources). **All names, organizations, tickers and figures in the game are fictional.** No real company names, brands, characters or events are used.
+Version 0.2, 2026-11-11. Owner: Claude. Design source: `docs/GDD-v2-concept.md`. Machine-readable data: `data/news.json` (123 news templates, 16 sources). **All names, organizations, tickers and figures in the game are fictional.** No real company names, brands, characters or events are used.
 
 Language note: the v2 in-game text (`data/strings_v2.json`) is already English. Fictional proper names and data ids (for example `lai_suat`, `chinh_thuc`) are kept as they appear in the data files. The v1 dashboard strings (`data/strings.json`, `data/events.json`) are still Vietnamese; see `docs/GITHUB-READINESS.md`.
 
@@ -39,7 +39,7 @@ The company is sensitive to: **interest rate** (borrowing cost), **exchange rate
 
 The names are generic and not aimed at any real person. If one coincides with a real person by accident, change it.
 
-## 4. News sources (10 sources, see `data/news.json`)
+## 4. News sources (16 sources, see `data/news.json`)
 
 | Type | Source (fictional) | Reliability | Delay |
 |---|---|---:|---:|
@@ -51,10 +51,29 @@ The names are generic and not aimed at any real person. If one coincides with a 
 | Press | Dai Duong News Agency | 0.85 | 1 day |
 | Social media | Anonymous Investors Forum | 0.40 | 0 |
 | Social media | "Tam Chuyen" (Gossip) Network | 0.45 | 0 |
+| Official | Tan Lac Trade Register | 0.95 | 2 days |
+| Official | Tan Lac Settlement Office | 0.97 | 0 |
+| Official | Tan Lac Market Registry | 0.97 | 0 |
+| Press | Harbor Ledger | 0.82 | 1 day |
+| Press | Courtyard Dispatch | 0.80 | 0 |
+| Press | Canal Review | 0.85 | 1 day |
 | Internal | Internal tip (anonymous) | 0.35 | 0 |
 | Internal | Colleague at the company | 0.60 | 0 |
 
 Reliability is a reference probability used when generating false news; **the player does not see this number**. The player only sees the source type (a chip) and must learn through experience, together with the verification tools.
+
+### Headline style
+
+- English only, at most 90 characters, with no manual line breaks; verify two-line fit in the existing news cards during layout review.
+- Official sources use dry notices and defined reporting periods. Press sources describe business effects with measured language.
+- Social sources sound conversational and rumor-like, without emojis. Insiders speak quietly from a limited vantage point.
+- Vary framing and vocabulary while keeping the direction, time period, event and magnitude implied by the template's fields intact.
+- Keep `{pct}` only where the template supplies `magnitude_pct`. Never expose hidden truth or kind labels in a headline.
+- Use original fictional names and tickers. Avoid real institutions, investment instructions, and claims of guaranteed returns.
+
+The six additional sources are peers of the existing official and press sources, with matching reliability and delay. The averages of both fields remain unchanged in every tier. Social and insider voices remain represented by their existing sources.
+
+The 41 original templates remain unchanged. Two new headlines per original preserve the topic x kind x source-tier distribution exactly (123 total). Source reliability is still hidden from the player.
 
 ## 5. The "kind" and "truth" labels of news
 
@@ -110,6 +129,8 @@ The recommended actions for the boss reuse the remaining 8 cards, renamed to fit
 8. Are the weekly report figures reliable enough to present to the board?
 9. Does the rumor that a bank is about to collapse require immediate action?
 10. Looking back at the whole stretch: should the company hold cash or invest in inventory?
+
+The expanded bank contains 20 questions: three per hidden state variable, plus the existing rival-discount and report-integrity questions. Each question has a relevant file mapping in `datasets.json` under `relevance.map`; questions about the stock index concern sentiment rather than direct company returns. New state questions use the existing current-state answer rule and frame pricing, hiring, inventory, loans, marketing spend and expansion decisions without prescribing an action.
 
 Every question has a predetermined answer according to the run's world scenario (Codex generates it from the seed).
 

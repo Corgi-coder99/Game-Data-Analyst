@@ -577,7 +577,12 @@ func test_ramp() -> void:
 	# harder files really appear for a strong player
 	var strong := make(104, st, false, 6)
 	var weak := make(104, LearnState.new(), false, 6)
-	check(strong[1].files[0].row_count >= weak[1].files[0].row_count, "a strong player on day 6 gets files at least as large")
+	# T-038: compare the day's total rows; the first file can be a near-fixed-size type (competitor scrape).
+	var strong_rows := 0
+	for f in strong[1].files: strong_rows += int(f.row_count)
+	var weak_rows := 0
+	for f in weak[1].files: weak_rows += int(f.row_count)
+	check(strong_rows >= weak_rows, "a strong player on day 6 gets files at least as large in total")
 
 # ---- 8. unused features change nothing -------------------------------------------------------------------
 

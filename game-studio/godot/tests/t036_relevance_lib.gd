@@ -11,7 +11,7 @@ const Reading = preload("res://tests/t036_reading.gd")
 
 # Question -> what a relevant file must mirror. q5 is an event question (the rival's discount shows in the
 # competitor scrape); q8 (report integrity) has no data mirror.
-const TARGET := {"q1":"nguyen_lieu", "q3":"lai_suat", "q4":"suc_mua", "q5":"@competitor_scrape", "q6":"tin_dung", "q8":"@web_funnel", "q9":"tin_dung"}
+const TARGET := {"q1":"nguyen_lieu", "q3":"lai_suat", "q4":"suc_mua", "q5":"@competitor_scrape", "q6":"tin_dung", "q8":"@web_funnel", "q9":"tin_dung", "q10":"ty_gia", "q11":"ty_gia", "q12":"ty_gia", "q13":"chung_khoan", "q14":"chung_khoan", "q15":"chung_khoan", "q16":"nguyen_lieu", "q17":"nguyen_lieu", "q18":"lai_suat", "q19":"lai_suat", "q20":"suc_mua", "q21":"suc_mua", "q22":"tin_dung"}
 static func is_relevant(file: Dictionary, qid: String) -> bool:
 	var t: String = TARGET.get(qid, "")
 	if t == "": return false

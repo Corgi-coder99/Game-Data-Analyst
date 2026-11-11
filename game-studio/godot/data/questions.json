@@ -1,53 +1,144 @@
 {
- "questions": [
-  {
-   "id": "q1",
-   "text": "Will imported materials prices rise, fall or stay flat this week?",
-   "variable": "nguyen_lieu",
-   "window_days": 1,
-   "answer_rule": "next_state"
-  },
-  {
-   "id": "q3",
-   "text": "Which way will business loan rates move next week?",
-   "variable": "lai_suat",
-   "window_days": 0,
-   "answer_rule": "state"
-  },
-  {
-   "id": "q4",
-   "text": "Will household spending recover or keep falling this quarter?",
-   "variable": "suc_mua",
-   "window_days": 0,
-   "answer_rule": "state"
-  },
-  {
-   "id": "q5",
-   "text": "Is the rival's discount a real threat, or just advertising?",
-   "variable": "competitor_discount",
-   "window_days": 1,
-   "answer_rule": "event"
-  },
-  {
-   "id": "q6",
-   "text": "Is the partner bank safe enough to route a large payment through?",
-   "variable": "tin_dung",
-   "window_days": 0,
-   "answer_rule": "state"
-  },
-  {
-   "id": "q8",
-   "text": "Are this week's report figures reliable enough to present to the board?",
-   "variable": "logging_error",
-   "window_days": 0,
-   "answer_rule": "integrity"
-  },
-  {
-   "id": "q9",
-   "text": "Does the rumor of a failing bank call for immediate action?",
-   "variable": "tin_dung",
-   "window_days": 0,
-   "answer_rule": "bank_rumor"
-  }
- ]
+  "questions": [
+    {
+      "id": "q1",
+      "text": "Will imported materials prices rise, fall or stay flat this week?",
+      "variable": "nguyen_lieu",
+      "window_days": 1,
+      "answer_rule": "next_state"
+    },
+    {
+      "id": "q3",
+      "text": "Which way will business loan rates move next week?",
+      "variable": "lai_suat",
+      "window_days": 0,
+      "answer_rule": "state"
+    },
+    {
+      "id": "q4",
+      "text": "Will household spending recover or keep falling this quarter?",
+      "variable": "suc_mua",
+      "window_days": 0,
+      "answer_rule": "state"
+    },
+    {
+      "id": "q5",
+      "text": "Is the rival's discount a real threat, or just advertising?",
+      "variable": "competitor_discount",
+      "window_days": 1,
+      "answer_rule": "event"
+    },
+    {
+      "id": "q6",
+      "text": "Is the partner bank safe enough to route a large payment through?",
+      "variable": "tin_dung",
+      "window_days": 0,
+      "answer_rule": "state"
+    },
+    {
+      "id": "q8",
+      "text": "Are this week's report figures reliable enough to present to the board?",
+      "variable": "logging_error",
+      "window_days": 0,
+      "answer_rule": "integrity"
+    },
+    {
+      "id": "q9",
+      "text": "Does the rumor of a failing bank call for immediate action?",
+      "variable": "tin_dung",
+      "window_days": 0,
+      "answer_rule": "bank_rumor"
+    },
+    {
+      "window_days": 0,
+      "id": "q10",
+      "text": "Would exchange-rate movement raise or lower our next import bill?",
+      "answer_rule": "state",
+      "variable": "ty_gia"
+    },
+    {
+      "window_days": 0,
+      "id": "q11",
+      "text": "Which way is the exchange rate moving as we price the new shipment?",
+      "answer_rule": "state",
+      "variable": "ty_gia"
+    },
+    {
+      "window_days": 0,
+      "id": "q12",
+      "text": "For our expansion budget, is the exchange rate rising, falling or flat?",
+      "answer_rule": "state",
+      "variable": "ty_gia"
+    },
+    {
+      "window_days": 0,
+      "id": "q13",
+      "text": "Is the stock index rising, falling or flat as we review expansion plans?",
+      "answer_rule": "state",
+      "variable": "chung_khoan"
+    },
+    {
+      "window_days": 0,
+      "id": "q14",
+      "text": "Which way is market sentiment moving before our hiring review?",
+      "answer_rule": "state",
+      "variable": "chung_khoan"
+    },
+    {
+      "window_days": 0,
+      "id": "q15",
+      "text": "For the marketing budget review, is the stock index up, down or flat?",
+      "answer_rule": "state",
+      "variable": "chung_khoan"
+    },
+    {
+      "window_days": 0,
+      "id": "q16",
+      "text": "Are material costs rising, falling or flat as we price the next batch?",
+      "answer_rule": "state",
+      "variable": "nguyen_lieu"
+    },
+    {
+      "window_days": 0,
+      "id": "q17",
+      "text": "Which way are input prices moving before we replenish inventory?",
+      "answer_rule": "state",
+      "variable": "nguyen_lieu"
+    },
+    {
+      "window_days": 0,
+      "id": "q18",
+      "text": "Are borrowing rates rising, falling or flat before we renew the loan?",
+      "answer_rule": "state",
+      "variable": "lai_suat"
+    },
+    {
+      "window_days": 0,
+      "id": "q19",
+      "text": "Which way are loan rates moving as we cost the new warehouse?",
+      "answer_rule": "state",
+      "variable": "lai_suat"
+    },
+    {
+      "window_days": 0,
+      "id": "q20",
+      "text": "Is household demand rising, falling or flat before we add sales staff?",
+      "answer_rule": "state",
+      "variable": "suc_mua"
+    },
+    {
+      "window_days": 0,
+      "id": "q21",
+      "text": "Which way is household spending moving as we set marketing spend?",
+      "answer_rule": "state",
+      "variable": "suc_mua"
+    },
+    {
+      "window_days": 0,
+      "id": "q22",
+      "text": "Is business credit expanding, tightening or holding steady for our stock loan?",
+      "answer_rule": "state",
+      "variable": "tin_dung"
+    }
+  ]
 }
