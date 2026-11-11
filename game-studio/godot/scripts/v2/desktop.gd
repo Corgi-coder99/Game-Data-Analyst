@@ -12,13 +12,18 @@ const ReportWindow = preload("res://scripts/v2/windows/report_window.gd")
 const DataWindow = preload("res://scripts/v2/windows/data_window.gd")
 const DataSession = preload("res://scripts/data/session.gd")
 const TutorialPanel = preload("res://scripts/v2/tutorial_panel.gd")
+# T-035: learning layer (Handbook app, guided tutorial coach, the learner state).
+const HandbookWindow = preload("res://scripts/v2/windows/handbook_window.gd")
+const CaseCoach = preload("res://scripts/v2/learn/case_coach.gd")
+const LearnState = preload("res://scripts/learn/learn_state.gd")
+const TutorialScript = preload("res://scripts/learn/tutorial_script.gd")
 const CityArt = preload("res://scripts/v2/city_art.gd")
 const START_MINUTES := 8 * 60 + 30
 const TOOL_MINUTES := 30
 const PUBLIC_FIELDS := ["uid", "day", "source_id", "source_tier", "source_name", "headline", "topic", "verification", "verified_by"]
 const WORK_AREA := Rect2(58, 30, 442, 290)
 # Icon order on the desktop: window id, sprite. "help" opens the tutorial instead of a window.
-const ICONS := [["news", "app_news"], ["files", "app_files"], ["sheet", "app_sheet"], ["charts", "app_charts"], ["report", "app_mail"], ["company", "app_bi"], ["tools", "app_code"], ["help", "app_help"]]
+const ICONS := [["news", "app_news"], ["files", "app_files"], ["sheet", "app_sheet"], ["charts", "app_charts"], ["report", "app_mail"], ["company", "app_bi"], ["tools", "app_code"], ["handbook", "app_handbook"], ["help", "app_help"]]
 # T-034: these icons open the Data window on a tab.
 const DATA_TABS := ["files", "sheet", "charts"]
 var game: RefCounted
@@ -28,6 +33,12 @@ var company_window: Control
 var tools_window: Control
 var report_window: Control
 var data_window: Control
+var handbook_window: Control
+# T-035: the learner state (the profile one when the flow sets it, a transient one otherwise) and the guided coach.
+var learn: RefCounted
+var case_coach: Control
+var report_sent := false
+signal cards_unlocked(ids: Array)
 # T-034: the run's data session (files, sheets, pins). Created for a real world only; data_seed is set by the flow.
 var data_session: RefCounted
 var data_seed := 0
@@ -104,7 +115,8 @@ func _build() -> void:
 	tools_window = ToolsWindow.new()
 	report_window = ReportWindow.new()
 	data_window = DataWindow.new()
-	for pair in [["news", news_window], ["company", company_window], ["tools", tools_window], ["report", report_window], ["data", data_window]]:
+	handbook_window = HandbookWindow.new()
+	for pair in [["news", news_window], ["company", company_window], ["tools", tools_window], ["report", report_window], ["data", data_window], ["handbook", handbook_window]]:
 		add_child(pair[1])
 		pair[1].initialize(strings)
 		pair[1].hide()
@@ -129,6 +141,10 @@ func _build() -> void:
 	_build_tray()
 	_build_taskbar()
 	add_child(coach.overlay)
+	case_coach = CaseCoach.new()
+	add_child(case_coach)
+	case_coach.build(strings)
+	add_child(case_coach.overlay)
 
 func _strip(area: Rect2) -> ScrollContainer:
 	var node := ScrollContainer.new()
@@ -171,8 +187,8 @@ func _build_icons() -> void:
 		var id: String = ICONS[i][0]
 		var tile := Button.new()
 		tile.name = "Icon_" + id
-		tile.position = Vector2(2, 32 + i * 36)
-		tile.size = Vector2(52, 34)
+		tile.position = Vector2(2, 32 + i * 32)
+		tile.size = Vector2(52, 31)
 		tile.clip_contents = true
 		tile.tooltip_text = strings.windows[id]
 		for state in ["normal", "pressed", "disabled", "focus"]:
@@ -193,13 +209,13 @@ func _build_icons() -> void:
 		caption.add_theme_font_size_override("font_size", 8)
 		caption.add_theme_color_override("font_color", Palette.color(22))
 		caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		caption.position = Vector2(0, 18)
-		caption.size = Vector2(52, 14)
+		caption.position = Vector2(0, 17)
+		caption.size = Vector2(52, 13)
 		caption.clip_text = true
 		caption.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		tile.add_child(caption)
-		caption.size = Vector2(52, 14)
-		tile.size = Vector2(52, 34)
+		caption.size = Vector2(52, 13)
+		tile.size = Vector2(52, 31)
 		icon_buttons[id] = tile
 
 func _build_tray() -> void:
@@ -320,10 +336,16 @@ func setup(value: RefCounted) -> void:
 	coach.skipped = false
 	coach.finished = false
 	coach.active = false
+	report_sent = false
+	if learn == null: learn = LearnState.new()
+	handbook_window.attach_learn(learn)
 	var day := int(game.status().day)
 	coach.set_day(day)
-	if day == 1: coach.start()
 	_make_data_session()
+	var guided: bool = data_session != null and data_session.tutorial_today()
+	case_coach.start_day(day, guided)
+	coach.suppressed = guided
+	if day == 1 and not guided: coach.start()
 	_apply_windows()
 	refresh()
 
@@ -482,19 +504,23 @@ func start_day() -> void:
 	report_window.reset()
 	clear_pins()
 	coach.reset_goals()
+	report_sent = false
 	var day := 1 if game == null else int(game.status().day)
 	coach.set_day(day)
 	if day > 1 and coach.active:
 		coach.active = false
 		coach.layout()
-	# Day 2 introduces the deadline once, unless the player skipped the coach.
-	if day == 2 and not coach.skipped: coach.start_deadline()
 	open_ids.clear()
 	front = ""
 	if day > 1:
 		open_ids.append("news")
 		front = "news"
 	_start_data_day()
+	var guided: bool = data_session != null and data_session.tutorial_today()
+	case_coach.start_day(day, guided)
+	coach.suppressed = guided
+	# Day 2 introduces the deadline once, unless the player skipped the coach (the guided case 2 says it itself).
+	if day == 2 and not coach.skipped and not guided: coach.start_deadline()
 	_apply_windows()
 	refresh()
 
@@ -529,6 +555,7 @@ func open_window(id: String) -> void:
 			_note("opened_browser")
 			coach.set_goal("read")
 		"tools": _note("opened_tools")
+		"handbook": handbook_window.refresh()
 		"report": _note("opened_mail")
 
 func minimize_window(id: String) -> void:
@@ -579,6 +606,11 @@ func _make_data_session() -> void:
 	if game == null or not game.has_method("spend_minutes"): return
 	if data_session == null:
 		data_session = DataSession.new(game, data_seed)
+		if learn == null: learn = LearnState.new()
+		data_session.attach_learn(learn, learn.tutorial_active())
+		data_session.cards_unlocked.connect(func(ids):
+			handbook_window.refresh()
+			cards_unlocked.emit(ids))
 		data_window.attach_session(data_session)
 		company_window.attach_session(data_session)
 		report_window.attach_session(data_session)
@@ -611,6 +643,7 @@ func _on_report_locked(value: bool) -> void:
 	if company_window.dash_view != null:
 		company_window.dash_view.locked = value
 		company_window.dash_view.refresh()
+	report_sent = value
 	if not value: return
 	coach.set_goal("send")
 	_note("sent")
@@ -672,3 +705,55 @@ func _process(delta: float) -> void:
 	question_offset = _scroll_strip(question_scroll, question, question_offset, delta, 18.0)
 	ticker_offset = _scroll_strip(ticker_scroll, ticker, ticker_offset, delta, 30.0)
 	if coach != null: coach.set_target(coach_rect())
+	_update_case_coach()
+
+# ---- T-035: the guided tutorial coach ----------------------------------------------------------------
+
+func _update_case_coach() -> void:
+	if case_coach == null or data_session == null: return
+	var show: bool = case_coach.active and not coach.active
+	case_coach.visible = show
+	case_coach.overlay.visible = show
+	if coach.suppressed != show:
+		coach.suppressed = show
+		coach.layout()
+	if not case_coach.active: return
+	var composed: bool = report_window.forecast != "" and report_window.confidence != ""
+	case_coach.refresh(TutorialScript.context(data_session, composed, report_sent, case_coach.manual))
+	case_coach.set_target(case_rect() if show else Rect2())
+
+# Where the guided coach points, in desktop coordinates.
+func case_rect() -> Rect2:
+	var id: String = case_coach.current_id()
+	var in_data: bool = front == "data"
+	match id:
+		"open":
+			if in_data and data_window.tab == "files" and not data_window.files_view.open_buttons.is_empty(): return data_window.files_view.open_buttons.values()[0].get_global_rect()
+			return icon_buttons.files.get_global_rect()
+		"look":
+			if in_data and data_window.tab == "sheet": return data_window.sheet_view.grid.get_global_rect()
+			return icon_buttons.sheet.get_global_rect()
+		"dedupe", "standardize", "group", "outliers", "filter", "rate":
+			var op: String = {"rate": "computed"}.get(id, id)
+			if in_data and data_window.tab == "sheet" and data_window.sheet_view.toolbar_buttons.has(op): return data_window.sheet_view.toolbar_buttons[op].get_global_rect()
+			return icon_buttons.sheet.get_global_rect()
+		"chart", "line":
+			if in_data and data_window.tab == "charts": return data_window.chart_view.pin_button.get_global_rect()
+			return icon_buttons.charts.get_global_rect()
+		"attach":
+			if front == "report" and report_window.analysis_panel != null and not report_window.analysis_panel.attach_buttons.is_empty(): return report_window.analysis_panel.attach_buttons.values()[0].get_global_rect()
+			if front == "report" and report_window.analysis_button != null: return report_window.analysis_button.get_global_rect()
+			return icon_buttons.report.get_global_rect()
+		"finding":
+			if front == "report" and report_window.analysis_panel != null and not report_window.analysis_panel.finding_pickers.is_empty(): return report_window.analysis_panel.finding_pickers.values()[0].get_global_rect()
+			if front == "report" and report_window.analysis_button != null: return report_window.analysis_button.get_global_rect()
+			return icon_buttons.report.get_global_rect()
+		"forecast":
+			if front == "report" and not report_window.forecast_buttons.is_empty():
+				var first: Rect2 = report_window.forecast_buttons.values()[0].get_global_rect()
+				return first.merge(report_window.confidence_buttons.values()[-1].get_global_rect())
+			return icon_buttons.report.get_global_rect()
+		"send":
+			if front == "report" and report_window.submit_button != null: return report_window.submit_button.get_global_rect()
+			return icon_buttons.report.get_global_rect()
+	return Rect2()

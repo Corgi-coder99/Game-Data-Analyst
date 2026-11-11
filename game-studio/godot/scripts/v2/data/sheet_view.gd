@@ -6,6 +6,7 @@ const Grid = preload("res://scripts/v2/data/grid_view.gd")
 const Forms = preload("res://scripts/data/step_forms.gd")
 const Palette = preload("res://scripts/v2/palette.gd")
 const WindowTheme = preload("res://scripts/v2/theme_v2.gd")
+const HintPopup = preload("res://scripts/v2/learn/hint_popup.gd")
 signal changed
 var session: RefCounted
 var texts: Dictionary = {}
@@ -33,6 +34,7 @@ var zoom_button: Button
 var pin_button: Button
 var file_picker: Control
 var remove_button: Button
+var hint_button: Button
 var note := ""
 
 func build(p_session: RefCounted, p_texts: Dictionary) -> void:
@@ -62,6 +64,7 @@ func build(p_session: RefCounted, p_texts: Dictionary) -> void:
 	var looks := UI.button(self, texts.sheet.looks, Rect2(0, 240, 70, 14), texts.sheet.looks_title)
 	looks.pressed.connect(toggle_looks)
 	looks.name = "LooksButton"
+	hint_button = HintPopup.add_button(self, self, Rect2(372, 31, 61, 14), session, func(): return sheet.file_id if sheet != null else session.hint_file())
 	refresh()
 
 func show_file(file_id: String) -> void:
@@ -95,6 +98,7 @@ func refresh() -> void:
 		grid.visible = false
 		grid.highlight = {}
 	for op in toolbar_buttons: toolbar_buttons[op].disabled = sheet == null
+	if hint_button != null: hint_button.get_meta("refresh").call()
 	note_label.text = note if note != "" else session.message
 	changed.emit()
 
