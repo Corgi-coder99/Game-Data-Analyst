@@ -30,7 +30,7 @@ static func defaults(display_name: String, today: String) -> Dictionary:
 		"pending_fine": 0,
 		"pending_bonus": 0,
 		"ladder": {"for_day": "", "step": ""},
-		"settings": {"attendance": true, "quiet_start": 21, "quiet_end": 8, "intro_seen": false},
+		"settings": {"attendance": true, "quiet_start": 21, "quiet_end": 8, "intro_seen": false, "audio": {"master": 70, "music": 40, "sfx": 70, "mute": false}},
 		"stats": {"days_total": 0, "best_rank_index": -1, "ontime_streak": 0, "best_ontime": 0, "honest_days": 0, "honest_right": 0, "runs_survived": 0, "rehired": 0, "perfect_days": 0, "verified_days": 0, "best_day": {}},
 	}
 

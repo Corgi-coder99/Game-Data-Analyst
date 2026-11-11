@@ -44,6 +44,7 @@ func finish(meta: RefCounted, date: String, index: int = 1, accuracy: float = 1.
 func run() -> void:
 	test_clock()
 	test_profile_files()
+	test_audio_profile()
 	test_names()
 	test_streaks()
 	test_leave()
@@ -484,3 +485,23 @@ func test_meta_off_score_and_leak() -> void:
 	for filename in DirAccess.get_files_at("res://scripts/meta"):
 		if filename.ends_with(".gd") and filename != "clock.gd":
 			check(not FileAccess.get_file_as_string("res://scripts/meta/" + filename).contains("Time.get_"), filename + " does not read the real date")
+
+func test_audio_profile() -> void:
+	wipe()
+	var file := FileAccess.open(PATH, FileAccess.WRITE)
+	file.store_string(JSON.stringify({"version": 1, "display_name": "Analyst", "settings": {"attendance": false}}))
+	file.close()
+	var profile := Profile.new(PATH)
+	profile.load_or_create("2026-11-11")
+	check(profile.data.settings.audio == {"master":70, "music":40, "sfx":70, "mute":false}, "old profile gets audio defaults")
+	check(not profile.data.settings.attendance, "old attendance preserved")
+	profile.data.settings.audio = {"master":22, "music":0, "sfx":99, "mute":true}
+	check(profile.save(), "audio profile saved")
+	var loaded := Profile.new(PATH)
+	loaded.load_or_create("2026-11-11")
+	check(loaded.data.settings.audio == profile.data.settings.audio, "all audio settings persist")
+	profile.data.settings.audio = {"master":"bad", "music":false, "sfx":[], "mute":1}
+	profile.save()
+	loaded.load_or_create("2026-11-11")
+	check(loaded.data.settings.audio == {"master":70, "music":40, "sfx":70, "mute":false}, "wrong audio types fall back")
+	wipe()

@@ -163,6 +163,7 @@ func show_money(type: String, amount: int, delay: float = 0.0, column: int = 0) 
 
 func set_emote(name: String) -> void:
 	build()
+	if name != "": preload("res://scripts/audio/audio_manager.gd").emit_for(self, "select" if name == "happy" else "warning")
 	emote = name
 	if name == "":
 		emote_node.hide()
@@ -187,6 +188,7 @@ func react(value: String, pick: int = 0) -> String:
 	thumb_node.visible = value == "happy"
 	reaction_time = 0.0
 	_apply_reaction()
+	preload("res://scripts/audio/audio_manager.gd").emit_for(self, "keyboard_slam" if mood == "angry" else "confirm")
 	reacted.emit(mood, shout)
 	return shout
 
@@ -216,6 +218,7 @@ func _apply_popup(record: Dictionary) -> void:
 	if local < 0.0:
 		node.visible = false
 		return
+	if not record.get("sounded", false): record.sounded = true; preload("res://scripts/audio/audio_manager.gd").emit_for(self, "coin_gain" if record.positive else "coin_spend")
 	var progress := clampf(local / POPUP_TIME, 0.0, 1.0)
 	record.done = progress >= 1.0
 	node.visible = not record.done

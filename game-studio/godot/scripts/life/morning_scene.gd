@@ -141,6 +141,7 @@ func choose_breakfast(choice: String) -> Dictionary:
 		"sleep_in": message = daily.breakfast_result.sleep_in % int(result.change.stamina)
 	step = "transport"
 	render()
+	if int(result.cost) > 0: preload("res://scripts/audio/audio_manager.gd").emit_for(self, "coin_spend")
 	breakfast_done.emit(choice)
 	return result
 
@@ -154,6 +155,7 @@ func choose_transport(id: String) -> Dictionary:
 	closed = true
 	message = daily.transport_result % [daily.transport[id], int(result.cost)]
 	render()
+	if int(result.cost) > 0: preload("res://scripts/audio/audio_manager.gd").emit_for(self, "coin_spend")
 	finished.emit(id)
 	return result
 
