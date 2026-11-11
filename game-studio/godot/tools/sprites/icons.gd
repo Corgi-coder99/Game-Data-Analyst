@@ -31,7 +31,10 @@ const ICONS := {
 "app_mail":["oooooooo","oWWWWWWo","oWpWWpWo","oWWpppWo","oWWWppWo","oWWWWWWo","oooooooo","........"],
 "app_bi":["oooooooo","oDDDDDDo","oDDDDGDo","oDGDDGDo","oDGDGGDo","oDGGGGDo","oDDDDDDo","oooooooo"],
 "app_code":["oooooooo","oDDDDDDo","oDGDDDDo","oDDGDDDo","oDGDDDDo","oDDDGGDo","oDDDDDDo","oooooooo"],
-"app_help":["..oooo..",".oYYYYo.","oYYoooYo","oYYYYoYo","oYYYooYo","oYYYYYYo",".oYYoYo.","..oooo.."]}
+"app_help":["..oooo..",".oYYYYo.","oYYoooYo","oYYYYoYo","oYYYooYo","oYYYYYYo",".oYYoYo.","..oooo.."],
+"app_files":["........",".yyy....","yYYYYYYy","yYYYYYYy","yYYYYYYy","yYYYYYYy","yyyyyyyy","........"],
+"app_sheet":["oooooooo","oGGoGGGo","oooooooo","oWWoWWWo","oooooooo","oWWoWWWo","oooooooo","oooooooo"],
+"app_charts":["oooooooo","oWWWWWWo","oWWWWBWo","oWWBWBWo","oWBBWBWo","oWBBBBWo","oooooooo","........"]}
 static func definitions() -> Dictionary:
 	var out := {}
 	for id in ICONS:

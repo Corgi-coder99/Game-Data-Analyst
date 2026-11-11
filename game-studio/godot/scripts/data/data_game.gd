@@ -14,6 +14,7 @@ var _ref: RefCounted
 var _charts: RefCounted
 var _grader: RefCounted
 var _world: RefCounted
+var _cfg_data: Dictionary = {}
 var _cache: Dictionary = {}
 var _submissions: Dictionary = {}
 var _reviewed: Dictionary = {}
@@ -23,6 +24,7 @@ func _init(source: RefCounted, seed_value: int, cfg: Dictionary = {}) -> void:
 	var scenario: RefCounted = source.get("_scenario") if source.get("_scenario") != null else source
 	if source.get("_scenario") != null: _world = source
 	var config: Dictionary = cfg if not cfg.is_empty() else Loader.load_json("res://data/datasets.json")
+	_cfg_data = config.get("data", {})
 	_gen = Generator.new(scenario, seed_value, config)
 	_ref = Reference.new(config)
 	_charts = Charts.new(config)
@@ -86,6 +88,43 @@ func submit_analysis(day: int, file_id: String, analysis: Dictionary) -> Diction
 	if _is_reviewed(day): return {"ok":false, "error":"day_closed"}
 	_submissions["%d|%s" % [day, file_id]] = analysis.duplicate(true)
 	return {"ok":true}
+
+# T-034: the scoring hook used by WorldGame (via the flow). `analysis` is the report payload:
+# {pipelines: {file_id: steps}, attachments: [{type, file_id, spec, steps, ...}], findings: {file_id: {id: value}}}.
+# Stores one submission per file and returns only a signed number (no truth leaves this class).
+# Default config: a good analysis (grade >= analysis_good) adds analysis_bonus * grade; the penalty is 0.
+func score_analysis(day: int, analysis: Dictionary) -> float:
+	if not _allowed(day) or _is_reviewed(day): return 0.0
+	var ids: Array = []
+	for source in [analysis.get("pipelines", {}), analysis.get("findings", {})]:
+		for id in source:
+			if not ids.has(id): ids.append(id)
+	for item in analysis.get("attachments", []):
+		if item is Dictionary and not ids.has(item.get("file_id", "")): ids.append(item.get("file_id", ""))
+	var total := 0.0
+	var count := 0
+	var answered := 0
+	for id in ids:
+		var f := _file(day, str(id))
+		if f.is_empty(): continue
+		var chart: Dictionary = {}
+		for item in analysis.get("attachments", []):
+			if item is Dictionary and item.get("file_id", "") == id and item.get("type", "") == "chart" and chart.is_empty(): chart = item.get("spec", {})
+		var submission := {"pipeline":analysis.get("pipelines", {}).get(id, []), "chart":chart, "findings":analysis.get("findings", {}).get(id, {})}
+		submit_analysis(day, str(id), submission)
+		answered += submission.findings.size()
+		total += float(_grader.grade(f, _ref, _ref.evaluate_reference(f).truth, submission).total)
+		count += 1
+	if count == 0: return 0.0
+	var grade := total / count
+	var cfg: Dictionary = _cfg_data
+	if grade >= float(cfg.get("analysis_good", 0.6)): return float(cfg.get("analysis_bonus", 1.0)) * grade
+	if answered > 0 and grade < float(cfg.get("analysis_wrong_below", 0.3)): return -float(cfg.get("analysis_wrong_penalty", 0.0))
+	return 0.0
+
+# T-034: the review record for the "Your analysis" step; same gate as review().
+func analysis_review(day: int) -> Dictionary:
+	return review(day)
 
 # Only after the day's review: manifest, reference result, truth, hidden values and the grade.
 func review(day: int) -> Dictionary:

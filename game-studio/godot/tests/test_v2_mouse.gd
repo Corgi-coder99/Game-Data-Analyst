@@ -140,7 +140,7 @@ func run() -> void:
 	await click(desktop.task_buttons.news, "Browser taskbar entry")
 	check(desktop.front == "news", "taskbar brings the Browser back")
 	await click(desktop.news_window.pin_buttons[uid], "Pin")
-	check(desktop.get_pinned() == [uid] and desktop.coach.current_id() == "mail", "Pin adds evidence and advances the tutorial")
+	check(desktop.get_pinned() == [uid] and desktop.coach.current_id() == "files", "Pin adds evidence and advances the tutorial")
 	check(desktop.tray_slots[0].uid == uid and desktop.tray_slots[0].jump.is_visible_in_tree(), "the evidence tray shows the pin")
 	var second: String = desktop.entries[1].uid
 	await click(desktop.news_window.pin_buttons[second], "Pin second article")

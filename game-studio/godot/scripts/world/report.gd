@@ -6,6 +6,7 @@ static func validate(input: Dictionary, question_id: String, available: Array, i
 	if not config.grading.confidence.has(input.get("confidence", "")): return "invalid_confidence"
 	if not input.get("evidence") is Array: return "invalid_evidence"
 	if not input.get("actions") is Array: return "invalid_actions"
+	if input.has("analysis") and not input.analysis is Dictionary: return "invalid_analysis"
 	if input.evidence.size() > int(config.grading.max_evidence): return "too_many_evidence"
 	if input.actions.size() > limit: return "too_many_actions"
 	var seen := {}
