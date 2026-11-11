@@ -227,6 +227,8 @@ static func line_edit(parent: Node, area: Rect2, text: String, placeholder: Stri
 	node.add_theme_font_size_override("font_size", 8)
 	node.add_theme_constant_override("minimum_character_width", 2)
 	node.custom_minimum_size = Vector2(0, 14)
+	for state in ["normal", "focus", "read_only"]:
+		node.add_theme_stylebox_override(state, WindowTheme.box(3, 94))
 	parent.add_child(node)
 	node.size = Vector2(area.size.x, maxf(area.size.y, 14.0))
 	return node

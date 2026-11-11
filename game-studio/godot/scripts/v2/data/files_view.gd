@@ -25,10 +25,10 @@ func refresh() -> void:
 		var y: int = 20 + i * 52
 		UI.panel(self, Rect2(0, y, 432, 48), 3, 81)
 		var fresh: bool = session.is_new(f.id)
-		UI.label(self, str(f.title), Rect2(8, y + 4, 240, 14), 22, 12)
-		UI.label(self, "%s.csv" % f.name, Rect2(8, y + 20, 160, 12), 7)
-		UI.label(self, texts.files.rows % f.row_count, Rect2(172, y + 20, 70, 12), 7)
-		UI.label(self, session.messy_hint(), Rect2(8, y + 32, 240, 12), 6)
+		UI.label(self, str(f.title), Rect2(8, y + 1, 240, 18), 22, 12)
+		UI.label(self, "%s.csv" % f.name, Rect2(8, y + 21, 160, 12), 7)
+		UI.label(self, texts.files.rows % f.row_count, Rect2(172, y + 21, 70, 12), 7)
+		UI.label(self, session.messy_hint(), Rect2(8, y + 34, 240, 12), 6)
 		if fresh:
 			var badge := UI.panel(self, Rect2(252, y + 5, 34, 14), 24, 23)
 			UI.label(badge, texts.files.new, Rect2(4, 1, 28, 12), 1)

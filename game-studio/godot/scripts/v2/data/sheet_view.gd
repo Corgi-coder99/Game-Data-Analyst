@@ -156,9 +156,10 @@ func _render_steps() -> void:
 	if sheet == null: return
 	if count == 0:
 		UI.wrapped(steps_box, texts.sheet.no_steps, Rect2(3, 16, 128, 36), 6, 3)
+		return
 	var scroll := ScrollContainer.new()
 	scroll.position = Vector2(2, 14)
-	scroll.size = Vector2(130, 112)
+	scroll.size = Vector2(130, 96)
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	steps_box.add_child(scroll)
 	var holder := Control.new()
@@ -168,7 +169,7 @@ func _render_steps() -> void:
 	for i in count:
 		var report: Dictionary = sheet.step_report(i)
 		var failed: bool = not report.get("ok", true)
-		var main := UI.button(holder, "%d %s" % [i + 1, Forms.describe(list[i])], Rect2(0, i * 16, 56, 14), Forms.describe(list[i]))
+		var main := UI.button(holder, "%d %s" % [i + 1, texts.ops[list[i].op]], Rect2(0, i * 16, 56, 14), Forms.describe(list[i]))
 		main.toggle_mode = true
 		main.button_pressed = i == sheet.selected_step
 		main.alignment = HORIZONTAL_ALIGNMENT_LEFT
@@ -186,15 +187,17 @@ func _render_steps() -> void:
 		delete.pressed.connect(func(): _do(func(): sheet.delete_step(i)))
 		step_buttons.append({"main":main, "edit":edit, "up":up, "down":down, "delete":delete})
 	# detail of the selected step
-	var y := 128
+	var y := 112
 	if sheet.selected_step >= 0 and sheet.selected_step < count:
 		var report: Dictionary = sheet.step_report(sheet.selected_step)
+		UI.wrapped(steps_box, Forms.describe(list[sheet.selected_step]), Rect2(3, y, 128, 22), 7, 2)
+		y += 23
 		if report.get("ok", true):
 			UI.label(steps_box, texts.sheet.preview % [report.get("rows_in", 0), report.get("rows_out", 0)], Rect2(3, y, 128, 12), 22)
 			var diff: Dictionary = sheet.step_diff(sheet.selected_step)
 			if diff.removed.size() > 0 or diff.changed.size() > 0:
 				UI.label(steps_box, "%s  %s" % [texts.sheet.removed % diff.removed.size(), texts.sheet.changed % diff.changed.size()], Rect2(3, y + 12, 128, 12), 28)
-			remove_button = UI.button(steps_box, texts.sheet.view_result if sheet.view_removed else texts.sheet.view_removed, Rect2(3, y + 26, 128, 14), "Look at the rows this step removed")
+			remove_button = UI.button(steps_box, texts.sheet.view_result if sheet.view_removed else texts.sheet.view_removed, Rect2(3, y + 25, 128, 14), "Look at the rows this step removed")
 			remove_button.disabled = diff.removed.size() == 0
 			remove_button.pressed.connect(func():
 				sheet.view_removed = not sheet.view_removed

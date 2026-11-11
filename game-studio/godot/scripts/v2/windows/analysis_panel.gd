@@ -19,6 +19,7 @@ func build(p_session: RefCounted, p_texts: Dictionary, p_locked: bool) -> void:
 	texts = p_texts
 	locked = p_locked
 	size = Vector2(434, 270)
+	set_meta("overlay", true)
 	UI.panel(self, Rect2(0, 0, 434, 270), 2, 94)
 	UI.label(self, texts.mail.title, Rect2(6, 2, 200, 14), 28, 12)
 	var done := UI.button(self, texts.mail.done, Rect2(364, 2, 66, 16))

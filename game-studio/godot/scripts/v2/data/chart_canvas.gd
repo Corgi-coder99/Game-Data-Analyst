@@ -17,6 +17,11 @@ static func short(text: String, chars: int) -> String:
 	if text.length() <= chars: return text
 	return text.substr(0, maxi(1, chars - 1)) + "."
 
+# ISO dates lose the year on the axis (2026-02-15 becomes 02-15).
+static func axis_text(text: String) -> String:
+	if text.length() == 10 and text[4] == "-" and text[7] == "-": return text.substr(5)
+	return text
+
 func _text(pos: Vector2, text: String, color_index: int = 22, align: int = HORIZONTAL_ALIGNMENT_LEFT, width: float = -1.0) -> void:
 	var font: Font = get_theme_default_font()
 	draw_string(font, pos, text, align, width, 8, Palette.color(color_index))
@@ -135,7 +140,7 @@ func _draw_xy(type: String, series: Array, plot: Rect2) -> void:
 	if chars < 4: every = int(ceil(4.0 / maxf(1.0, float(chars)) * 1.5))
 	if type == "histogram" and cats.size() > 4: every = ceili(cats.size() / 3.0)
 	for i in range(0, cats.size(), maxi(1, every)):
-		var label_text := short(str(cats[i]), maxi(4, chars * maxi(1, every)))
+		var label_text := short(axis_text(str(cats[i])), maxi(4, chars * maxi(1, every)))
 		_text(Vector2(plot.position.x + slot * (i + 0.5) - slot * 0.5 * maxi(1, every), plot.end.y + 10.0), label_text, 7, HORIZONTAL_ALIGNMENT_CENTER, slot * maxi(1, every))
 
 func _draw_scatter(series: Array, plot: Rect2) -> void:
