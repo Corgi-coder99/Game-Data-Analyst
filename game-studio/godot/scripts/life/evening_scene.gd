@@ -273,6 +273,7 @@ func _after(kind: String, result: Dictionary, success_text: String) -> Dictionar
 		message = success_text
 	else:
 		message = strings.life.errors.get(str(result.get("error", "")), strings.life.errors.unknown)
+	if result.ok and kind in ["food", "treat", "gold_buy", "land_buy", "house_buy"]: preload("res://scripts/audio/audio_manager.gd").emit_for(self, "coin_spend")
 	acted.emit(kind, result)
 	render()
 	return result

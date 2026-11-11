@@ -18,6 +18,11 @@ var cancel_button: Button
 var back_button: Button
 var status_label: Label
 var confirming := false
+const AudioManager = preload("res://scripts/audio/audio_manager.gd")
+var audio_sliders: Dictionary = {}
+var audio_labels: Dictionary = {}
+var mute_button: Button
+var sound_test_button: Button
 
 func _ready() -> void:
 	_prepare_once()
@@ -77,6 +82,7 @@ func _prepare_once() -> void:
 	back_button = button(self, "Back", Rect2(270, 316, 100, 22))
 	back_button.focus_mode = Control.FOCUS_NONE
 	back_button.pressed.connect(close)
+	_build_audio()
 
 func open(meta_ref: RefCounted) -> void:
 	_prepare_once()
@@ -95,6 +101,7 @@ func refresh() -> void:
 	confirm_button.visible = confirming
 	cancel_button.visible = confirming
 	reset_button.disabled = confirming
+	_refresh_audio()
 
 func apply_name() -> void:
 	var saved: String = meta.profile.set_name(name_edit.text)
@@ -137,3 +144,49 @@ func close() -> void:
 
 func apply_name_if_changed() -> void:
 	if meta != null and name_edit.text != str(meta.profile.data.display_name): apply_name()
+
+func _build_audio() -> void:
+	_panel(self, Rect2(524, 48, 112, 226))
+	_text(self, "AUDIO", Rect2(532, 56, 96, 14), 89)
+	for i in 3:
+		var key: String = ["master", "music", "sfx"][i]
+		var y := 80 + i * 44
+		audio_labels[key] = _text(self, key.capitalize(), Rect2(532, y, 96, 14), 22)
+		var slider := HSlider.new()
+		slider.position = Vector2(532, y + 16)
+		slider.size = Vector2(96, 16)
+		slider.min_value = 0
+		slider.max_value = 100
+		slider.step = 1
+		add_child(slider)
+		audio_sliders[key] = slider
+		slider.value_changed.connect(_audio_changed.bind(key))
+	mute_button = button(self, "Mute: OFF", Rect2(532, 214, 96, 20))
+	mute_button.pressed.connect(_toggle_mute)
+	sound_test_button = button(self, "Sound test", Rect2(532, 244, 96, 20))
+	sound_test_button.pressed.connect(func(): AudioManager.emit_for(self, "success"))
+
+func _refresh_audio() -> void:
+	var values: Dictionary = meta.profile.data.settings.get("audio", AudioManager.DEFAULTS)
+	for key in audio_sliders:
+		audio_sliders[key].set_value_no_signal(values.get(key, AudioManager.DEFAULTS[key]))
+		audio_labels[key].text = "%s %d" % [str(key).capitalize(), audio_sliders[key].value]
+	mute_button.text = "Mute: ON" if values.get("mute", false) else "Mute: OFF"
+	var manager := AudioManager.find_for(self)
+	if manager != null: manager.bind_profile(meta.profile)
+
+func _audio_changed(value: float, key: String) -> void:
+	if meta == null: return
+	var values: Dictionary = meta.profile.data.settings.get("audio", AudioManager.DEFAULTS.duplicate())
+	values[key] = int(value)
+	meta.profile.data.settings.audio = values
+	meta.profile.save()
+	_refresh_audio()
+
+func _toggle_mute() -> void:
+	if meta == null: return
+	var values: Dictionary = meta.profile.data.settings.get("audio", AudioManager.DEFAULTS.duplicate())
+	values.mute = not values.get("mute", false)
+	meta.profile.data.settings.audio = values
+	meta.profile.save()
+	_refresh_audio()
