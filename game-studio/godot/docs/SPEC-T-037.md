@@ -30,3 +30,11 @@ In `TASKS.md` under T-037 (Vietnamese, short, per AGENTS.md): files changed, tes
 
 ## Scope amendment (2026-11-11, reviewer decision after Codex's blocker)
 `scripts/meta/profile.gd` drops unknown `settings` keys on load, so audio settings would be erased. You may therefore also edit `scripts/meta/profile.gd` (additive: extend the default `settings` with `audio` fields master/music/sfx/mute and keep unknown-key sanitizing for others; backward compatible with old profile files) and `tests/test_t030_meta.gd` (add checks only; do not relax any). Note: another task (T-035, learning layer) will add skill-progress fields to the same profile file later; keep your edit small and additive to ease merging.
+
+## Performance amendment (2026-11-11, after Codex's first run timed out; reviewer measured test_t037_synth > 500 s)
+Cause: pure-GDScript synthesis is ~100x slower than native. `music.gd` builds 96 beats (~72 s at 22050 Hz = 1.6M samples) and recomputes a 2.8 s pluck plus echo for each of 96 chord notes, ~50M interpreted operations per mood. Fix requirements:
+1. **Loop length 8 bars (32 beats, about 24-30 s)** instead of 24 bars; chord notes repeat so **cache each unique pluck+echo waveform per (mood, note)** and mix cached copies; mix with a **tight loop over precomputed arrays** (avoid per-sample function calls, avoid `sin()` per sample where a precomputed table or a recurrence works; precompute a 1024-entry sine table, use `RATE = 16000` for music and 22050 for SFX).
+2. **Never block the game**: build music loops in a `Thread` at startup (low priority) one mood at a time, play a short silence or SFX only until ready, and expose `is_ready(mood)`; SFX are small (<= 0.6 s) and may be built lazily on first use and cached.
+3. **Budget**: building one mood loop must take < 3 s in headless Godot on this machine, all 27 SFX < 5 s total. Add a timing test that fails above 3x these budgets.
+4. **Tests must each finish in < 60 s** (the tooling kills commands after 180 s): split test files, test one mood fully (determinism and seamless loop) and the others by structural properties (length, non-silent, differ from each other) using a smaller `loop_bars` parameter if needed; do not generate all 5 moods x2 in one test.
+5. If it is still too slow after one optimization pass, stop and report the measured timings (guard rule).
