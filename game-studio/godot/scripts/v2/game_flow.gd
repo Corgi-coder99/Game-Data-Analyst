@@ -21,6 +21,9 @@ const Meta = preload("res://scripts/meta/meta.gd")
 const LetterScene = preload("res://scripts/v2/letter_scene.gd")
 const WallScene = preload("res://scripts/v2/wall_scene.gd")
 const SettingsScene = preload("res://scripts/v2/settings_scene.gd")
+const ConsentScene = preload("res://scripts/v2/consent_scene.gd")
+const Playlog = preload("res://scripts/telemetry/playlog.gd")
+var telemetry: RefCounted
 const LeaveScene = preload("res://scripts/v2/leave_scene.gd")
 const Toast = preload("res://scripts/v2/toast.gd")
 const Juice = preload("res://scripts/v2/juice.gd")  # T-039: feedback animations (visual only)
@@ -117,6 +120,8 @@ func _ready() -> void:
 	add_child(preload("res://scripts/v2/juice_hooks.gd").new())
 	apply_display_settings()
 	announce_rollover()
+	if meta != null and telemetry == null: telemetry = Playlog.new(meta.profile)
+	if telemetry != null: telemetry.session_start()
 	if autostart: start_title()
 
 # T-039: the profile's display settings (pixel font, reduce motion). Without a profile the defaults stay.
@@ -226,6 +231,7 @@ func _reset_game() -> void:
 # ---- steps ------------------------------------------------------------
 
 func start_title() -> void:
+	if telemetry != null and game != null: telemetry.quit_run(state, game.status())
 	_reset_game()
 	game = null
 	_set_state("TITLE")
@@ -238,7 +244,14 @@ func start_title() -> void:
 		title_view.wall_requested.connect(open_meta_view.bind("WALL"))
 		title_view.settings_requested.connect(open_meta_view.bind("SETTINGS"))
 		title_view.leave_requested.connect(open_meta_view.bind("LEAVE"))
-		title_view.quit_requested.connect(func(): get_tree().quit()))
+		title_view.quit_requested.connect(_quit_game))
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_CLOSE_REQUEST: _quit_game()
+
+func _quit_game() -> void:
+	if telemetry != null and game != null: telemetry.quit_run(state, game.status())
+	get_tree().quit()
 
 # ---- T-030: meta screens and the run entry ---------------------------------------------------------
 
@@ -252,6 +265,9 @@ func begin_run(mode: String) -> void:
 	_next_pre_run()
 
 func _next_pre_run() -> void:
+	if telemetry != null and not bool(meta.profile.data.telemetry.seen) and (pre_run_queue.is_empty() or str(pre_run_queue[0].get("type", "")) != "intro"):
+		_enter_consent(_next_pre_run)
+		return
 	if pre_run_queue.is_empty():
 		if tutorial_choice_enabled and meta != null and str(meta.profile.data.learn.tutorial) == "":
 			_enter_tutorial_choice()
@@ -265,6 +281,18 @@ func _next_pre_run() -> void:
 		_swap(meta_view)
 		meta_view.open(screen)
 		meta_view.finished.connect(_next_pre_run, CONNECT_ONE_SHOT))
+
+func _enter_consent(after: Callable) -> void:
+	# Persist No before displaying: closing here must not opt in or prompt again.
+	meta.profile.data.telemetry.seen = true
+	meta.profile.save()
+	_set_state("CONSENT")
+	_show(func():
+		meta_view = ConsentScene.new()
+		_swap(meta_view)
+		meta_view.chosen.connect(func(value):
+			telemetry.set_consent(value)
+			after.call(), CONNECT_ONE_SHOT))
 
 # T-035: the first-run choice: guided tutorial days 1-5 or skip. Remembered in the profile.
 func _enter_tutorial_choice() -> void:
@@ -290,6 +318,9 @@ func open_meta_view(which: String) -> void:
 			"SETTINGS": meta_view = SettingsScene.new()
 			_: meta_view = LeaveScene.new()
 		_swap(meta_view)
+		if which == "SETTINGS":
+			meta_view.telemetry = telemetry
+			meta_view.consent_requested.connect(func(): _enter_consent(func(): open_meta_view("SETTINGS")))
 		meta_view.open(meta)
 		meta_view.back_requested.connect(start_title, CONNECT_ONE_SHOT))
 
@@ -307,6 +338,7 @@ func new_game(seed_value: int = -1, overrides: Dictionary = {}) -> void:
 	start_with_game(Game.new(chosen, HORIZON, overrides))
 
 func start_with_game(value: RefCounted) -> void:
+	if telemetry != null and game != null: telemetry.quit_run(state, game.status())
 	_reset_game()
 	boss_log.clear()
 	visited.clear()
@@ -318,6 +350,8 @@ func start_with_game(value: RefCounted) -> void:
 	elif learn_state == null: learn_state = LearnState.new()
 	learn_outcome = {}
 	focus_info = {"bonus": 0, "reason": "neutral"}
+	if telemetry != null:
+		telemetry.run_start(run_mode, seed_used, int(game.status().horizon), str(learn_state.data.tutorial), int(floor(learn_state.mean_level())))
 	if daily_active():
 		life.enable_daily()
 		if meta != null: meta.begin_run(life)
@@ -333,6 +367,7 @@ func _enter_day_start() -> void:
 		return
 	_set_state("DAY_START")
 	game.begin_day()
+	_telemetry_day_start()
 	phase = "sang"
 	boss_shown = false
 	first_tool_done = false
@@ -412,6 +447,7 @@ func _begin_work_day() -> void:
 	game.begin_day(int(focus_info.bonus))
 	if late_minutes > 0:
 		game.set("_minutes", int(game.status().minutes) + late_minutes)
+	_telemetry_day_start()
 	phase = "sang"
 	boss_shown = false
 	first_tool_done = false
@@ -501,6 +537,7 @@ func _enter_work() -> void:
 	_show(_build_desktop)
 
 func _build_desktop() -> void:
+	var fresh := desktop == null
 	if desktop == null:
 		desktop = DesktopScene.instantiate()
 		desktop.data_seed = seed_used
@@ -513,10 +550,24 @@ func _build_desktop() -> void:
 	else:
 		desktop.start_day()
 	_swap(desktop)
+	if fresh and telemetry != null:
+		desktop.report_window.wait_requested.connect(func(): telemetry.time_spent(game.status(), false))
+		if desktop.data_session != null:
+			desktop.data_session.changed.connect(func(): telemetry.time_spent(game.status(), true))
+			desktop.data_session.hint_given.connect(func(_info): telemetry.hint(game.status()))
 	desktop.refresh()
 
-func _on_tool_used(_uid: String, _tool_id: String, _result: Dictionary) -> void:
-	pass
+func _telemetry_day_start() -> void:
+	if telemetry != null: telemetry.day_start(game.status(), game.question_today(), game.news_today())
+
+func _on_tool_used(uid: String, tool_id: String, result: Dictionary) -> void:
+	if telemetry == null: return
+	var item := {}
+	for news in game.news_today():
+		if str(news.get("uid", "")) == uid:
+			item = news
+			break
+	telemetry.verification(game.status(), tool_id, result, item)
 
 func _on_time_changed(minutes: int) -> void:
 	# The window light changes after the first tool use or once the clock passes noon.
@@ -531,6 +582,7 @@ func submit_report(input: Dictionary) -> Dictionary:
 	if state != "WORK" or game == null: return _reject("day_closed")
 	var result: Dictionary = game.submit_report(input)
 	if not result.ok: return _reject(str(result.error))
+	if telemetry != null: telemetry.report_submit(game.status(), input)
 	_set_state("SUBMITTED")
 	submission = input.duplicate(true)
 	if desktop != null: desktop.report_window.lock(true)
@@ -566,6 +618,7 @@ func _build_review(day: int) -> void:
 		review_view.hints_by_file = desktop.data_session.hints_by_file()
 		review_view.tutorial_day = desktop.data_session.tutorial_today()
 	review_view.show_review(game, day, submission, before_status)
+	if telemetry != null: telemetry.day_end(game.status(), review_view.data)
 
 # Used by tests and scripts: one press of Continue.
 func continue_review() -> void:
@@ -638,6 +691,7 @@ func _after_evening(_skipped: bool = false) -> void:
 func _enter_ending() -> void:
 	_set_state("ENDING")
 	var final_status: Dictionary = game.status()
+	if telemetry != null: telemetry.run_end(final_status)
 	life.settle_for_ending(final_status)
 	if meta != null:
 		for text in meta.finish_run(final_status).get("toasts", []): toast(str(text))

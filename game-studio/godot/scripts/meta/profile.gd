@@ -29,6 +29,7 @@ static func defaults(display_name: String, today: String) -> Dictionary:
 		"winners": [],
 		"pending_fine": 0,
 		"pending_bonus": 0,
+		"telemetry": {"seen": false, "enabled": false, "player_pid": ""},
 		"learn": {"tutorial": "", "cards": {}, "xp": {"data_cleaning": 0, "charts": 0, "statistics": 0, "causality": 0, "communication": 0}, "events": {}, "tutorial_days": {}, "hints_used": 0},
 		"ladder": {"for_day": "", "step": ""},
 		"settings": {"attendance": true, "quiet_start": 21, "quiet_end": 8, "intro_seen": false, "pixel_font": true, "reduce_motion": false, "audio": {"master": 70, "music": 40, "sfx": 70, "mute": false}},

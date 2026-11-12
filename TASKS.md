@@ -18,14 +18,13 @@ Trạng thái: Backlog -> In progress -> Review -> Done. Bị chặn thì chuy�
 
 ## In progress
 
-| ID | Việc | Owner | Nhánh | File được sửa | Tiêu chí hoàn thành |
-|---|---|---|---|---|---|
-| T-041 | Cài đặt telemetry theo SPEC-T-040 (VU duyệt spec 2026-11-12). Codex chỉ chạy kiểm tra nhanh (<170 giây); Claude chạy test cửa sổ/dài | Codex | codex/T-041 | scripts/telemetry/*, scripts/v2/settings_scene.gd, scripts/v2/consent_scene.gd, hook nhỏ trong scripts/v2/game_flow.gd, scripts/meta/profile.gd (thêm trường), data/strings_v2.json (mục telemetry), tests/test_t041_*, tests/telemetry_bots.gd, tools/check_playlog.py | Mặc định không ghi gì; sau khi đồng ý ghi đúng lược đồ và qua check_playlog.py; xuất/xóa dữ liệu chạy được; balance_sim/balance_world không đổi |
+(chưa có)
 
 ## Review
 
 | ID | Việc | Owner | Nhánh | File được sửa | Tiêu chí hoàn thành |
 |---|---|---|---|---|---|
+| T-041 | Telemetry opt-in theo SPEC-T-040 (consent, playlog cục bộ, observer, bot generator, validator). Codex viết mã, dừng vì sandbox; Claude sửa review() trong game_flow, sửa lỗi 3.0 sau khi ghi lại vượt cap, cập nhật fixture cũ, chạy test. Chờ VU duyệt merge vào v2 | Codex + Claude | codex/T-041 | scripts/telemetry/*, scripts/v2/*, scripts/meta/profile.gd, data/strings_v2.json, tests/test_t041_*, tests/telemetry_bots.gd, tools/check_playlog.py | Xem docs/HANDOFF-T-041.md mục Claude nghiệm thu |
 | T-016 | Style bible pixel mới: bảng màu 32 màu, kích thước sprite, ánh sáng, giao diện máy tính, hoạt ảnh, kiểm tra tự động. Chờ VU xem | Claude | v2 | shared/style-bible/pixel-office-v2.md, palette-v2.json | VU duyệt style bible; quyết định có sửa CLAUDE.md mục 4 không |
 | T-017 | Content bible v2 (thế giới hư cấu Tân Lạc, công ty Lục Châu, nhân vật, 10 nguồn tin, ánh xạ 8 cú sốc) và data/news.json (41 mẫu tin, đã kiểm hợp lệ). Chờ VU xem | Claude | v2 | game-studio/godot/docs/CONTENT-BIBLE-v2.md, data/news.json | VU duyệt nội dung |
 | T-040 | Spec telemetry ẩn danh (opt-in, mặc định tắt, không mạng, giả danh ngẫu nhiên, lược đồ 11 sự kiện, bot làm nguồn dữ liệu, 5 câu hỏi phân tích) và assumptions-log. Chờ VU duyệt spec, đặc biệt câu chữ đồng ý (nên kiểm với trường/CNIL trước khi đăng) | Claude | v2 | game-studio/godot/docs/SPEC-T-040.md, data-analytics/game-v2/assumptions-log.md | VU duyệt spec; sau đó mở T-041 |
@@ -60,6 +59,12 @@ Trạng thái: Backlog -> In progress -> Review -> Done. Bị chặn thì chuy�
 (chưa có)
 
 ## Ghi chú bàn giao
+
+### T-041 | Codex | 2026-11-12 | Chưa hoàn tất — dừng guard rule
+
+- Nhánh `codex/T-041`, owner Codex/In progress có sẵn; không đổi dòng trạng thái. Đã viết telemetry opt-in, consent/Settings, writer/profile/hooks, bot generator, validator và test headless; chưa nghiệm thu đầy đủ. Đúng 16 file đổi kể cả ghi chú/handoff; chi tiết: `game-studio/godot/docs/HANDOFF-T-041.md`.
+- Storage bốn lượt: 5/1, 5/1, 114/1, 115/0 (checks/failures). Sau hai lần sửa môi trường test vẫn FAIL vì lưu profile; Codex đã hiểu guard theo nguyên nhân thay vì cả test và chạy thêm một lượt, rồi dừng. Flow gặp hook trước khi report_window được tạo; sửa chưa chạy lại. Không xác nhận observer/non-interference, 450 mẫu, test_sim hay validator; Python .venv bị Access denied lúc khởi động.
+- Không mạng/download/push/merge/stage/commit; không chạy test dài/cửa sổ/chuột/balance. Claude cần review bản dở dang, chạy kiểm tra nhanh còn thiếu rồi toàn bộ kiểm tra dài liệt kê trong handoff. Không coi đây là bản đạt spec.
 
 ### T-007 | Codex | 2026-11-10 | Review
 

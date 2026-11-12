@@ -113,6 +113,11 @@ func run() -> void:
 	check(flow.state == "INTRO", "the first-run explanation appears")
 	await shot("intro")
 	await click(flow.meta_view.continue_button, "Continue")
+	# T-041: the one-time telemetry consent follows the intro; a real click on "No thanks".
+	check(flow.state == "CONSENT", "the consent screen follows the intro")
+	await shot("consent")
+	await click(flow.meta_view.no_button, "No thanks")
+	check(flow.state == "MORNING" and not bool(flow.meta.profile.data.telemetry.enabled), "No keeps telemetry off")
 	check(flow.state == "MORNING" and flow.run_mode == "daily" and flow.seed_used == LocalDaySource.seed_for_date("2026-11-10"), "Daily Shift started with the date seed")
 	await click(flow.morning_view.buttons.home, "Eat at home")
 	check(flow.morning_view.step == "transport" and flow.morning_view.buttons.has("bus"), "breakfast chosen with a real click, transport choices shown: " + str(flow.morning_view.buttons.keys()) + " " + flow.morning_view.step)
