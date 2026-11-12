@@ -77,7 +77,7 @@ func test_strings() -> void:
 	check(strings.money.plus % 120 == "+$120" and strings.money.minus % 80 == "-$80", "money formats")
 	for item in Loader.load_json("res://data/news.json").news:
 		check(not item.headline.is_empty(), "headline present " + item.id)
-	check(Loader.load_json("res://data/questions.json").questions.size() == 7, "all questions kept")
+	check(Loader.load_json("res://data/questions.json").questions.size() >= 7, "all questions kept (T-038 grew the list from 7 to 20)")
 
 func test_stage_popups() -> void:
 	var stage: Control = Stage.new()
