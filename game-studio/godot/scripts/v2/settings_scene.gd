@@ -4,6 +4,13 @@ extends "res://scripts/life/daily_base.gd"
 const WindowTheme3 = preload("res://scripts/v2/theme_v2.gd")
 signal back_requested
 signal profile_reset
+signal consent_requested
+var telemetry: RefCounted
+var telemetry_button: Button
+var export_button: Button
+var delete_button: Button
+var telemetry_summary: Label
+var export_toast: Label
 var meta: RefCounted
 var name_edit: LineEdit
 var apply_button: Button
@@ -88,6 +95,41 @@ func _prepare_once() -> void:
 	back_button.pressed.connect(close)
 	_build_audio()
 	_build_display()
+	_build_telemetry()
+
+func _build_telemetry() -> void:
+	_panel(self, Rect2(4, 190, 112, 156))
+	_wrapped(self, strings.telemetry.toggle, Rect2(12, 196, 96, 36), 22, 3)
+	telemetry_button = button(self, "OFF", Rect2(12, 234, 96, 20))
+	telemetry_button.pressed.connect(toggle_telemetry)
+	export_button = button(self, strings.telemetry.export, Rect2(12, 258, 96, 20))
+	export_button.pressed.connect(export_telemetry)
+	delete_button = button(self, strings.telemetry.delete, Rect2(12, 282, 96, 20))
+	delete_button.pressed.connect(delete_telemetry)
+	telemetry_summary = _wrapped(self, "", Rect2(12, 308, 96, 32), 7, 2)
+	export_toast = _wrapped(self, "", Rect2(126, 248, 388, 84), 22, 7)
+	export_toast.add_theme_stylebox_override("normal", WindowTheme3.box(3, 91))
+	export_toast.hide()
+
+func toggle_telemetry() -> void:
+	if telemetry == null: return
+	if telemetry.enabled():
+		telemetry.set_consent(false)
+		refresh()
+	else: consent_requested.emit()
+
+func export_telemetry() -> void:
+	if telemetry == null: return
+	var destination: String = telemetry.writer.export_data()
+	export_toast.text = strings.telemetry.export_failed if destination == "" else strings.telemetry.exported + "\n" + destination
+	export_toast.show()
+	get_tree().create_timer(12.0).timeout.connect(func(): if is_instance_valid(export_toast): export_toast.hide())
+
+func delete_telemetry() -> void:
+	if telemetry == null: return
+	telemetry.delete_data()
+	export_toast.hide()
+	refresh()
 
 func _build_display() -> void:
 	_panel(self, Rect2(4, 48, 112, 136))
@@ -122,6 +164,7 @@ func toggle_reduce_motion() -> void:
 func open(meta_ref: RefCounted) -> void:
 	_prepare_once()
 	meta = meta_ref
+	if telemetry == null: telemetry = preload("res://scripts/telemetry/playlog.gd").new(meta.profile)
 	confirming = false
 	refresh()
 
@@ -139,6 +182,11 @@ func refresh() -> void:
 	_refresh_audio()
 	pixel_font_button.text = "ON" if bool(data.settings.get("pixel_font", true)) else "OFF"
 	motion_button.text = "ON" if bool(data.settings.get("reduce_motion", false)) else "OFF"
+	if telemetry != null:
+		telemetry_button.text = "ON" if telemetry.enabled() else "OFF"
+		var stored: Dictionary = telemetry.writer.summary()
+		telemetry_summary.text = strings.telemetry.stored % [stored.runs, stored.kb]
+		export_button.disabled = not telemetry.enabled() or telemetry.writer.stored_bytes() == 0
 
 func apply_name() -> void:
 	var saved: String = meta.profile.set_name(name_edit.text)
@@ -169,6 +217,7 @@ func cancel_reset() -> void:
 
 func confirm_reset() -> void:
 	if not confirming: return
+	if telemetry != null: telemetry.set_consent(false)
 	meta.reset_profile()
 	confirming = false
 	status_label.text = "Profile reset."

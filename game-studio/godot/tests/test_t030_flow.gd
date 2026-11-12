@@ -113,7 +113,11 @@ func test_first_run_and_daily() -> void:
 	check(flow.state == "INTRO" and flow.meta_view != null, "first run shows the explanation screen")
 	check(flow.meta_view.screen.lines.size() == 3 and flow.meta.profile.data.settings.attendance == true, "attendance is ON by default")
 	flow.meta_view.finish()
+	# T-041: the one-time consent screen follows the intro; the answer is No here.
+	check(flow.state == "CONSENT", "after the intro the telemetry consent is asked once")
+	flow.meta_view.chosen.emit(false)
 	check(flow.state == "MORNING" and flow.run_mode == "daily", "then the Daily Shift starts")
+	check(not bool(flow.meta.profile.data.telemetry.enabled), "No leaves telemetry off")
 	check(flow.seed_used == LocalDaySource.seed_for_date("2026-11-10"), "the Daily Shift seed comes from the date: %d" % flow.seed_used)
 	var seed_a: int = flow.seed_used
 	flow.queue_free()
@@ -138,7 +142,7 @@ func test_first_run_and_daily() -> void:
 func test_day_log_and_toasts() -> void:
 	wipe()
 	var flow := new_flow("2026-11-10")
-	flow.meta.profile.data.settings.intro_seen = true
+	flow.meta.profile.data.settings.intro_seen = true; flow.meta.profile.data.telemetry.seen = true
 	flow.begin_run("daily")
 	check(flow.state == "MORNING", "straight to the morning once the intro was seen")
 	var wallet: int = flow.life.wallet
@@ -169,7 +173,7 @@ func test_day_log_and_toasts() -> void:
 func test_letter_flow() -> void:
 	wipe()
 	var flow := new_flow("2026-11-10")
-	flow.meta.profile.data.settings.intro_seen = true
+	flow.meta.profile.data.settings.intro_seen = true; flow.meta.profile.data.telemetry.seen = true
 	flow.meta.profile.data.last_finished_day = "2026-11-04"
 	flow.meta.profile.data.reputation = 50
 	flow.begin_run("run")
@@ -192,14 +196,14 @@ func test_letter_flow() -> void:
 	for pair in [[8, "termination"], [9, "rehire"], [2, "reminder"], [3, "warning"]]:
 		wipe()
 		var f := new_flow("2026-12-01")
-		f.meta.profile.data.settings.intro_seen = true
+		f.meta.profile.data.settings.intro_seen = true; f.meta.profile.data.telemetry.seen = true
 		f.meta.profile.data.last_finished_day = Clock.add_days("2026-12-01", -int(pair[0]))
 		f.begin_run("run")
 		check(f.state == "LETTER" and f.meta_view.screen.step == pair[1], "%d days away -> %s" % [pair[0], pair[1]])
 		f.queue_free()
 	wipe()
 	var leave := new_flow("2026-12-01")
-	leave.meta.profile.data.settings.intro_seen = true
+	leave.meta.profile.data.settings.intro_seen = true; leave.meta.profile.data.telemetry.seen = true
 	leave.meta.profile.data.last_finished_day = "2026-11-27"
 	leave.meta.profile.data.leave.append({"date": "2026-11-28", "reason": "cat"})
 	leave.meta.profile.data.leave.append({"date": "2026-11-29", "reason": "cat"})
@@ -211,7 +215,7 @@ func test_letter_flow() -> void:
 func test_attendance_off() -> void:
 	wipe()
 	var flow := new_flow("2026-12-10")
-	flow.meta.profile.data.settings.intro_seen = true
+	flow.meta.profile.data.settings.intro_seen = true; flow.meta.profile.data.telemetry.seen = true
 	flow.meta.profile.data.last_finished_day = "2026-11-01"
 	flow.meta.profile.data.reputation = 80
 	flow.meta.set_attendance(false)
@@ -236,7 +240,7 @@ func test_full_game_and_score() -> void:
 	for with_meta in [false, true]:
 		wipe()
 		var flow := new_flow("2026-11-10", with_meta)
-		if with_meta: flow.meta.profile.data.settings.intro_seen = true
+		if with_meta: flow.meta.profile.data.settings.intro_seen = true; flow.meta.profile.data.telemetry.seen = true
 		flow.seed_used = 31
 		flow.run_mode = "run"
 		flow.start_with_game(Game.new(31, 10))

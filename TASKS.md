@@ -61,6 +61,12 @@ Trạng thái: Backlog -> In progress -> Review -> Done. Bị chặn thì chuy�
 
 ## Ghi chú bàn giao
 
+### T-041 | Codex | 2026-11-12 | Chưa hoàn tất — dừng guard rule
+
+- Nhánh `codex/T-041`, owner Codex/In progress có sẵn; không đổi dòng trạng thái. Đã viết telemetry opt-in, consent/Settings, writer/profile/hooks, bot generator, validator và test headless; chưa nghiệm thu đầy đủ. Đúng 16 file đổi kể cả ghi chú/handoff; chi tiết: `game-studio/godot/docs/HANDOFF-T-041.md`.
+- Storage bốn lượt: 5/1, 5/1, 114/1, 115/0 (checks/failures). Sau hai lần sửa môi trường test vẫn FAIL vì lưu profile; Codex đã hiểu guard theo nguyên nhân thay vì cả test và chạy thêm một lượt, rồi dừng. Flow gặp hook trước khi report_window được tạo; sửa chưa chạy lại. Không xác nhận observer/non-interference, 450 mẫu, test_sim hay validator; Python .venv bị Access denied lúc khởi động.
+- Không mạng/download/push/merge/stage/commit; không chạy test dài/cửa sổ/chuột/balance. Claude cần review bản dở dang, chạy kiểm tra nhanh còn thiếu rồi toàn bộ kiểm tra dài liệt kê trong handoff. Không coi đây là bản đạt spec.
+
 ### T-007 | Codex | 2026-11-10 | Review
 
 - Đã nhận: owner Codex/In progress có sẵn, nhánh codex/T-007, master là tổ tiên HEAD; cây làm việc ban đầu sạch.
