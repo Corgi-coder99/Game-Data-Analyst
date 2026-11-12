@@ -13,6 +13,9 @@ Trạng thái: Backlog -> In progress -> Review -> Done. Bị chặn thì chuy�
 | T-008 | check_web.py: ép stdout UTF-8 để không lỗi UnicodeEncodeError trên console Windows mặc định | Codex | codex/T-008 | media-marketing/web/check_web.py | Chạy `python -I check_web.py` (không cần -X utf8) qua 6 mục |
 | T-010 | Kịch bản và video quảng cáo 30 giây (làm sau T-012 để cảnh quay không hiện công ty gần hết người dùng) | Claude/Codex | chưa chốt | media-marketing/video/* | Chưa có spec |
 | T-019d | Giao diện v2 phần d: hiệu ứng, chỉnh theo playtest và ảnh chụp. Sau T-019c | Codex | codex/T-019d | scenes/v2/*, scripts/v2/*, assets/v2/* | Chưa có spec |
+| T-041 | Cài đặt telemetry theo SPEC-T-040 (sau T-040 và VU duyệt spec) | Codex | codex/T-041 | scripts/telemetry/*, hook nhỏ trong game_flow.gd, tests/test_t041_* | Mặc định không ghi gì; sau khi đồng ý ghi đúng lược đồ; xuất JSON; test qua |
+| T-042 | Đóng gói bản Windows/Web và trang itch.io (cần VU duyệt trước khi đăng, tải hay cài preset) | Claude | claude/T-042 | export_presets.cfg, media-marketing/itch/* | Bản chạy được, mô tả trung thực, có thông báo quyền riêng tư |
+| T-043 | Quy trình phân tích: dữ liệu playlog -> EDA, funnel, retention theo ngày chơi, cân bằng; case study 1 (skill programmatic-eda, funnel-analysis, cohort-analysis, analysis-qa-checklist) | Claude | claude/T-043 | data-analytics/game-v2/* | Có kế hoạch, báo cáo QA, kết luận kèm giả định và giới hạn; dùng dữ liệu tự chơi/bot trước khi có người chơi thật |
 
 ## In progress
 
@@ -24,6 +27,8 @@ Trạng thái: Backlog -> In progress -> Review -> Done. Bị chặn thì chuy�
 |---|---|---|---|---|---|
 | T-016 | Style bible pixel mới: bảng màu 32 màu, kích thước sprite, ánh sáng, giao diện máy tính, hoạt ảnh, kiểm tra tự động. Chờ VU xem | Claude | v2 | shared/style-bible/pixel-office-v2.md, palette-v2.json | VU duyệt style bible; quyết định có sửa CLAUDE.md mục 4 không |
 | T-017 | Content bible v2 (thế giới hư cấu Tân Lạc, công ty Lục Châu, nhân vật, 10 nguồn tin, ánh xạ 8 cú sốc) và data/news.json (41 mẫu tin, đã kiểm hợp lệ). Chờ VU xem | Claude | v2 | game-studio/godot/docs/CONTENT-BIBLE-v2.md, data/news.json | VU duyệt nội dung |
+| T-040 | Spec telemetry ẩn danh (opt-in, mặc định tắt, không mạng, giả danh ngẫu nhiên, lược đồ 11 sự kiện, bot làm nguồn dữ liệu, 5 câu hỏi phân tích) và assumptions-log. Chờ VU duyệt spec, đặc biệt câu chữ đồng ý (nên kiểm với trường/CNIL trước khi đăng) | Claude | v2 | game-studio/godot/docs/SPEC-T-040.md, data-analytics/game-v2/assumptions-log.md | VU duyệt spec; sau đó mở T-041 |
+| T-044 | Tài liệu học offline Game Analytics (HTML một file, 5 bài tập, tự lưu và xuất .json để gửi Claude chấm) | Claude | v2 | deliverables/hoc-game-analytics_2026-11-12.html | VU làm thử và gửi lại file bài làm để chấm |
 
 ## Done
 
