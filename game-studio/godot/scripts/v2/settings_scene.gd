@@ -23,6 +23,10 @@ var audio_sliders: Dictionary = {}
 var audio_labels: Dictionary = {}
 var mute_button: Button
 var sound_test_button: Button
+# T-039: display toggles (pixel font, reduce motion), stored in the profile settings.
+const Juice = preload("res://scripts/v2/juice.gd")
+var pixel_font_button: Button
+var motion_button: Button
 
 func _ready() -> void:
 	_prepare_once()
@@ -83,6 +87,37 @@ func _prepare_once() -> void:
 	back_button.focus_mode = Control.FOCUS_NONE
 	back_button.pressed.connect(close)
 	_build_audio()
+	_build_display()
+
+func _build_display() -> void:
+	_panel(self, Rect2(4, 48, 112, 136))
+	_text(self, "DISPLAY", Rect2(12, 56, 96, 14), 89)
+	_text(self, "Pixel font", Rect2(12, 76, 96, 12), 22)
+	pixel_font_button = button(self, "ON", Rect2(12, 90, 96, 20))
+	pixel_font_button.focus_mode = Control.FOCUS_NONE
+	pixel_font_button.pressed.connect(toggle_pixel_font)
+	_text(self, "Reduce motion", Rect2(12, 124, 96, 12), 22)
+	motion_button = button(self, "OFF", Rect2(12, 138, 96, 20))
+	motion_button.focus_mode = Control.FOCUS_NONE
+	motion_button.pressed.connect(toggle_reduce_motion)
+
+func toggle_pixel_font() -> void:
+	if meta == null: return
+	var settings: Dictionary = meta.profile.data.settings
+	settings.pixel_font = not bool(settings.get("pixel_font", true))
+	meta.profile.save()
+	WindowTheme3.set_pixel_font(bool(settings.pixel_font))
+	theme = WindowTheme3.create()
+	refresh()
+
+func toggle_reduce_motion() -> void:
+	if meta == null: return
+	var settings: Dictionary = meta.profile.data.settings
+	settings.reduce_motion = not bool(settings.get("reduce_motion", false))
+	meta.profile.save()
+	Juice.reduce_motion = bool(settings.reduce_motion)
+	if Juice.reduce_motion: Juice.finish_all()
+	refresh()
 
 func open(meta_ref: RefCounted) -> void:
 	_prepare_once()
@@ -102,6 +137,8 @@ func refresh() -> void:
 	cancel_button.visible = confirming
 	reset_button.disabled = confirming
 	_refresh_audio()
+	pixel_font_button.text = "ON" if bool(data.settings.get("pixel_font", true)) else "OFF"
+	motion_button.text = "ON" if bool(data.settings.get("reduce_motion", false)) else "OFF"
 
 func apply_name() -> void:
 	var saved: String = meta.profile.set_name(name_edit.text)

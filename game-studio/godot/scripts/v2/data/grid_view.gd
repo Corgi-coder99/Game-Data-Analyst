@@ -1,4 +1,5 @@
 extends Control
+const FontTheme = preload("res://scripts/v2/theme_v2.gd")  # T-039: loading it installs the UI font
 # T-034: virtualized table grid. Only the visible rows are drawn (400-row files stay cheap).
 # 1x: font 8, row 12, header 14. 2x: everything doubled. Mouse wheel scrolls (Shift = sideways).
 const Palette = preload("res://scripts/v2/palette.gd")

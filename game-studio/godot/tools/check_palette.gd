@@ -53,6 +53,21 @@ static func validate() -> bool:
 			var img := Image.load_from_file("res://assets/v2/" + file)
 			if img == null or not validate_image(img,file):
 				return false
+	# T-039 rule: assets/v2/fonts holds palette-free font atlases (the text color comes from the theme),
+	# so the palette check skips that folder and only requires pure white on transparent, binary alpha.
+	var fonts := 0
+	for file in DirAccess.get_files_at("res://assets/v2/fonts"):
+		if not file.ends_with(".png"): continue
+		fonts += 1
+		var atlas := Image.load_from_file("res://assets/v2/fonts/" + file)
+		if atlas == null: return false
+		for y in range(atlas.get_height()):
+			for x in range(atlas.get_width()):
+				var p := atlas.get_pixel(x, y)
+				if p.a8 != 0 and not (p.a8 == 255 and p.r8 == 255 and p.g8 == 255 and p.b8 == 255):
+					printerr("FAIL font atlas ", file, " pixel (", x, ",", y, ") ", p)
+					return false
+	print("Font atlases PASS: ", fonts, " PNG; white on transparent, binary alpha")
 	print("Palette PASS: ",count," PNG; ",allowed.size()," allowed colors (v4); binary alpha")
 	return count > 0
 func _init() -> void:

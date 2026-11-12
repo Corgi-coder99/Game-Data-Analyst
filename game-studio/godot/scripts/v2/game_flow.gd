@@ -1,4 +1,5 @@
 extends Node
+const FontTheme = preload("res://scripts/v2/theme_v2.gd")  # T-039: loading it installs the UI font
 # Orchestrates one ten-day game: TITLE -> NEW_GAME -> DAY_START -> WORK -> SUBMITTED -> REVIEW
 # -> (EVENING -> DAY_START | ENDING) -> END_SCREEN. Only the public WorldGame API is used here;
 # the hidden labels are read solely by review_scene.gd after a day has ended.
@@ -22,6 +23,7 @@ const WallScene = preload("res://scripts/v2/wall_scene.gd")
 const SettingsScene = preload("res://scripts/v2/settings_scene.gd")
 const LeaveScene = preload("res://scripts/v2/leave_scene.gd")
 const Toast = preload("res://scripts/v2/toast.gd")
+const Juice = preload("res://scripts/v2/juice.gd")  # T-039: feedback animations (visual only)
 # T-035: the learning layer (state in the profile, first-run choice, daily settlement of XP and cards).
 const LearnState = preload("res://scripts/learn/learn_state.gd")
 const TutorialChoice = preload("res://scripts/v2/learn/tutorial_choice.gd")
@@ -112,8 +114,17 @@ func _ready() -> void:
 		meta = Meta.new()
 		tutorial_choice_enabled = true
 	if autostart: preload("res://scripts/audio/audio_manager.gd").install(self)
+	add_child(preload("res://scripts/v2/juice_hooks.gd").new())
+	apply_display_settings()
 	announce_rollover()
 	if autostart: start_title()
+
+# T-039: the profile's display settings (pixel font, reduce motion). Without a profile the defaults stay.
+func apply_display_settings() -> void:
+	if meta == null or meta.profile == null: return
+	var settings: Dictionary = meta.profile.data.settings
+	FontTheme.set_pixel_font(bool(settings.get("pixel_font", true)))
+	Juice.reduce_motion = bool(settings.get("reduce_motion", false))
 
 # A month ended since the last session: its Employee of the Month plaque was just settled.
 func announce_rollover() -> void:
@@ -124,6 +135,7 @@ func announce_rollover() -> void:
 func toast(text: String) -> void:
 	preload("res://scripts/audio/audio_manager.gd").emit_for(self, "achievement")
 	toast_log.append(text)
+	Juice.confetti(toast_layer, Vector2(320, 52))
 	if toast_view != null: toast_view.push(text)
 
 func daily_active() -> bool:
@@ -146,7 +158,7 @@ func _update_hud() -> void:
 
 # Builds a view, fading to the dark layer and back in 25 percent steps (about 280 ms in total).
 func _show(builder: Callable) -> void:
-	if not fade_enabled or fade_rect == null:
+	if not fade_enabled or fade_rect == null or Juice.reduce_motion or not Juice.enabled or Juice.instant:
 		builder.call()
 		return
 	if fade_time >= 0.0:
@@ -440,6 +452,7 @@ func skip_commute() -> void:
 func _build_office(day: int) -> void:
 	office = OfficeScene.instantiate()
 	_swap(office)
+	Juice.title_card(toast_layer, "Day %d" % day)
 	office.set_phase("sang")
 	var arrival := 510 + late_minutes if daily_active() else 510
 	office.set_clock(arrival / 60, arrival % 60)
@@ -542,6 +555,7 @@ func _build_review(day: int) -> void:
 	_swap(review_view)
 	review_view.line_shown.connect(func(category, text): boss_log.append({"category":category, "text":text}))
 	review_view.line_shown.connect(func(category, _text): preload("res://scripts/audio/audio_manager.gd").review_for(self, category))
+	review_view.line_shown.connect(func(category, _text): if category == "promotion": Juice.confetti(toast_layer, Vector2(320, 120)))
 	review_view.finished.connect(_after_review)
 	review_view.life_text = strings.life.review_line % [life.projected_net_worth(game.status()), life.mood]
 	if life.vitals != null and life.vitals.hr_warning and life.vitals.sick_today: review_view.life_note = strings.daily.hr_line

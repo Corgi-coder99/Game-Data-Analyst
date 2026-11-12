@@ -316,6 +316,7 @@ func _refresh_clock_bar(state: Dictionary) -> void:
 		clock_bar.queue_free()
 		clock_bar = null
 	if not state.has("band"): return
+	if str(state.band) != clock_band and str(state.band) != "on_time": preload("res://scripts/v2/juice.gd").pulse(clock, 3)
 	clock_band = str(state.band)
 	var info := {"minutes":clock_minutes, "band":clock_band, "deadline_on_time":state.deadline_on_time, "deadline_late":state.deadline_late}
 	clock_bar = ReportWindow.deadline_bar(clock.get_parent(), Rect2(452, 12, 184, 3), info)

@@ -287,6 +287,7 @@ func render() -> void:
 	submit_button.add_theme_font_size_override("font_size", 12)
 	submit_button.disabled = not ready_to_submit()
 	submit_button.pressed.connect(request_submit)
+	preload("res://scripts/v2/juice.gd").set_pulse(submit_button, not submit_button.disabled)
 	# Checklist beside the Send button.
 	var todo := missing()
 	var y_list := 216

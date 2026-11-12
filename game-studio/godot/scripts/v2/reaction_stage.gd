@@ -1,7 +1,9 @@
 extends Control
+const FontTheme = preload("res://scripts/v2/theme_v2.gd")  # T-039: loading it installs the UI font
 # T-020: the player and the desk neighbor, with floating money text, an emote icon and the
 # neighbor's reaction. Purely visual: it only shows values handed in by the review scene.
 const Palette = preload("res://scripts/v2/palette.gd")
+const Juice = preload("res://scripts/v2/juice.gd")  # T-039
 const Library = preload("res://scripts/v2/sprite_lib.gd")
 const STAGE_SIZE := Vector2(208, 120)
 const POPUP_TIME := 1.2
@@ -170,6 +172,7 @@ func set_emote(name: String) -> void:
 		return
 	emote_node.texture = lib.frame("emote_" + name)
 	emote_node.show()
+	if name == "happy": Juice.hop(player_node)
 
 # mood: "angry" (slam + shout), "happy" (cheer + thumbs up), anything else clears the reaction.
 func react(value: String, pick: int = 0) -> String:
@@ -189,6 +192,7 @@ func react(value: String, pick: int = 0) -> String:
 	reaction_time = 0.0
 	_apply_reaction()
 	preload("res://scripts/audio/audio_manager.gd").emit_for(self, "keyboard_slam" if mood == "angry" else "confirm")
+	if mood == "angry": Juice.shake(get_parent() if get_parent() is Control else self, 2, 0.25)
 	reacted.emit(mood, shout)
 	return shout
 
@@ -211,6 +215,11 @@ func _reaction_length() -> float:
 	if mood == "happy": return CHEER_STEP * CHEER_FRAMES.size() * CHEER_CYCLES
 	return 0.0
 
+# T-039: the popup bounces in; income sparkles.
+func _popup_juice(record: Dictionary) -> void:
+	Juice.bounce(record.label)
+	if record.positive: Juice.sparkle(self, record.label.position + Vector2(20, 8))
+
 # The text rises in whole pixels and fades in 25 percent steps over the last 60 percent.
 func _apply_popup(record: Dictionary) -> void:
 	var node: Label = record.label
@@ -218,6 +227,7 @@ func _apply_popup(record: Dictionary) -> void:
 	if local < 0.0:
 		node.visible = false
 		return
+	if not record.get("sounded", false): _popup_juice(record)
 	if not record.get("sounded", false): record.sounded = true; preload("res://scripts/audio/audio_manager.gd").emit_for(self, "coin_gain" if record.positive else "coin_spend")
 	var progress := clampf(local / POPUP_TIME, 0.0, 1.0)
 	record.done = progress >= 1.0

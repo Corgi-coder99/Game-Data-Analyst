@@ -1,4 +1,5 @@
 extends Control
+const FontTheme = preload("res://scripts/v2/theme_v2.gd")  # T-039: loading it installs the UI font
 # T-026: compact status strip: Stamina (bolt), Mood (smile), Health (heart), Stress (spiral) and the
 # wallet. Icons are drawn in code from palette v3 colors. A second line can show the Focus reason.
 const Palette = preload("res://scripts/v2/palette.gd")
@@ -14,6 +15,9 @@ const STRIP := Rect2(372, 0, 268, 12)
 var life: RefCounted
 var focus_text := ""
 var show_focus := false
+# T-039: the wallet number counts up or down to the real value (drawing only).
+var shown_wallet := 0
+var wallet_target := -999999
 
 func _ready() -> void:
 	size = Vector2(640, 360)
@@ -61,7 +65,12 @@ func _draw() -> void:
 		draw_rect(Rect2(x + 11, 5, fill, 3), Palette.color(color))
 		draw_string(font, Vector2(x + 36, 9.5), str(value), HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Palette.color(22))
 		x += SEGMENT
-	draw_string(font, Vector2(x + 2, 9.5), "$%d" % v.wallet, HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Palette.color(52))
+	if int(v.wallet) != wallet_target:
+		var first := wallet_target == -999999
+		wallet_target = int(v.wallet)
+		if first: shown_wallet = wallet_target
+		else: preload("res://scripts/v2/juice.gd").count(self, func(n): shown_wallet = n, shown_wallet, wallet_target)
+	draw_string(font, Vector2(x + 2, 9.5), "$%d" % shown_wallet, HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Palette.color(52))
 	if show_focus and focus_text != "":
 		draw_string(font, Vector2(344, 354), focus_text, HORIZONTAL_ALIGNMENT_LEFT, 200, 8, Palette.color(48))
 
