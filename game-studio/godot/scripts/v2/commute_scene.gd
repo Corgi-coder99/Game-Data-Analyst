@@ -779,7 +779,9 @@ func _draw_highlight(p: Pen) -> void:
 	if street_active() and index >= 0:
 		var rect := shop_rect(index)
 		var x := int(rect.position.x)
-		p.frame(x, SHOP_TOP, 84, SIDEWALK_Y - SHOP_TOP, pulse)
+		# T-039: hover lift, the outer highlight frame rises by 1 px (drawing only).
+		var lift := 1 if preload("res://scripts/v2/juice.gd").active() and hover_index >= 0 else 0
+		p.frame(x, SHOP_TOP - lift, 84, SIDEWALK_Y - SHOP_TOP + lift, pulse)
 		p.frame(x + 1, SHOP_TOP + 1, 82, SIDEWALK_Y - SHOP_TOP - 2, pulse)
 		p.frame(x + 2, SHOP_TOP + 2, 80, SIDEWALK_Y - SHOP_TOP - 4, 91)
 		# Sign glow around the plate.
