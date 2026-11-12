@@ -56,6 +56,21 @@ if not pair.empty:
     summ["ci95_hi"] = summ["mean"] + 1.96 * summ["se"]
     summ.round(3).to_csv(out / "verify_first_vs_submit_early_paired.csv")
     print("\nPAIRED verify_first - submit_early\n", summ.round(3))
+# --- 3b. Đối chứng: một lần verify (analyst_clean) vs không verify (analyst_no_verify), ghép cặp theo seed ---
+if "analyst_no_verify" in set(r.bot):
+    r["won_i"] = r.won.astype(int)
+    pv = r[r.bot.isin(["analyst_clean", "analyst_no_verify"])].pivot(index="seed", columns="bot", values=["acc", "ev", "score", "trust", "won_i"])
+    d2 = pd.DataFrame({m: pv[m]["analyst_clean"] - pv[m]["analyst_no_verify"] for m in ["acc", "ev", "score", "trust", "won_i"]})
+    s2 = d2.agg(["mean", "std", "count"]).T
+    s2["se"] = s2["std"] / s2["count"] ** 0.5
+    s2["ci95_lo"] = s2["mean"] - 1.96 * s2["se"]
+    s2["ci95_hi"] = s2["mean"] + 1.96 * s2["se"]
+    s2.round(3).to_csv(out / "verify_vs_no_verify_paired.csv")
+    print("\nPAIRED one-verify - no-verify\n", s2.round(3))
+    nv = df[(df.e == "report_submit") & (df.bot == "analyst_no_verify")]
+    cv = df[(df.e == "report_submit") & (df.bot == "analyst_clean")]
+    print("minutes mean: no_verify %.1f clean %.1f" % (nv.minutes.mean(), cv.minutes.mean()))
+
 vf = df[(df.e == "verify") & df.bot.isin(["analyst_verify_first", "analyst_submit_early"])]
 print("\nVERIFY events per bot\n", vf.groupby("bot").size())
 

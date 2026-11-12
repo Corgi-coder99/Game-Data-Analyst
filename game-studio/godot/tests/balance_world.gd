@@ -96,7 +96,7 @@ static func propose_analyst(game: RefCounted, session: RefCounted, bot: String, 
 	if question.id in ["q1", "q4", "q5"]: order = ["truy_van_lich_su", "kiem_dinh_gia_thuyet"]
 	if question.id == "q8": order = ["lam_sach_du_lieu", "truy_van_lich_su", "doi_chieu_nguon", "kiem_dinh_gia_thuyet"]
 	var today: Array = game.news_today().filter(func(n): return n.topic == topic_for(question.id) and n.day == game.status().day and not str(n.uid).ends_with("-late"))
-	if not today.is_empty() and game.status().band != "missed":
+	if not today.is_empty() and game.status().band != "missed" and not bool(stats.get("skip_verify", false)):
 		var before: int = game.status().energy
 		game.verify(today[0].uid, order[0])
 		if game.status().energy < before: stats["verifications"] = int(stats.get("verifications", 0)) + 1

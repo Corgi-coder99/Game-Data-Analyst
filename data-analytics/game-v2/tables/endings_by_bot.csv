@@ -1,5 +1,6 @@
 bot,fired,survived
 analyst_clean,1,59
+analyst_no_verify,2,58
 analyst_sloppy,11,49
 analyst_slow,16,44
 analyst_submit_early,1,59

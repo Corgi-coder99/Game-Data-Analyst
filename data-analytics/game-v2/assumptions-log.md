@@ -13,5 +13,5 @@ Dùng cho dự án case study Game Data Analyst (T-040 đến T-043). Mỗi mụ
 
 ## T-043 (2026-11-12)
 - A-007: T-043 dùng 60 game/bot (không phải 200) vì thời gian chạy; không có khoảng tin cậy giữa bot, chỉ mô tả.
-- A-008: Bot verify-first và submit-early cho kết quả giống hệt; không dùng làm bằng chứng về giá trị của verify.
+- A-008: Bot verify-first và submit-early cho kết quả giống hệt; không dùng làm bằng chứng về giá trị của verify; đã thêm bot đối chứng analyst_no_verify (cờ skip_verify trong tests/balance_world.gd, mặc định tắt nên không đổi balance).
 - A-009: Retention (câu 5) hoãn đến khi có người chơi thật.

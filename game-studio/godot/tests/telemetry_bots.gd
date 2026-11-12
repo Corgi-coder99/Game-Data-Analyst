@@ -6,7 +6,7 @@ const Session = preload("res://scripts/data/session.gd")
 const Analyst = preload("res://tests/t036_analyst.gd")
 const Playlog = preload("res://scripts/telemetry/playlog.gd")
 const Observer = preload("res://scripts/telemetry/bot_observer.gd")
-const BOTS := ["random_reporter", "rumor_follower", "official_only", "verifier", "careful_hedger", "late_verifier", "analyst_clean", "analyst_sloppy", "analyst_slow", "chart_misleader", "analyst_verify_first", "analyst_submit_early"]
+const BOTS := ["random_reporter", "rumor_follower", "official_only", "verifier", "careful_hedger", "late_verifier", "analyst_clean", "analyst_sloppy", "analyst_slow", "chart_misleader", "analyst_verify_first", "analyst_submit_early", "analyst_no_verify"]
 
 func _initialize() -> void:
 	call_deferred("generate")
@@ -32,8 +32,8 @@ static func run_one(bot: String, seed_value: int, days: int, log: RefCounted, ov
 					var tool := "truy_van_lich_su" if qid in ["q1", "q4", "q5"] else ("lam_sach_du_lieu" if qid == "q8" else "doi_chieu_nguon")
 					game.verify(related[0].uid, tool)
 			# Submit-early finishes the clean analyst's public data work and submits immediately.
-			var strategy := "analyst_clean" if bot in ["analyst_verify_first", "analyst_submit_early"] else bot
-			report = Balance.propose_analyst(game, session, strategy, {})
+			var strategy := "analyst_clean" if bot in ["analyst_verify_first", "analyst_submit_early", "analyst_no_verify"] else bot
+			report = Balance.propose_analyst(game, session, strategy, {"skip_verify": bot == "analyst_no_verify"})
 		else:
 			report = Balance.propose(game, bot, rng, {})
 		if bot == "late_verifier":
@@ -48,12 +48,14 @@ func generate() -> void:
 	var games := 200
 	var seed_value := 104
 	var days := 10
+	var only_bot := ""
 	var destination := "user://telemetry_bots/bot_playlog.jsonl"
 	for arg in OS.get_cmdline_user_args():
 		if arg.begins_with("--games="): games = int(arg.trim_prefix("--games="))
 		elif arg.begins_with("--seed="): seed_value = int(arg.trim_prefix("--seed="))
 		elif arg.begins_with("--days="): days = int(arg.trim_prefix("--days="))
 		elif arg.begins_with("--output="): destination = arg.trim_prefix("--output=")
+		elif arg.begins_with("--bot="): only_bot = arg.trim_prefix("--bot=")
 	var writer := preload("res://scripts/telemetry/writer.gd").new(destination)
 	if not writer.valid_path() or not destination.begins_with("user://telemetry_bots/") or games < 1 or days not in [10, 30]:
 		printerr("Use --output=user://telemetry_bots/<file>.jsonl, --games=N, --days=10 or 30")
@@ -61,6 +63,7 @@ func generate() -> void:
 		return
 	var runs := 0
 	for bot in BOTS:
+		if only_bot != "" and bot != only_bot: continue
 		var log := Playlog.new(null, destination, bot)
 		log.writer.max_bytes = 256 * 1024 * 1024  # bot data is for analysis: never prune a bot run
 		for index in games:
