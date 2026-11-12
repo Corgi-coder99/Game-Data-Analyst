@@ -1,0 +1,21 @@
+{
+ "events": 33063,
+ "runs": 720,
+ "dup_run_start": 0,
+ "runs_without_end": 0,
+ "src_values": [
+  "bot"
+ ],
+ "event_counts": {
+  "day_start": 6584,
+  "wait": 6584,
+  "report_submit": 6584,
+  "day_end": 6584,
+  "verify": 5275,
+  "run_start": 720,
+  "run_end": 720,
+  "session_start": 12
+ },
+ "acc_out_of_range": 0,
+ "runs_day_start_not_10": 127
+}

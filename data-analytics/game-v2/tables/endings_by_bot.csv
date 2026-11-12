@@ -1,0 +1,13 @@
+bot,fired,survived
+analyst_clean,1,59
+analyst_sloppy,11,49
+analyst_slow,16,44
+analyst_submit_early,1,59
+analyst_verify_first,1,59
+careful_hedger,0,60
+chart_misleader,2,58
+late_verifier,5,55
+official_only,12,48
+random_reporter,36,24
+rumor_follower,44,16
+verifier,4,56

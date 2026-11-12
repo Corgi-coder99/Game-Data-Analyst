@@ -10,3 +10,8 @@ Dùng cho dự án case study Game Data Analyst (T-040 đến T-043). Mỗi mụ
 | A-004 | 2026-11-12 | Dữ liệu bot (`src="bot"`) dùng để dựng pipeline, KHÔNG dùng để kết luận về hành vi người | Bot không phản ánh người | Kết luận sai nếu trộn | Luôn lọc theo `src`; báo cáo ghi rõ nguồn |
 | A-005 | 2026-11-12 | So sánh tutorial và không tutorial chỉ là quan sát, không ngẫu nhiên | Người chọn tutorial khác nhóm còn lại | Nhầm tương quan thành nhân quả | Ghi giới hạn trong báo cáo; không dùng từ "gây ra" |
 | A-006 | 2026-11-12 | Mẫu người chơi nhỏ (bạn bè, cộng đồng) và lệch | Không có kênh phân phối lớn | Khoảng tin cậy rộng, thiên lệch chọn mẫu | Báo cáo kích thước mẫu và khoảng tin cậy; không khái quát hóa |
+
+## T-043 (2026-11-12)
+- A-007: T-043 dùng 60 game/bot (không phải 200) vì thời gian chạy; không có khoảng tin cậy giữa bot, chỉ mô tả.
+- A-008: Bot verify-first và submit-early cho kết quả giống hệt; không dùng làm bằng chứng về giá trị của verify.
+- A-009: Retention (câu 5) hoãn đến khi có người chơi thật.
