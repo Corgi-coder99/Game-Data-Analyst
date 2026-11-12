@@ -44,7 +44,7 @@ func _build_room() -> void:
 	backdrop.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	backdrop.set_meta("overlay", true)
 	add_child(backdrop)
-	_text(self, daily.alarm, Rect2(159, 159, 21, 10), 51)
+	_text(self, daily.alarm, Rect2(159, 159, 22, 10), 51)
 	_sprite(self, "player", 0, Vector2(92, 196), 3)
 
 # ---- steps ---------------------------------------------------------------------------------
