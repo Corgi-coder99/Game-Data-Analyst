@@ -62,6 +62,7 @@ func generate() -> void:
 	var runs := 0
 	for bot in BOTS:
 		var log := Playlog.new(null, destination, bot)
+		log.writer.max_bytes = 256 * 1024 * 1024  # bot data is for analysis: never prune a bot run
 		for index in games:
 			var result := run_one(bot, seed_value + index, days, log)
 			if result.has("error"):

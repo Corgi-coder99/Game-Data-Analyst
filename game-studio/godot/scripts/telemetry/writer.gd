@@ -3,6 +3,8 @@ extends RefCounted
 const MAX_BYTES := 2 * 1024 * 1024
 var path: String
 var suppressed_run := ""
+# The player log keeps the 2 MiB cap; only the bot generator raises it so that no bot run is dropped.
+var max_bytes := MAX_BYTES
 
 func _init(file_path: String = "user://telemetry/playlog.jsonl") -> void:
 	path = file_path
@@ -19,8 +21,18 @@ func records() -> Array:
 		var line := file.get_line()
 		if line.is_empty(): continue
 		var parser := JSON.new()
-		if parser.parse(line) == OK and parser.data is Dictionary: out.append(parser.data)
+		if parser.parse(line) == OK and parser.data is Dictionary: out.append(_whole_numbers_as_int(parser.data))
 	return out
+
+# Godot parses every JSON number as a float, so a rewrite would turn 3 into 3.0 and break the schema
+# ("integers stay integers"). Whole-valued floats go back to int before the rows are written again.
+func _whole_numbers_as_int(row: Dictionary) -> Dictionary:
+	var fixed := {}
+	for key in row:
+		var value = row[key]
+		if value is float and is_finite(value) and value == floorf(value) and absf(value) < 1.0e15: value = int(value)
+		fixed[key] = value
+	return fixed
 
 func append(event: Dictionary) -> void:
 	if not valid_path(): return
@@ -29,11 +41,11 @@ func append(event: Dictionary) -> void:
 	var line := JSON.stringify(event) + "\n"
 	var bytes := line.to_utf8_buffer().size()
 	var size_bytes := stored_bytes()
-	if size_bytes + bytes > MAX_BYTES:
+	if size_bytes + bytes > max_bytes:
 		var kept := records()
 		kept.append(event)
 		# Drop a run as a unit, even if it spans sessions. Session-only records are units too.
-		while _bytes(kept) > MAX_BYTES and not kept.is_empty():
+		while _bytes(kept) > max_bytes and not kept.is_empty():
 			var oldest := str(kept[0].get("run_id", ""))
 			if oldest == "": kept.pop_front()
 			else:

@@ -91,6 +91,11 @@ func run() -> void:
 	check(retained.size() < 6 and retained.size() > 0, "oldest runs dropped")
 	check(not retained.has("0000000000000001"), "oldest run removed first")
 	for id in retained: check(retained[id].start == 1 and retained[id].end == 1, "whole runs retained")
+	# Rewriting after the cap must keep integers as integers (3, not 3.0): the validator rejects "v":1.0.
+	var raw := FileAccess.get_file_as_string(cap.path)
+	var float_ints := RegEx.new()
+	float_ints.compile("\"(v|t|day|minutes|seed)\":\\d+\\.0[,}]")
+	check(raw.length() > 0 and float_ints.search(raw) == null, "after the cap rewrite integers stay integers")
 	cap.delete_data()
 	# Leave a synthetic, human-schema fixture for the external Python validator.
 	log.delete_data()

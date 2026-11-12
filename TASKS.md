@@ -18,14 +18,13 @@ Trạng thái: Backlog -> In progress -> Review -> Done. Bị chặn thì chuy�
 
 ## In progress
 
-| ID | Việc | Owner | Nhánh | File được sửa | Tiêu chí hoàn thành |
-|---|---|---|---|---|---|
-| T-041 | Cài đặt telemetry theo SPEC-T-040 (VU duyệt spec 2026-11-12). Codex chỉ chạy kiểm tra nhanh (<170 giây); Claude chạy test cửa sổ/dài | Codex | codex/T-041 | scripts/telemetry/*, scripts/v2/settings_scene.gd, scripts/v2/consent_scene.gd, hook nhỏ trong scripts/v2/game_flow.gd, scripts/meta/profile.gd (thêm trường), data/strings_v2.json (mục telemetry), tests/test_t041_*, tests/telemetry_bots.gd, tools/check_playlog.py | Mặc định không ghi gì; sau khi đồng ý ghi đúng lược đồ và qua check_playlog.py; xuất/xóa dữ liệu chạy được; balance_sim/balance_world không đổi |
+(chưa có)
 
 ## Review
 
 | ID | Việc | Owner | Nhánh | File được sửa | Tiêu chí hoàn thành |
 |---|---|---|---|---|---|
+| T-041 | Telemetry opt-in theo SPEC-T-040 (consent, playlog cục bộ, observer, bot generator, validator). Codex viết mã, dừng vì sandbox; Claude sửa review() trong game_flow, sửa lỗi 3.0 sau khi ghi lại vượt cap, cập nhật fixture cũ, chạy test. Chờ VU duyệt merge vào v2 | Codex + Claude | codex/T-041 | scripts/telemetry/*, scripts/v2/*, scripts/meta/profile.gd, data/strings_v2.json, tests/test_t041_*, tests/telemetry_bots.gd, tools/check_playlog.py | Xem docs/HANDOFF-T-041.md mục Claude nghiệm thu |
 | T-016 | Style bible pixel mới: bảng màu 32 màu, kích thước sprite, ánh sáng, giao diện máy tính, hoạt ảnh, kiểm tra tự động. Chờ VU xem | Claude | v2 | shared/style-bible/pixel-office-v2.md, palette-v2.json | VU duyệt style bible; quyết định có sửa CLAUDE.md mục 4 không |
 | T-017 | Content bible v2 (thế giới hư cấu Tân Lạc, công ty Lục Châu, nhân vật, 10 nguồn tin, ánh xạ 8 cú sốc) và data/news.json (41 mẫu tin, đã kiểm hợp lệ). Chờ VU xem | Claude | v2 | game-studio/godot/docs/CONTENT-BIBLE-v2.md, data/news.json | VU duyệt nội dung |
 | T-040 | Spec telemetry ẩn danh (opt-in, mặc định tắt, không mạng, giả danh ngẫu nhiên, lược đồ 11 sự kiện, bot làm nguồn dữ liệu, 5 câu hỏi phân tích) và assumptions-log. Chờ VU duyệt spec, đặc biệt câu chữ đồng ý (nên kiểm với trường/CNIL trước khi đăng) | Claude | v2 | game-studio/godot/docs/SPEC-T-040.md, data-analytics/game-v2/assumptions-log.md | VU duyệt spec; sau đó mở T-041 |

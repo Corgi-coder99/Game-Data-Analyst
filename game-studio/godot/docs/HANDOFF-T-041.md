@@ -79,3 +79,16 @@ Validator: `D:\Dev\ai-company\.venv\Scripts\python.exe -X utf8 -I game-studio/go
 - `test_world`, `test_t036_balance`, các hồi quy data/learn/meta/flow cần thiết, đặc biệt `test_t033_api`, `test_t033_data`, `test_t033_ops`, `test_t035_logic`, `test_t030_meta`, `test_t030_flow`, `test_v2_flow`, `test_daily_flow`.
 - `balance_sim`, `balance_world` 2.000 ván/bot cho 10/30 ngày, so với baseline và bật/tắt telemetry; không tuyên bố byte-identical khi chưa đo/so.
 - Generator bot đủ batch và validator trên dữ liệu bot/human-schema, cap ở run đang mở quá lớn, disk failure, export/delete nhiều lần và review tính đúng các trường. Kiểm tra pháp lý/câu consent trước phát hành theo spec thuộc Claude/chủ dự án; không sửa assumptions-log ngoài scope.
+
+## Claude nghiệm thu (2026-11-12)
+
+Codex dừng vì sandbox của nó (user:// không ghi được, Python Access denied), không vì lỗi mã. Claude chạy lại ngoài sandbox đó.
+
+Sửa của Claude:
+- `game_flow.gd`: hook `day_end` dùng `review_view.data` thay vì gọi `game.review()` (test_v2_flow và test_t030_meta quy định chỉ review_scene.gd gọi review()).
+- `writer.gd`: ghi lại file sau khi vượt cap 2 MiB làm số nguyên thành `3.0` (Godot parse JSON ra float), validator từ chối. Đã chuẩn hóa số nguyên khi đọc lại; thêm kiểm tra vào test_t041_storage (bắt được lỗi khi bỏ bản sửa). Thêm `max_bytes` để bộ sinh bot nâng cap, không mất run của bot; cap 2 MiB của người chơi giữ nguyên.
+- `tests/test_t030_flow.gd`, `tests/test_t030_mouse.gd`: màn đồng ý chen sau intro nên fixture đặt `telemetry.seen = true`; test lần chạy đầu kiểm tra thêm bước CONSENT và bấm No thanks (chuột thật).
+
+Kết quả (đều 0 lỗi): headless test_t041_storage 116, test_t041_flow 31, test_t041_observer 14.271 (720 sự kiện lúc ngày mở, không lộ nhãn ẩn), test_sim 2.634, test_ui 106, test_v2_assets 484, test_v2_desktop 5.623, test_v2_flow 1.432, test_daily_flow 144, test_t030_meta 480, test_t030_flow 58, test_t033_api 22.180, test_t033_data 17.786, test_t033_ops 186, test_t035_logic 3.334, test_t036_balance 914, test_world 34.810. Có cửa sổ: test_t030_mouse 49, test_t030_render 8.956, test_v2_mouse 171, test_t026_mouse 34, test_t026_render 3.230, test_t027_mouse 30, test_t034_mouse 92, test_t035_mouse 154, test_v2_screens_render 22.933, test_v2_layout_render 7.120, test_t034_layout 15.140, test_t035_layout 13.321, test_t039_layout (--font=off và --motion=reduce) 22.936 mỗi lượt. balance_sim và balance_world: đầu ra giống hệt bản v2 (trừ dòng thời gian). Validator: tự kiểm tra OK; dữ liệu bot 240 run (20 ván/bot, 12 bot) 11.091 sự kiện, 0 lỗi.
+
+Chưa làm / giới hạn: bộ sinh bot 200 ván/bot vượt 580 giây (chạy nền khi cần cho T-043); chưa có test layout riêng cho màn đồng ý và Settings (đã xem ảnh chụp 640x360 và đọc rõ, ảnh `docs/screenshots-T-030/T-030-mouse-consent.png`); chưa thử mất đĩa thật; chưa chạy balance 2.000 ván/bot (balance_sim/balance_world mặc định đã chạy và giống hệt); chưa kiểm tra pháp lý câu đồng ý.
