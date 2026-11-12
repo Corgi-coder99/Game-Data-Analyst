@@ -13,13 +13,14 @@ Trạng thái: Backlog -> In progress -> Review -> Done. Bị chặn thì chuy�
 | T-008 | check_web.py: ép stdout UTF-8 để không lỗi UnicodeEncodeError trên console Windows mặc định | Codex | codex/T-008 | media-marketing/web/check_web.py | Chạy `python -I check_web.py` (không cần -X utf8) qua 6 mục |
 | T-010 | Kịch bản và video quảng cáo 30 giây (làm sau T-012 để cảnh quay không hiện công ty gần hết người dùng) | Claude/Codex | chưa chốt | media-marketing/video/* | Chưa có spec |
 | T-019d | Giao diện v2 phần d: hiệu ứng, chỉnh theo playtest và ảnh chụp. Sau T-019c | Codex | codex/T-019d | scenes/v2/*, scripts/v2/*, assets/v2/* | Chưa có spec |
-| T-041 | Cài đặt telemetry theo SPEC-T-040 (sau T-040 và VU duyệt spec) | Codex | codex/T-041 | scripts/telemetry/*, hook nhỏ trong game_flow.gd, tests/test_t041_* | Mặc định không ghi gì; sau khi đồng ý ghi đúng lược đồ; xuất JSON; test qua |
 | T-042 | Đóng gói bản Windows/Web và trang itch.io (cần VU duyệt trước khi đăng, tải hay cài preset) | Claude | claude/T-042 | export_presets.cfg, media-marketing/itch/* | Bản chạy được, mô tả trung thực, có thông báo quyền riêng tư |
 | T-043 | Quy trình phân tích: dữ liệu playlog -> EDA, funnel, retention theo ngày chơi, cân bằng; case study 1 (skill programmatic-eda, funnel-analysis, cohort-analysis, analysis-qa-checklist) | Claude | claude/T-043 | data-analytics/game-v2/* | Có kế hoạch, báo cáo QA, kết luận kèm giả định và giới hạn; dùng dữ liệu tự chơi/bot trước khi có người chơi thật |
 
 ## In progress
 
-(chưa có)
+| ID | Việc | Owner | Nhánh | File được sửa | Tiêu chí hoàn thành |
+|---|---|---|---|---|---|
+| T-041 | Cài đặt telemetry theo SPEC-T-040 (VU duyệt spec 2026-11-12). Codex chỉ chạy kiểm tra nhanh (<170 giây); Claude chạy test cửa sổ/dài | Codex | codex/T-041 | scripts/telemetry/*, scripts/v2/settings_scene.gd, scripts/v2/consent_scene.gd, hook nhỏ trong scripts/v2/game_flow.gd, scripts/meta/profile.gd (thêm trường), data/strings_v2.json (mục telemetry), tests/test_t041_*, tests/telemetry_bots.gd, tools/check_playlog.py | Mặc định không ghi gì; sau khi đồng ý ghi đúng lược đồ và qua check_playlog.py; xuất/xóa dữ liệu chạy được; balance_sim/balance_world không đổi |
 
 ## Review
 
