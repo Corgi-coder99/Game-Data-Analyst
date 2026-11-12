@@ -159,6 +159,9 @@ func run() -> void:
 	flow = Flow.new()
 	flow.autostart = false
 	flow.fade_enabled = false
+	# T-039: this test measures resting layouts; feedback animations are checked by test_t039_*.
+	# (test_t039_layout runs this file again with Reduce motion instead of the instant switch.)
+	preload("res://scripts/v2/juice.gd").instant = not ("--motion=reduce" in OS.get_cmdline_user_args())
 	# T-024: the evening is rendered in its own section at the end.
 	flow.evening_enabled = false
 	flow.daily_enabled = false

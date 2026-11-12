@@ -1,16 +1,31 @@
 extends Control
+const FontTheme = preload("res://scripts/v2/theme_v2.gd")  # T-039: loading it installs the UI font
 # T-034: draws a chart in code (palette v4): axes, ticks, labels, gridlines, legend. `mini` draws only the
 # shape (used for thumbnails). Input is the result of DataGame.chart_data and the chart spec.
 const Palette = preload("res://scripts/v2/palette.gd")
+const Juice = preload("res://scripts/v2/juice.gd")
 const COLORS := [19, 24, 28, 26, 30, 53, 36, 50]
 var data: Dictionary = {}
 var spec: Dictionary = {}
 var mini := false
 var message := ""
+# T-039: bars grow in and lines draw left to right on the first render only (0.3 s). 1.0 = fully drawn.
+var reveal := 1.0
+var revealed := false
 
 func set_chart(series_data: Dictionary, chart_spec: Dictionary) -> void:
 	data = series_data
 	spec = chart_spec
+	if not revealed and not mini and bool(series_data.get("ok", false)) and Juice.active() and is_inside_tree():
+		revealed = true
+		reveal = 0.0
+		var tween := create_tween()
+		tween.tween_method(_set_reveal, 0.0, 1.0, 0.3)
+		Juice._track(tween, _set_reveal.bind(1.0))
+	queue_redraw()
+
+func _set_reveal(value: float) -> void:
+	reveal = value
 	queue_redraw()
 
 static func short(text: String, chars: int) -> String:
@@ -124,6 +139,7 @@ func _draw_xy(type: String, series: Array, plot: Rect2) -> void:
 			var ci := cats.find(p.x)
 			var cx := plot.position.x + slot * (ci + 0.5)
 			var y := clampf(base - (float(p.y) - y_range.x) / span * plot.size.y, plot.position.y, base)
+			if type != "line": y = base - (base - y) * reveal
 			if type == "line":
 				pts.append(Vector2(cx, y))
 			else:
@@ -132,6 +148,7 @@ func _draw_xy(type: String, series: Array, plot: Rect2) -> void:
 				var x0 := cx - group * 0.5 + w * si
 				draw_rect(Rect2(x0, y, maxf(1.0, w - (0.0 if type == "histogram" else 1.0)), base - y), color)
 		if type == "line":
+			if reveal < 1.0: pts = pts.slice(0, maxi(1, int(ceil(pts.size() * reveal))))
 			if pts.size() > 1: draw_polyline(pts, color, 1.0)
 			for pt in pts: draw_rect(Rect2(pt - Vector2(1, 1), Vector2(3, 3)), color)
 	if mini: return

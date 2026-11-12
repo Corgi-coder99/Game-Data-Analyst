@@ -1,4 +1,5 @@
 extends RefCounted
+const FontTheme = preload("res://scripts/v2/theme_v2.gd")  # T-039: loading it installs the UI font
 # Palette-index drawing helper. Draws to an Image (static art) or a CanvasItem (animated art).
 # Every call uses a palette v4 index (1..112); there is no anti-aliasing and no alpha blending.
 const Palette = preload("res://scripts/v2/palette.gd")

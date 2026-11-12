@@ -66,6 +66,7 @@ func _card(item: Dictionary, is_pinned: bool) -> void:
 	rows[item.uid] = row
 	row.set_meta("verification", item.verification)
 	row.set_meta("uid", item.uid)
+	preload("res://scripts/v2/juice.gd").hover_lift(row)
 	row.gui_input.connect(_row_input.bind(item.uid))
 	# Pictogram thumbnail by topic (public field only).
 	var frame := Panel.new()

@@ -14,6 +14,7 @@ const BODY_WIDTH := 608
 const SWEEP_AREA := 396
 const STAGE_AT := Vector2(400, 0)
 const ReactionStage = preload("res://scripts/v2/reaction_stage.gd")
+const Juice = preload("res://scripts/v2/juice.gd")  # T-039
 signal finished
 signal line_shown(category: String, text: String)
 var strings: Dictionary
@@ -398,6 +399,8 @@ func _celebrate() -> void:
 	if bool(learn_outcome.get("graduated", false)): UIKit.wrapped(celebration, t.graduate, Rect2(52, 64, 306, 12), 21, 1)
 	var ok := UIKit.button(celebration, t.ok, Rect2(150, 80, 68, 16))
 	ok.name = "CelebrationOk"
+	Juice.pop_in(celebration)
+	if solved: Juice.confetti(celebration, Vector2(184, 12))
 	ok.pressed.connect(func():
 		celebration_done = true
 		celebration.visible = false)

@@ -1,4 +1,5 @@
 extends Node2D
+const FontTheme = preload("res://scripts/v2/theme_v2.gd")  # T-039: loading it installs the UI font
 # T-022: a multi-room floor plan (1280x560 world) seen through a 640x360 camera.
 # The camera starts on the Data Analytics room (the player's desk); the minimap or Tab pans to other rooms.
 signal seated

@@ -1,5 +1,27 @@
 extends RefCounted
 const Palette = preload("res://scripts/v2/palette.gd")
+# T-039: the one place that decides the UI font. The pixel font (scripts/v2/pixel_font.gd) is the default;
+# the Settings toggle "Pixel font" switches back to the engine font. The choice is installed as the
+# engine fallback font (labels and draw_string calls outside a themed Control use it) and as the default
+# font of every Theme made by create().
+const PixelFont = preload("res://scripts/v2/pixel_font.gd")
+static var pixel_font_on := true
+
+static func _static_init() -> void:
+	apply_font()
+
+static func font() -> Font:
+	var pixel: Font = PixelFont.font() if pixel_font_on else null
+	return pixel if pixel != null else PixelFont.default_font()
+
+static func apply_font() -> void:
+	ThemeDB.fallback_font = font()
+	# Controls with no Theme of their own resolve fonts through the engine default theme first.
+	ThemeDB.get_default_theme().default_font = font()
+
+static func set_pixel_font(on: bool) -> void:
+	pixel_font_on = on
+	apply_font()
 
 static func box(background: int, border: int = 5) -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
@@ -55,6 +77,7 @@ static func pastel_button(node: Button, fill: int = 89, border: int = 97) -> voi
 
 static func create() -> Theme:
 	var result := Theme.new()
+	result.default_font = font()
 	result.default_font_size = 8
 	for type in ["Label", "Button", "TooltipLabel", "ProgressBar"]:
 		result.set_font_size("font_size", type, 8)

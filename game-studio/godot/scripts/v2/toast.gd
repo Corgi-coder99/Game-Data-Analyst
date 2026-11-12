@@ -1,7 +1,9 @@
 extends Control
+const FontTheme = preload("res://scripts/v2/theme_v2.gd")  # T-039: loading it installs the UI font
 # T-030: achievement and meta toasts. Same look as the money popups (floating coloured text that rises
 # and fades) on a small dark plate. Toasts are shown one after another.
 const Palette = preload("res://scripts/v2/palette.gd")
+const Juice = preload("res://scripts/v2/juice.gd")  # T-039
 const LIFETIME := 2.6
 const RISE := 14.0
 const GOOD := 24
@@ -61,7 +63,8 @@ func advance(delta: float) -> void:
 		_next()
 		return
 	var t := elapsed / LIFETIME
-	plate.position = Vector2(170, 44.0 - RISE * minf(1.0, elapsed / 1.2))
+	var slide := floorf(24.0 * (1.0 - minf(1.0, elapsed / 0.15))) if Juice.active() else 0.0
+	plate.position = Vector2(170 + slide, 44.0 - RISE * minf(1.0, elapsed / 1.2))
 	plate.modulate = Color(1, 1, 1, 1.0 if t < 0.75 else 1.0 - (t - 0.75) / 0.25)
 
 func _process(delta: float) -> void:
