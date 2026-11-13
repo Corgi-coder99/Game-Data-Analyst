@@ -4,6 +4,7 @@ config_version=5
 [application]
 config/name="AI Company Game"
 run/main_scene="res://scenes/title.tscn"
+run/main_scene.v2_export="res://scenes/v2/main_v2.tscn"
 config/features=PackedStringArray("4.7")
 
 [display]

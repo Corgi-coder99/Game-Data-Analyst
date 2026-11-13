@@ -50,3 +50,6 @@ desktop.ini
 .vscode/
 .idea/
 *.swp
+
+# Built game packages (large; regenerate with Godot export)
+deliverables/data-corp-build_*/
