@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="vi"><head><meta charset="utf-8"><title>Tiến độ dự án: Game Data Analyst portfolio</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+:root{--bg:#fcfcfb;--ink:#0b0b0b;--ink2:#52514e;--line:#e6e5e1;--done:#1baf7a;--review:#2a78d6;--wait:#eb6834;--todo:#9a9990;--card:#fff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,Segoe UI,sans-serif}
+main{max-width:980px;margin:0 auto;padding:28px 20px 60px}
+h1{font-size:24px;margin:0 0 4px}.sub{color:var(--ink2);margin:0 0 20px}
+.bar{height:14px;background:var(--line);border-radius:7px;overflow:hidden;display:flex;margin:8px 0 6px}
+.bar span{display:block;height:100%}.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--ink2);margin-bottom:26px}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px}
+.stage{background:var(--card);border:1px solid var(--line);border-left:6px solid var(--todo);border-radius:8px;padding:14px 16px;margin:12px 0}
+.stage.done{border-left-color:var(--done)}.stage.review{border-left-color:var(--review)}.stage.wait{border-left-color:var(--wait)}
+.head{display:flex;justify-content:space-between;gap:10px;align-items:baseline;flex-wrap:wrap}
+.head h2{font-size:16px;margin:0}.tag{font-size:12px;padding:2px 9px;border-radius:10px;color:#fff;white-space:nowrap}
+.tag.done{background:var(--done)}.tag.review{background:var(--review)}.tag.wait{background:var(--wait)}.tag.todo{background:var(--todo)}
+ul{margin:8px 0 0;padding-left:20px}li{margin:3px 0}.check{margin-top:10px;padding:8px 10px;background:#fff7f2;border:1px dashed var(--wait);border-radius:6px;font-size:14px}
+.check b{color:var(--wait)}.note{color:var(--ink2);font-size:13px;margin-top:6px}
+.next{background:#eef5fd;border:1px solid var(--review);border-radius:8px;padding:12px 16px;margin:22px 0}
+table{border-collapse:collapse;width:100%;font-size:14px;margin-top:8px}td,th{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left}
+footer{color:var(--ink2);font-size:13px;margin-top:26px}
+</style></head><body><main>
+<h1>Tiến độ dự án: Game Data Analyst portfolio</h1>
+<p class="sub">Cập nhật 2026-11-13. Mục tiêu: có game có telemetry, 3 đến 4 case study, công cụ dùng lại được, rồi ứng tuyển alternance/stage tại studio game Pháp. Chỉ ghi những gì đã làm và kiểm tra thật.</p>
+
+<div class="bar" title="3 hoàn thành, 2 chờ duyệt/đang xem, 4 chưa làm">
+  <span style="width:33.3%;background:var(--done)"></span><span style="width:22.2%;background:var(--review)"></span><span style="width:11.1%;background:var(--wait)"></span><span style="width:33.4%;background:var(--todo)"></span>
+</div>
+<div class="legend"><span><i class="dot" style="background:var(--done)"></i>Hoàn thành (3/9)</span><span><i class="dot" style="background:var(--review)"></i>Xong, chờ VU xem (2/9)</span><span><i class="dot" style="background:var(--wait)"></i>Cần VU làm (1/9)</span><span><i class="dot" style="background:var(--todo)"></i>Chưa bắt đầu (3/9)</span></div>
+
+<section class="stage done"><div class="head"><h2>1. Game Data Corp v2 chơi được</h2><span class="tag done">Hoàn thành</span></div>
+<ul><li>Vòng chơi 10 ngày: tin tức, kiểm chứng, dữ liệu, báo cáo, review. Tutorial 5 ca, Daily Shift, Wall of Fame, Settings.</li><li>Bộ test headless và có cửa sổ đều 0 lỗi lần chạy gần nhất (nhánh <code>v2</code>).</li></ul>
+<div class="note">Chưa push lên GitHub. Chưa có người chơi thật ngoài bạn.</div></section>
+
+<section class="stage done"><div class="head"><h2>2. Telemetry ẩn danh (T-040, T-041)</h2><span class="tag done">Hoàn thành</span></div>
+<ul><li>Mặc định tắt, chỉ bật khi đồng ý, không gửi mạng, xuất/xóa dữ liệu trong Settings.</li><li>11 loại sự kiện, validator kiểm lược đồ: 0 lỗi trên 35.552 sự kiện bot. Cân bằng game không đổi.</li></ul>
+<div class="check"><b>VU kiểm tra:</b> câu chữ màn đồng ý với trường hoặc hướng dẫn CNIL trước khi đăng (assumptions-log A-002).</div></section>
+
+<section class="stage done"><div class="head"><h2>3. Case study 1 trên dữ liệu bot (T-043)</h2><span class="tag done">Hoàn thành</span></div>
+<ul><li>780 run, 13 bot. Phễu theo ngày, verify có/không (ghép cặp), áp lực thời gian, độ khó câu hỏi, 3 biểu đồ.</li><li>QA sign-off có lỗi tìm thấy và đã sửa.</li></ul>
+<div class="note">Giới hạn: bot không đại diện người; retention chưa làm được; người kiểm tra là chính Claude. Xem <code>data-analytics/game-v2/report.md</code>.</div></section>
+
+<section class="stage review"><div class="head"><h2>4. Đóng gói Web + Windows (T-042)</h2><span class="tag review">Chờ VU xem</span></div>
+<ul><li>Hai bản export chạy; bản Web vào đến màn đồng ý không lỗi console. Bản Windows mới thử khởi động headless.</li><li>Nháp trang itch.io và checklist phát hành trong <code>media-marketing/itch/</code>.</li></ul>
+<div class="check"><b>VU kiểm tra:</b> chạy thử <code>deliverables/data-corp-build_2026-11-13/windows/DataCorp.exe</code> và chơi một ngày; đọc nháp trang itch.io; còn logo Godot mặc định ở màn khởi động Web.</div></section>
+
+<section class="stage wait"><div class="head"><h2>5. Đăng lên itch.io</h2><span class="tag wait">Cần VU làm</span></div>
+<ul><li>Tự tạo tài khoản itch.io (tôi không tạo hộ), chọn tên hiển thị công khai, xác nhận khai báo nội dung có AI.</li><li>Duyệt bản build và mô tả rồi tự tải lên.</li></ul>
+<div class="note">Việc này không thể hoàn tác ngay (công khai), nên chỉ làm khi bạn đã duyệt.</div></section>
+
+<section class="stage review"><div class="head"><h2>6. Tài liệu học offline (T-044)</h2><span class="tag review">Chờ VU làm bài</span></div>
+<ul><li>20 ô trả lời, tự lưu trong trình duyệt, xuất file <code>.json</code> để gửi lại Claude chấm.</li></ul>
+<div class="check"><b>VU làm:</b> điền bài tập, bấm lưu, gửi file <code>bai-lam-game-analytics_*.json</code>.</div></section>
+
+<section class="stage"><div class="head"><h2>7. Thu dữ liệu người chơi thật</h2><span class="tag todo">Chưa bắt đầu</span></div>
+<ul><li>Cần bước 5. Mục tiêu đầu: vài chục lượt chơi tự nguyện, xuất file gửi tay.</li><li>Mở ra retention D1/D7, so tutorial với hoàn thành (chỉ quan sát, không phải thí nghiệm).</li></ul></section>
+
+<section class="stage"><div class="head"><h2>8. Case study 2 đến 4 và công cụ dùng lại</h2><span class="tag todo">Chưa bắt đầu</span></div>
+<ul><li>Retention trên dữ liệu thật, A/B-style, cân bằng độ khó; tách độ khó theo bot, thêm seed (200).</li><li>Đóng gói script phân tích thành công cụ chạy lại (validator, bảng, biểu đồ đã có nền).</li></ul></section>
+
+<section class="stage"><div class="head"><h2>9. Portfolio và ứng tuyển</h2><span class="tag todo">Chưa bắt đầu</span></div>
+<ul><li>Trang portfolio (case study + game), CV, danh sách studio Pháp, thư xin alternance/stage.</li></ul></section>
+
+<div class="next"><b>Bước tiếp theo đề xuất:</b> bạn chơi thử bản Windows một ngày (bước 4), rồi tạo tài khoản itch.io (bước 5). Trong lúc đó tôi có thể làm bước 8 trên dữ liệu bot (tách độ khó theo bot, 200 seed) mà không cần đăng gì.</div>
+
+<h3 style="margin-bottom:0">Rủi ro đang mở</h3>
+<table><tr><th>Rủi ro</th><th>Tình trạng</th></tr>
+<tr><td>Ổ C gần đầy (còn khoảng 1 GB)</td><td>Cần dọn; ảnh hưởng build và test</td></tr>
+<tr><td>Câu chữ đồng ý chưa kiểm pháp lý</td><td>Chặn bước 5</td></tr>
+<tr><td>Chưa có người chơi thật</td><td>Chặn retention và case study 2</td></tr>
+<tr><td>Code mới chỉ trên máy, chưa push</td><td>Cần bạn cho phép trước khi đẩy lên GitHub</td></tr></table>
+
+<footer>Nguồn: TASKS.md, report.md, qa-signoff.md và kết quả build ngày 2026-11-13. Tỉ lệ thanh tiến độ là đếm số giai đoạn, không phải khối lượng công việc.</footer>
+</main></body></html>
