@@ -1,4 +1,5 @@
 extends RefCounted
+const ImageIO = preload("res://scripts/v2/image_io.gd")
 # T-039: the pixel font, built at load time from the atlases written by tools/gen_font.gd.
 # One FontFile holds three bitmap size caches: 8 (Body), 12 (Title) and 16 (Body doubled, for the 2x
 # sheet zoom). Any other size, and any character without a glyph, falls back to the engine default font.
@@ -44,9 +45,9 @@ static func _build() -> FontFile:
 		var size: int = entry[0]
 		var scale: int = entry[2]
 		var base: String = DIR + str(entry[1])
-		if not FileAccess.file_exists(base + ".png") or not FileAccess.file_exists(base + ".json"): return null
+		if not ImageIO.exists(base + ".png") or not FileAccess.file_exists(base + ".json"): return null
 		var meta: Variant = JSON.parse_string(FileAccess.get_file_as_string(base + ".json"))
-		var image := Image.load_from_file(base + ".png")
+		var image := ImageIO.load_image(base + ".png")
 		if not meta is Dictionary or image == null: return null
 		image.convert(Image.FORMAT_RGBA8)
 		if scale > 1: image.resize(image.get_width() * scale, image.get_height() * scale, Image.INTERPOLATE_NEAREST)

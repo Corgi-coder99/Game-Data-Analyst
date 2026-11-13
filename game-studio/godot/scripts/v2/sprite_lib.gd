@@ -1,11 +1,12 @@
 extends RefCounted
+const ImageIO = preload("res://scripts/v2/image_io.gd")
 const Generator = preload("res://tools/gen_sprites.gd")
 var textures: Dictionary = {}
 var definitions: Dictionary = Generator.definitions()
 func frame(id: String, index: int = 0) -> AtlasTexture:
 	assert(definitions.has(id))
 	if not textures.has(id):
-		textures[id] = ImageTexture.create_from_image(Image.load_from_file("res://assets/v2/" + id + ".png"))
+		textures[id] = ImageTexture.create_from_image(ImageIO.load_image("res://assets/v2/" + id + ".png"))
 	var atlas := AtlasTexture.new()
 	atlas.atlas = textures[id]
 	var size: Vector2i = definitions[id].size
