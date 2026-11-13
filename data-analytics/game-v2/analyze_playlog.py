@@ -11,6 +11,7 @@ src, out = Path(sys.argv[1]), Path(sys.argv[2])
 out.mkdir(parents=True, exist_ok=True)
 rows = [json.loads(line) for line in src.read_text(encoding="utf-8").splitlines() if line.strip()]
 df = pd.DataFrame(rows)
+df["day"] = df["day"].astype("Int64") if "day" in df else df.get("day")
 df["bot"] = df["pid"].str.replace("bot-", "", regex=False)
 
 # --- 1. Chất lượng dữ liệu ---
@@ -86,7 +87,6 @@ print("\nSUBMIT by band\n", rs)
 dstart = ds[["run_id", "day", "question_id"]]
 q = de[["run_id", "day", "acc", "ev", "label", "bot"]].merge(dstart, on=["run_id", "day"])
 qdiff = q.groupby("question_id").agg(n=("acc", "count"), acc=("acc", "mean"), ev=("ev", "mean")).round(3)
-qdiff["wrong_label_share"] = q.groupby("question_id").label.apply(lambda s: (s != "correct").mean()).round(3) if "correct" in set(q.label) else None
 qdiff.to_csv(out / "question_difficulty.csv")
 print("\nQUESTION difficulty\n", qdiff.sort_values("acc"))
 print("\nLABELS\n", q.label.value_counts())

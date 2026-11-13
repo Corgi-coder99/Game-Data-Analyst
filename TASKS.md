@@ -14,7 +14,6 @@ Trạng thái: Backlog -> In progress -> Review -> Done. Bị chặn thì chuy�
 | T-010 | Kịch bản và video quảng cáo 30 giây (làm sau T-012 để cảnh quay không hiện công ty gần hết người dùng) | Claude/Codex | chưa chốt | media-marketing/video/* | Chưa có spec |
 | T-019d | Giao diện v2 phần d: hiệu ứng, chỉnh theo playtest và ảnh chụp. Sau T-019c | Codex | codex/T-019d | scenes/v2/*, scripts/v2/*, assets/v2/* | Chưa có spec |
 | T-042 | Đóng gói bản Windows/Web và trang itch.io (cần VU duyệt trước khi đăng, tải hay cài preset) | Claude | claude/T-042 | export_presets.cfg, media-marketing/itch/* | Bản chạy được, mô tả trung thực, có thông báo quyền riêng tư |
-| T-043 | Quy trình phân tích: dữ liệu playlog -> EDA, funnel, retention theo ngày chơi, cân bằng; case study 1 (skill programmatic-eda, funnel-analysis, cohort-analysis, analysis-qa-checklist) | Claude | claude/T-043 | data-analytics/game-v2/* | Có kế hoạch, báo cáo QA, kết luận kèm giả định và giới hạn; dùng dữ liệu tự chơi/bot trước khi có người chơi thật |
 
 ## In progress
 
@@ -34,6 +33,7 @@ Trạng thái: Backlog -> In progress -> Review -> Done. Bị chặn thì chuy�
 | ID | Việc | Owner | Ngày |
 |---|---|---|---|
 | T-041 | Telemetry opt-in (SPEC-T-040): consent, playlog cục bộ, observer, bot generator, validator. Codex viết mã; Claude sửa review() trong flow, lỗi 3.0 sau cap, fixture cũ và chạy test (mọi test 0 lỗi, cân bằng giống hệt v2). VU duyệt merge vào v2 | Codex + Claude | 2026-11-12 |
+| T-043 | Case study 1 trên playlog bot (780 run, 13 bot): phễu, verify có/không, áp lực thời gian, độ khó câu hỏi; QA sign-off kèm giới hạn. Retention hoãn đến khi có người chơi thật | Claude | 2026-11-13 |
 | T-003 | Viết GDD Data Corp (game-studio/godot/docs/GDD.md), VU đã duyệt | Claude | 2026-11-09 |
 | T-004 | Lõi mô phỏng Data Corp + balance_sim headless (Codex). Claude đã review, VU duyệt merge vào master | Codex | 2026-11-09 |
 | T-005a | Giao diện: khung và vòng tuần (Codex). Claude đã review, VU duyệt merge vào master | Codex | 2026-11-09 |
