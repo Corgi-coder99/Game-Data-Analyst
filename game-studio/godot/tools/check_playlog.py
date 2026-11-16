@@ -94,7 +94,7 @@ def validate(row):
             errors.append("invalid UTC date")
     if event == "consent" and row.get("value") is not True:
         errors.append("only opt-in consent can be retained")
-    choices = {"mode": ("none", "run", "daily"), "band": ("on_time", "late", "missed"),
+    choices = {"mode": ("none", "run", "daily", "practice"), "band": ("on_time", "late", "missed"),
                "timing": ("on_time", "late", "missed"), "free_text_len_class": ("0", "1-40", "41+")}
     for key, allowed in choices.items():
         if key in row and row[key] not in allowed:

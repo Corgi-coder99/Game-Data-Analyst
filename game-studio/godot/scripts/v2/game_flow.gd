@@ -32,6 +32,16 @@ const LearnState = preload("res://scripts/learn/learn_state.gd")
 const TutorialChoice = preload("res://scripts/v2/learn/tutorial_choice.gd")
 const HUD_STATES := ["MORNING", "TRANSPORT", "COMMUTE", "SHOP", "DAY_START", "WORK", "OVERTIME", "EVENING"]
 const HORIZON := 10
+# T-045: world-config overrides for the gentle Practice run. Only data: the rules code is unchanged
+# (trust_floor is the one additive career key; absent means 0, so every other mode is identical).
+const PRACTICE_OVERRIDES := {"world": {
+	"career": {"initial_trust": 60, "trust_floor": 30, "warning": 0, "demote": 0, "low_trust_days": 99, "max_demotions": 99},
+	"analysis_energy": 5,
+	"clock": {"on_time": 1080, "late": 1200},
+	"kind_weights": {"signal": 70, "trap": 8, "partial": 6, "stale": 6, "noise": 10},
+	"grading": {"wrong_factor": 1.2},
+	"win": {"demo": "thuc_tap"},
+}}
 const FADE_STEP := 0.035
 const NOON := 12 * 60
 signal state_changed(new_state: String)
@@ -144,7 +154,11 @@ func toast(text: String) -> void:
 	if toast_view != null: toast_view.push(text)
 
 func daily_active() -> bool:
-	return daily_enabled and commute_enabled
+	return daily_enabled and commute_enabled and not practice_mode()
+
+# T-045: the gentle "Practice" run: no firing, no morning/commute/evening, nothing saved to the profile.
+func practice_mode() -> bool:
+	return run_mode == "practice"
 
 func _set_state(value: String) -> void:
 	state = value
@@ -241,6 +255,7 @@ func start_title() -> void:
 		title_view.set_profile(meta)
 		title_view.play_requested.connect(begin_run.bind("run"))
 		title_view.daily_requested.connect(begin_run.bind("daily"))
+		title_view.practice_requested.connect(begin_run.bind("practice"))
 		title_view.wall_requested.connect(open_meta_view.bind("WALL"))
 		title_view.settings_requested.connect(open_meta_view.bind("SETTINGS"))
 		title_view.leave_requested.connect(open_meta_view.bind("LEAVE"))
@@ -259,7 +274,7 @@ func _quit_game() -> void:
 func begin_run(mode: String) -> void:
 	run_mode = mode
 	if meta == null:
-		new_game(-1, {})
+		new_game(-1, PRACTICE_OVERRIDES if practice_mode() else {})
 		return
 	pre_run_queue = meta.pre_run_screens()
 	_next_pre_run()
@@ -272,7 +287,7 @@ func _next_pre_run() -> void:
 		if tutorial_choice_enabled and meta != null and str(meta.profile.data.learn.tutorial) == "":
 			_enter_tutorial_choice()
 			return
-		new_game(meta.daily_seed() if run_mode == "daily" else -1, {})
+		_start_selected_run()
 		return
 	var screen: Dictionary = pre_run_queue.pop_front()
 	_set_state("INTRO" if screen.type == "intro" else "LETTER")
@@ -307,7 +322,7 @@ func _on_tutorial_chosen(mode: String) -> void:
 	if state != "TUTORIAL_CHOICE": return
 	meta.profile.data.learn.tutorial = mode
 	meta.profile.save()
-	new_game(meta.daily_seed() if run_mode == "daily" else -1, {})
+	_start_selected_run()
 
 func open_meta_view(which: String) -> void:
 	if meta == null: return
@@ -325,8 +340,12 @@ func open_meta_view(which: String) -> void:
 		meta_view.back_requested.connect(start_title, CONNECT_ONE_SHOT))
 
 func _replay() -> void:
-	run_mode = "run"
-	new_game(-1, {})
+	if not practice_mode(): run_mode = "run"
+	_start_selected_run()
+
+func _start_selected_run() -> void:
+	if practice_mode(): new_game(-1, PRACTICE_OVERRIDES)
+	else: new_game(meta.daily_seed() if run_mode == "daily" and meta != null else -1, {})
 
 func new_game(seed_value: int = -1, overrides: Dictionary = {}) -> void:
 	var chosen := seed_value
@@ -360,6 +379,7 @@ func start_with_game(value: RefCounted) -> void:
 		hud.bind(null)
 	_set_state("NEW_GAME")
 	_enter_day_start()
+	if practice_mode(): toast(strings.practice.note)
 
 func _enter_day_start() -> void:
 	if daily_active():
@@ -372,7 +392,7 @@ func _enter_day_start() -> void:
 	boss_shown = false
 	first_tool_done = false
 	var day := int(game.status().day)
-	if commute_enabled:
+	if commute_enabled and not practice_mode():
 		_show(func(): _build_commute(day))
 	else:
 		_show(func(): _build_office(day))
@@ -630,7 +650,7 @@ func _after_review() -> void:
 	_record_day()
 	if bool(game.status().finished): _enter_ending()
 	elif daily_active() and overtime_enabled: _enter_overtime()
-	elif evening_enabled: _enter_evening()
+	elif evening_enabled and not practice_mode(): _enter_evening()
 	else: _close_day()
 
 # T-030: the finished day goes to the ScoreSink (public parts only); achievements appear as toasts.
@@ -642,9 +662,10 @@ func _learn_toasts() -> void:
 	for up in learn_outcome.get("levelups", []): toast(strings.learn.skills.levelup % [strings.learn.handbook.skills[up.skill], int(up.to)])
 	if not learn_outcome.get("new_cards", []).is_empty(): toast(strings.learn.skills.unlocked % learn_outcome.new_cards.size())
 	if bool(learn_outcome.get("graduated", false)): toast(strings.learn.tutorial.graduate)
+	if practice_mode(): toast(strings.practice.note)
 
 func _record_day() -> void:
-	if meta == null or game == null: return
+	if meta == null or game == null or practice_mode(): return
 	var after: Dictionary = game.status()
 	var context := {"focus_bonus": int(focus_info.bonus), "late_minutes": late_minutes}
 	var outcome: Dictionary = meta.finish_day(game, int(after.day), submission, before_status, after, context, run_mode, seed_used)
@@ -693,7 +714,7 @@ func _enter_ending() -> void:
 	var final_status: Dictionary = game.status()
 	if telemetry != null: telemetry.run_end(final_status)
 	life.settle_for_ending(final_status)
-	if meta != null:
+	if meta != null and not practice_mode():
 		for text in meta.finish_run(final_status).get("toasts", []): toast(str(text))
 	_show(func(): _build_ending(final_status))
 	_set_state("END_SCREEN")

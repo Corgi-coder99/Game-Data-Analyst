@@ -3,6 +3,7 @@ const CityArt = preload("res://scripts/v2/city_art.gd")
 signal play_requested
 signal quit_requested
 signal daily_requested
+signal practice_requested
 signal wall_requested
 signal settings_requested
 signal leave_requested
@@ -13,6 +14,7 @@ var tagline_label: Label
 var play_button: Button
 var quit_button: Button
 var daily_button: Button
+var practice_button: Button
 var wall_button: Button
 var settings_button: Button
 var leave_button: Button
@@ -49,16 +51,18 @@ func _build() -> void:
 	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	tagline_label = label(self, strings.title.tagline, Rect2(0, 120, 640, 12), 7)
 	tagline_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	play_button = button(self, strings.title.play, Rect2(260, 142, 120, 22))
+	play_button = button(self, strings.title.play, Rect2(196, 142, 120, 22))
+	practice_button = button(self, strings.title.practice, Rect2(324, 142, 120, 22))
 	daily_button = button(self, "Daily Shift", Rect2(260, 168, 120, 22))
 	wall_button = button(self, "Wall of Fame", Rect2(196, 194, 120, 22))
 	leave_button = button(self, "Request leave", Rect2(324, 194, 120, 22))
 	settings_button = button(self, "Settings", Rect2(196, 220, 120, 22))
 	quit_button = button(self, strings.title.quit, Rect2(324, 220, 120, 22))
-	for b in [play_button, daily_button, wall_button, leave_button, settings_button, quit_button]: b.focus_mode = Control.FOCUS_NONE
+	for b in [play_button, practice_button, daily_button, wall_button, leave_button, settings_button, quit_button]: b.focus_mode = Control.FOCUS_NONE
 	profile_label = label(self, "", Rect2(160, 246, 320, 12), 7)
 	profile_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	daily_button.pressed.connect(func(): daily_requested.emit())
+	practice_button.pressed.connect(func(): practice_requested.emit())
 	wall_button.pressed.connect(func(): wall_requested.emit())
 	leave_button.pressed.connect(func(): leave_requested.emit())
 	settings_button.pressed.connect(func(): settings_requested.emit())

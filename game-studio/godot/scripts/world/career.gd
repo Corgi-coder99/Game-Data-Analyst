@@ -22,7 +22,7 @@ func adoption() -> float:
 func update(result: Dictionary) -> Dictionary:
 	var c: Dictionary = _config.career
 	var before := trust
-	trust = clampf(trust + float(result.delta), 0, 100)
+	trust = clampf(trust + float(result.delta), float(c.get("trust_floor", 0)), 100)
 	positive_delta += maxf(0, result.delta)
 	_tenure += 1
 	_correct = _correct + 1 if result.acc >= 1 else 0
