@@ -30,6 +30,7 @@ const Juice = preload("res://scripts/v2/juice.gd")  # T-039: feedback animations
 # T-035: the learning layer (state in the profile, first-run choice, daily settlement of XP and cards).
 const LearnState = preload("res://scripts/learn/learn_state.gd")
 const TutorialChoice = preload("res://scripts/v2/learn/tutorial_choice.gd")
+const PrimerScene = preload("res://scripts/v2/learn/primer_scene.gd")
 const HUD_STATES := ["MORNING", "TRANSPORT", "COMMUTE", "SHOP", "DAY_START", "WORK", "OVERTIME", "EVENING"]
 const HORIZON := 10
 # T-045: world-config overrides for the gentle Practice run. Only data: the rules code is unchanged
@@ -256,6 +257,7 @@ func start_title() -> void:
 		title_view.play_requested.connect(begin_run.bind("run"))
 		title_view.daily_requested.connect(begin_run.bind("daily"))
 		title_view.practice_requested.connect(begin_run.bind("practice"))
+		title_view.howto_requested.connect(show_primer.bind(start_title))
 		title_view.wall_requested.connect(open_meta_view.bind("WALL"))
 		title_view.settings_requested.connect(open_meta_view.bind("SETTINGS"))
 		title_view.leave_requested.connect(open_meta_view.bind("LEAVE"))
@@ -284,6 +286,9 @@ func _next_pre_run() -> void:
 		_enter_consent(_next_pre_run)
 		return
 	if pre_run_queue.is_empty():
+		if practice_mode() and meta != null and not primer_seen():
+			show_primer(_next_pre_run)
+			return
 		if tutorial_choice_enabled and meta != null and str(meta.profile.data.learn.tutorial) == "":
 			_enter_tutorial_choice()
 			return
@@ -307,6 +312,25 @@ func _enter_consent(after: Callable) -> void:
 		_swap(meta_view)
 		meta_view.chosen.connect(func(value):
 			telemetry.set_consent(value)
+			after.call(), CONNECT_ONE_SHOT))
+
+# T-046: the plain-English primer, shown once before the first Practice run and from the title ("How to play").
+var primer_view: Control
+
+func primer_seen() -> bool:
+	return meta == null or int(meta.profile.data.learn.events.get("primer_seen", 0)) > 0
+
+func show_primer(after: Callable) -> void:
+	_set_state("PRIMER")
+	_show(func():
+		primer_view = PrimerScene.new()
+		_swap(primer_view)
+		primer_view.open(strings.primer)
+		primer_view.finished.connect(func():
+			if state != "PRIMER": return
+			if meta != null:
+				meta.profile.data.learn.events["primer_seen"] = 1
+				meta.profile.save()
 			after.call(), CONNECT_ONE_SHOT))
 
 # T-035: the first-run choice: guided tutorial days 1-5 or skip. Remembered in the profile.

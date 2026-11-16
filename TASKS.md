@@ -22,6 +22,7 @@ Trạng thái: Backlog -> In progress -> Review -> Done. Bị chặn thì chuy�
 
 | ID | Việc | Owner | Nhánh | File được sửa | Tiêu chí hoàn thành |
 |---|---|---|---|---|---|
+| T-046 | Primer "How the job works" (8 trang, nút How to play, hiện một lần trước Practice). Spec game-studio/godot/docs/SPEC-T-046.md. Chờ VU và người mới đọc thử | Claude | v2 | primer_scene.gd, title_scene.gd, game_flow.gd, strings_v2.json, tests/test_t045_practice.gd | Test 0 lỗi, người mới hiểu luật trước khi chơi |
 | T-045 | Chế độ Practice cho người chơi mới (không bị sa thải, đồng hồ thoải mái, tin ít bẫy, không lưu điểm). Spec game-studio/godot/docs/SPEC-T-045.md. Chờ VU chơi thử | Claude | v2 | game_flow.gd, title_scene.gd, career.gd, strings_v2.json, tools/check_playlog.py, tests/test_t045_practice.gd | Test 0 lỗi, chế độ thường không đổi, người mới chơi được |
 | T-042 | Đóng gói Web + Windows (export_presets.cfg, project.godot thêm main_scene.v2_export), nháp trang itch.io và checklist. Chờ VU: tạo tài khoản itch.io, kiểm tra câu chữ đồng ý (CNIL), duyệt rồi tự đăng | Claude | v2 | export_presets.cfg, media-marketing/itch/* | Bản export chạy được, mô tả trung thực, có thông báo quyền riêng tư |
 | T-016 | Style bible pixel mới: bảng màu 32 màu, kích thước sprite, ánh sáng, giao diện máy tính, hoạt ảnh, kiểm tra tự động. Chờ VU xem | Claude | v2 | shared/style-bible/pixel-office-v2.md, palette-v2.json | VU duyệt style bible; quyết định có sửa CLAUDE.md mục 4 không |

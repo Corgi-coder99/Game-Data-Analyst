@@ -84,10 +84,21 @@ func test_flow() -> void:
 	check(flow.title_view.practice_button != null and not flow.title_view.practice_button.disabled, "the title has an enabled Practice button")
 	flow.title_view.practice_button.pressed.emit()
 	var guard := 0
-	while flow.state in ["INTRO", "LETTER", "CONSENT", "TUTORIAL_CHOICE"] and guard < 8:
+	var primer_shown := false
+	while flow.state in ["INTRO", "LETTER", "CONSENT", "TUTORIAL_CHOICE", "PRIMER"] and guard < 12:
 		guard += 1
 		if flow.state in ["INTRO", "LETTER"]: flow.meta_view.finished.emit()
+		if flow.state == "PRIMER":
+			primer_shown = true
+			var view: Control = flow.primer_view
+			check(view.pages.size() == 8 and view.title_label.text == "Your job" and view.back_button.disabled, "primer opens on page 1")
+			for index in 7: view.next_button.pressed.emit()
+			check(view.page == 7 and view.next_button.text == "Start" and not view.skip_button.visible, "the last page offers Start")
+			for page in view.pages: check(page.title.length() <= 24 and page.text.length() <= 420, "primer page fits: " + page.title)
+			view.next_button.pressed.emit()
 		await process_frame
+	check(primer_shown, "the first Practice run shows the primer")
+	check(flow.primer_seen(), "the primer is remembered")
 	check(flow.run_mode == "practice" and flow.practice_mode(), "run mode is practice")
 	check(flow.game != null and flow.state != "MORNING" and flow.state != "COMMUTE", "practice skips the morning and the commute (state %s)" % flow.state)
 	check(not flow.daily_active(), "no daily life in practice")
@@ -107,6 +118,20 @@ func test_flow() -> void:
 				_: pass
 			await process_frame
 			if flow.game != null and int(flow.game.status().day) > day + 1: break
+	# From the title, "How to play" opens the primer and returns to the title.
+	flow.start_title()
+	await process_frame
+	flow.title_view.howto_button.pressed.emit()
+	check(flow.state == "PRIMER", "How to play opens the primer")
+	flow.primer_view.skip_button.pressed.emit()
+	check(flow.state == "TITLE", "closing the primer returns to the title")
+	flow.title_view.practice_button.pressed.emit()
+	guard = 0
+	while flow.state in ["INTRO", "LETTER", "CONSENT", "TUTORIAL_CHOICE"] and guard < 12:
+		guard += 1
+		if flow.state in ["INTRO", "LETTER"]: flow.meta_view.finished.emit()
+		await process_frame
+	check(flow.state != "PRIMER" and flow.practice_mode(), "the primer is not shown again before Practice")
 	check(flow.meta.profile.data.history.size() == 0, "practice saves no day history")
 	check(not flow.meta.profile.data.achievements.has("first_report"), "practice earns no achievement")
 	check(flow.state != "EVENING", "no evening in practice")
